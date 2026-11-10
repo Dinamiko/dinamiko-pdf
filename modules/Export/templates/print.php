@@ -2,8 +2,15 @@
 /**
  * Content-only print document.
  *
- * Themes can override this file by adding content-pdf/print.php. Keep the `.cpdf-article`
- * element: it is what gets exported and what receives the PDF content width.
+ * Themes can override this file. The first match wins (child theme, then parent theme):
+ *
+ *   content-pdf/print-{post_type}-{slug}.php
+ *   content-pdf/print-{post_type}-{id}.php
+ *   content-pdf/print-{post_type}.php
+ *   content-pdf/print.php
+ *
+ * Keep the `.cpdf-article` element: it is what gets exported and what receives the PDF
+ * content width. Keep wp_head() and wp_footer(): they load the exporter.
  *
  * Variables from PrintEndpoint::render():
  *

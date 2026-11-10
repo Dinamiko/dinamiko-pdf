@@ -215,4 +215,44 @@ test.describe( 'PDF export', () => {
 		await browserPage.goto( printUrl( post.link ) );
 		await expectPdfDownload( await downloadPromise, 'Blocks-Export.pdf' );
 	} );
+
+	test( 'theme templates follow the print template hierarchy', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		// Block child theme with content-pdf/print-page.php and print-post-cpdf-hierarchy-post.php.
+		await requestUtils.activateTheme( 'cpdf-test-child' );
+		const slugPost = await requestUtils.createPost( {
+			title: 'Hierarchy Post',
+			slug: 'cpdf-hierarchy-post',
+			content: BLOCK_CONTENT,
+			status: 'publish',
+		} );
+
+		await browserPage.route( '**/modules/Export/build/index.js*', ( route ) =>
+			route.abort()
+		);
+		const marker = browserPage.locator( '.cpdf-article .cpdf-test-template' );
+
+		// print-page.php matches every page.
+		await browserPage.goto( printUrl( page.link ) );
+		await expect( marker ).toHaveText( 'print-page.php' );
+
+		// print-post-{slug}.php matches only that post.
+		await browserPage.goto( printUrl( slugPost.link ) );
+		await expect( marker ).toHaveText( 'print-post-cpdf-hierarchy-post.php' );
+
+		// Other posts fall back to the plugin template.
+		await browserPage.goto( printUrl( post.link ) );
+		await expect( marker ).toHaveCount( 0 );
+		await expect(
+			browserPage.locator( '.cpdf-article .wp-block-post-title' )
+		).toHaveText( 'Blocks Export' );
+		await browserPage.unroute( '**/modules/Export/build/index.js*' );
+
+		// A custom template still exports.
+		const downloadPromise = browserPage.waitForEvent( 'download' );
+		await browserPage.goto( printUrl( page.link ) );
+		await expectPdfDownload( await downloadPromise, 'Shortcode-Page.pdf' );
+	} );
 } );

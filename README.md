@@ -21,7 +21,52 @@ If the browser cannot run the exporter, the plugin opens the browser's print dia
 - **Shortcode**: `[content_pdf_button]`. Optional attributes: `label="…"`, and `id="123"` to export another post.
 - Add the CSS class `cpdf-page-break` to any block to start it on a new page.
 - Open `https://example.com/any-post/?cpdf_print=1` to export directly, or add `&cpdf_mode=print` to get the print dialog instead.
-- A theme can supply its own `content-pdf/print.php` template. Keep the `.cpdf-article` element, because that is what gets exported.
+- A theme can supply its own print template. See [Custom print templates](#custom-print-templates).
+
+## Custom print templates
+
+The print page (what ends up in the PDF) can be replaced from the theme, in block themes and classic themes alike. Content PDF uses the first file that exists, checking the child theme and then the parent theme:
+
+1. `content-pdf/print-{post_type}-{slug}.php`, e.g. `print-post-hello-world.php`
+2. `content-pdf/print-{post_type}-{id}.php`, e.g. `print-page-42.php`
+3. `content-pdf/print-{post_type}.php`, e.g. `print-product.php`
+4. `content-pdf/print.php`
+5. The plugin's default, `modules/Export/templates/print.php`
+
+Start by copying the default template. It's a complete HTML document and must keep:
+
+- an element with the class `cpdf-article` and the width style shown below. Only this element is exported.
+- `wp_head()` and `wp_footer()`, which load the exporter and the theme/block styles.
+- `<p class="cpdf-status">` (optional), which shows the export progress.
+
+These variables are available: `$post` (`WP_Post`), `$content` (the post content after `the_content`), `$title`, `$geometry` (page size and margins), `$is_block_theme`, `$body_classes` and `$show_title`. Use `$post` for anything else, such as custom fields, the featured image or the author.
+
+```php
+<?php
+defined( 'ABSPATH' ) || exit;
+$cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) $geometry['content_px'], (int) $geometry['gutter_px'] );
+?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<title><?php echo esc_html( wp_strip_all_tags( $title ) ); ?></title>
+	<?php wp_head(); ?>
+</head>
+<body <?php body_class( $body_classes ); ?>>
+	<p class="cpdf-status" role="status" aria-live="polite"></p>
+	<article class="entry-content cpdf-article" style="<?php echo esc_attr( $cpdf_width ); ?>">
+		<h1><?php echo wp_kses_post( $title ); ?></h1>
+		<?php echo get_the_post_thumbnail( $post, 'large' ); ?>
+		<p>Price: <?php echo esc_html( get_post_meta( $post->ID, 'price', true ) ); ?></p>
+		<?php echo $content; ?>
+	</article>
+	<?php wp_footer(); ?>
+</body>
+</html>
+```
+
+Plugins can change the lookup list with `cpdf_print_template_hierarchy`, or return any absolute path from `cpdf_print_template`.
 
 ## Hooks
 
@@ -31,7 +76,8 @@ If the browser cannot run the exporter, the plugin opens the browser's print dia
 | `cpdf_hidden_selectors` | filter | CSS selectors hidden on the print page (share buttons, related posts, comment forms). |
 | `cpdf_show_title` | filter | Whether the print page shows the post title (default `true`). |
 | `cpdf_keep_theme_background` | filter | Keep the theme's page background instead of white. |
-| `cpdf_print_template` | filter | Path of the print page template. |
+| `cpdf_print_template_hierarchy` | filter | Theme template names tried for the print page, most specific first. |
+| `cpdf_print_template` | filter | Absolute path of the print page template (after the theme lookup). |
 | `cpdf_export_config` | filter | Config passed to the exporter (paper, margins, footer, fonts, filename). |
 | `cpdf_engine` | filter | Replace the PDF engine (an `Dinamiko\ContentPdf\Export\Engine\Engine`). |
 | `cpdf_dequeue_scripts` | filter | Script handles removed from the print page (by default, scripts loaded from the theme). |

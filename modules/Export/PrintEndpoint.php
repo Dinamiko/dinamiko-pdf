@@ -137,7 +137,7 @@ class PrintEndpoint {
 			$body_classes[] = 'cpdf-theme-background';
 		}
 
-		$template = locate_template( 'content-pdf/print.php' );
+		$template = locate_template( $this->template_candidates( $post ) );
 
 		/**
 		 * Filters the print page template path.
@@ -153,6 +153,31 @@ class PrintEndpoint {
 
 		include $template;
 		exit;
+	}
+
+	/**
+	 * Theme template names for the print page, most specific first:
+	 * content-pdf/print-{post_type}-{slug}.php, print-{post_type}-{id}.php,
+	 * print-{post_type}.php, print.php.
+	 *
+	 * @param WP_Post $post Post being exported.
+	 * @return string[]
+	 */
+	public function template_candidates( WP_Post $post ): array {
+		$candidates = TemplateHierarchy::candidates( $post->post_type, $post->post_name, $post->ID );
+
+		/**
+		 * Filters the theme template names tried for the print page, most specific first.
+		 *
+		 * @param string[] $candidates Paths relative to the theme directory.
+		 * @param WP_Post  $post       Post being exported.
+		 */
+		return array_values(
+			array_filter(
+				(array) apply_filters( 'cpdf_print_template_hierarchy', $candidates, $post ),
+				'is_string'
+			)
+		);
 	}
 
 	/**
