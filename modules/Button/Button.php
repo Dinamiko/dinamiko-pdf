@@ -1,0 +1,148 @@
+<?php
+/**
+ * "Download PDF" button: automatic placement and shortcode.
+ *
+ * @package Dinamiko\ContentPdf
+ */
+
+declare( strict_types=1 );
+
+namespace Dinamiko\ContentPdf\Button;
+
+use Dinamiko\ContentPdf\Export\PrintEndpoint;
+use Dinamiko\ContentPdf\Settings\Settings;
+use Inpsyde\Modularity\Properties\Properties;
+use WP_Post;
+
+/**
+ * Appends the button to content of enabled post types and provides [content_pdf_button].
+ */
+class Button {
+
+	public const SHORTCODE = 'content_pdf_button';
+	public const HANDLE    = 'cpdf-button';
+
+	private const BUILD_DIR = 'modules/Button/build/';
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Settings      $settings       Settings.
+	 * @param PrintEndpoint $print_endpoint Print endpoint.
+	 * @param Properties    $properties     Plugin properties.
+	 */
+	public function __construct(
+		private Settings $settings,
+		private PrintEndpoint $print_endpoint,
+		private Properties $properties
+	) {
+	}
+
+	/**
+	 * Register (not enqueue) the button script and style; they are enqueued when a button renders.
+	 */
+	public function register_assets(): void {
+		$asset_file = $this->properties->basePath() . self::BUILD_DIR . 'index.asset.php';
+		if ( ! is_readable( $asset_file ) ) {
+			return;
+		}
+		$asset = require $asset_file;
+
+		wp_register_script(
+			self::HANDLE,
+			$this->properties->baseUrl() . self::BUILD_DIR . 'index.js',
+			$asset['dependencies'],
+			$asset['version'],
+			[ 'in_footer' => true ]
+		);
+		wp_add_inline_script(
+			self::HANDLE,
+			'window.cpdfButton = ' . wp_json_encode(
+				[
+					'working' => __( 'Preparing PDF…', 'content-pdf' ),
+					'done'    => __( 'PDF downloaded', 'content-pdf' ),
+					'failed'  => __( 'Opening print dialog…', 'content-pdf' ),
+				]
+			) . ';',
+			'before'
+		);
+
+		wp_register_style( self::HANDLE, false, [], $this->properties->version() );
+		wp_add_inline_style(
+			self::HANDLE,
+			'.cpdf-button-wrap{margin-block:1.5em}.cpdf-button{cursor:pointer}.cpdf-button[aria-busy="true"]{cursor:progress;opacity:.75}'
+		);
+	}
+
+	/**
+	 * Append the button to the main post content of enabled post types.
+	 *
+	 * @param string $content Content.
+	 * @return string
+	 */
+	public function append( string $content ): string {
+		if (
+			$this->print_endpoint->is_active()
+			|| is_admin()
+			|| is_feed()
+			|| ! is_singular()
+			|| ! in_the_loop()
+			|| ! is_main_query()
+		) {
+			return $content;
+		}
+		$post = get_post();
+		if ( ! $post instanceof WP_Post || get_queried_object_id() !== $post->ID ) {
+			return $content;
+		}
+		if ( ! in_array( $post->post_type, $this->settings->get()['post_types'], true ) ) {
+			return $content;
+		}
+		if ( has_shortcode( $post->post_content, self::SHORTCODE ) ) {
+			return $content;
+		}
+		return $content . $this->render( $post );
+	}
+
+	/**
+	 * Shortcode callback.
+	 *
+	 * @param array<string, string>|string $atts Attributes.
+	 * @return string
+	 */
+	public function shortcode( array|string $atts ): string {
+		if ( $this->print_endpoint->is_active() ) {
+			return '';
+		}
+		$atts = shortcode_atts(
+			[
+				'label' => '',
+				'id'    => 0,
+			],
+			$atts,
+			self::SHORTCODE
+		);
+		$post = $atts['id'] ? get_post( (int) $atts['id'] ) : get_post();
+		return $post instanceof WP_Post ? $this->render( $post, (string) $atts['label'] ) : '';
+	}
+
+	/**
+	 * Button markup. Uses core button block classes so themes style it.
+	 *
+	 * @param WP_Post $post  Post.
+	 * @param string  $label Optional label.
+	 * @return string
+	 */
+	public function render( WP_Post $post, string $label = '' ): string {
+		wp_enqueue_script( self::HANDLE );
+		wp_enqueue_style( self::HANDLE );
+
+		$label = '' !== $label ? $label : __( 'Download PDF', 'content-pdf' );
+
+		return sprintf(
+			'<div class="cpdf-button-wrap wp-block-buttons"><div class="wp-block-button"><button type="button" class="cpdf-button wp-block-button__link wp-element-button" data-cpdf-url="%1$s">%2$s</button></div></div>',
+			esc_url( $this->print_endpoint->url( $post ) ),
+			esc_html( $label )
+		);
+	}
+}

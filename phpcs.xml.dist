@@ -23,7 +23,7 @@
 	<rule ref="PHPCompatibilityWP"/>
 
 	<rule ref="WordPress">
-		<!-- Classes follow PSR-4 (modules/Sample/Module.php), not class-*.php. -->
+		<!-- Classes follow PSR-4 (modules/Button/Module.php), not class-*.php. -->
 		<exclude name="WordPress.Files.FileName"/>
 		<!-- Short array syntax is used throughout the codebase. -->
 		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>

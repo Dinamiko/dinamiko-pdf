@@ -6,6 +6,7 @@
  * Author:      Dinamiko
  * License:     MIT
  * Text Domain: content-pdf
+ * Requires at least: 6.5
  * Requires PHP: 8.1
  *
  * @package Dinamiko\ContentPdf
@@ -15,9 +16,10 @@ declare( strict_types=1 );
 
 namespace Dinamiko\ContentPdf;
 
-use Dinamiko\ContentPdf\Sample\Module;
 use Inpsyde\Modularity\Package;
 use Inpsyde\Modularity\Properties\PluginProperties;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Returns the plugin package, creating it on the first call.
@@ -29,8 +31,16 @@ function plugin(): Package {
 
 	if ( ! $package ) {
 		$properties = PluginProperties::new( __FILE__ );
-		$package    = Package::new( $properties )->addModule( new Module() );
+		$package    = Package::new( $properties )
+			->addModule( new Settings\Module() )
+			->addModule( new Export\Module() )
+			->addModule( new Button\Module() );
 
+		/**
+		 * Extra modules (e.g. premium add-ons) to add to the package before it boots.
+		 *
+		 * @param \Inpsyde\Modularity\Module\Module[] $modules Modules.
+		 */
 		$modules = apply_filters( 'cpdf_modules', [] );
 		foreach ( $modules as $module ) {
 			$package->addModule( $module );

@@ -1,0 +1,308 @@
+<?php
+/**
+ * The content-only print page at ?cpdf_print=1.
+ *
+ * @package Dinamiko\ContentPdf
+ */
+
+declare( strict_types=1 );
+
+namespace Dinamiko\ContentPdf\Export;
+
+use Dinamiko\ContentPdf\Export\Engine\Engine;
+use Dinamiko\ContentPdf\Settings\Settings;
+use Inpsyde\Modularity\Properties\Properties;
+use WP_Post;
+
+/**
+ * Outputs a minimal HTML document containing only the post content, styled by the theme,
+ * and hands it to the PDF engine.
+ */
+class PrintEndpoint {
+
+	public const QUERY_VAR = 'cpdf_print';
+
+	/**
+	 * True while the print page is being rendered.
+	 *
+	 * @var bool
+	 */
+	private bool $active = false;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Settings   $settings   Settings.
+	 * @param Engine     $engine     Default PDF engine.
+	 * @param Properties $properties Plugin properties.
+	 */
+	public function __construct(
+		private Settings $settings,
+		private Engine $engine,
+		private Properties $properties
+	) {
+	}
+
+	/**
+	 * Whether the current request renders the print page.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return $this->active;
+	}
+
+	/**
+	 * Print URL for a post.
+	 *
+	 * @param int|WP_Post|null $post Post.
+	 * @return string
+	 */
+	public function url( int|WP_Post|null $post = null ): string {
+		return add_query_arg( self::QUERY_VAR, '1', (string) get_permalink( $post ) );
+	}
+
+	/**
+	 * Detect a print request early and set up flags that must exist before other code runs.
+	 * Rendering happens at the end of `template_redirect`, so plugins that set themselves up
+	 * there (page builders, redirects, maintenance mode) run first.
+	 */
+	public function detect(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view.
+		if ( empty( $_GET[ self::QUERY_VAR ] ) || ! is_singular() ) {
+			return;
+		}
+
+		// The main query already enforced visibility; drafts/private posts 404 before this point.
+		$this->active = true;
+
+		show_admin_bar( false );
+		add_filter( 'wp_lazy_loading_enabled', '__return_false' );
+		add_filter( 'should_load_block_assets_on_demand', '__return_false' );
+		add_filter( 'should_load_separate_core_block_assets', '__return_false' );
+
+		if ( ! headers_sent() ) {
+			header( 'X-Robots-Tag: noindex, nofollow' );
+			header( 'Cache-Control: private, no-store' );
+		}
+
+		add_action( 'template_redirect', [ $this, 'render' ], PHP_INT_MAX );
+	}
+
+	/**
+	 * Render the print page and exit.
+	 */
+	public function render(): void {
+		the_post();
+		$post = get_post();
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		// Render before wp_head(): block CSS and per-block global styles are enqueued during rendering.
+		$content = apply_filters( 'the_content', $post->post_content ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook.
+
+		// Emoji images come from a CDN (cross-origin); keep real glyphs instead.
+		remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+		remove_action( 'wp_print_styles', 'print_emoji_styles' );
+		remove_action( 'wp_enqueue_scripts', 'wp_enqueue_emoji_styles' );
+		remove_action( 'wp_footer', 'wp_print_speculation_rules' );
+
+		// The template prints its own <title> (the post title, used as the PDF filename).
+		remove_action( 'wp_head', '_wp_render_title_tag', 1 );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ], 999 );
+		add_action( 'wp_print_scripts', [ $this, 'dequeue_theme_scripts' ], 999 );
+		add_action( 'wp_print_footer_scripts', [ $this, 'dequeue_theme_scripts' ], 1 );
+
+		$title          = get_the_title( $post );
+		$geometry       = $this->settings->geometry();
+		$is_block_theme = wp_is_block_theme();
+
+		/**
+		 * Whether the print page shows the post title above the content.
+		 *
+		 * @param bool    $show Default true.
+		 * @param WP_Post $post Post being exported.
+		 */
+		$show_title   = (bool) apply_filters( 'cpdf_show_title', true, $post );
+		$body_classes = [ 'cpdf-print' ];
+
+		/**
+		 * Keep the theme's page background instead of white paper.
+		 *
+		 * @param bool    $keep Default false.
+		 * @param WP_Post $post Post being exported.
+		 */
+		if ( apply_filters( 'cpdf_keep_theme_background', false, $post ) ) {
+			$body_classes[] = 'cpdf-theme-background';
+		}
+
+		$template = locate_template( 'content-pdf/print.php' );
+
+		/**
+		 * Filters the print page template path.
+		 *
+		 * @param string  $template Absolute path.
+		 * @param WP_Post $post     Post being exported.
+		 */
+		$template = (string) apply_filters(
+			'cpdf_print_template',
+			$template ? $template : __DIR__ . '/templates/print.php',
+			$post
+		);
+
+		include $template;
+		exit;
+	}
+
+	/**
+	 * Enqueue print styles and the engine assets.
+	 */
+	public function enqueue(): void {
+		$post = get_post();
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		$settings = $this->settings->get();
+		$geometry = $this->settings->geometry();
+		$base_url = (string) $this->properties->baseUrl();
+
+		wp_enqueue_style(
+			'cpdf-print',
+			$base_url . 'modules/Export/assets/css/print.css',
+			[],
+			$this->properties->version()
+		);
+
+		/**
+		 * Selectors hidden on the print page (share buttons, related posts, comment forms…).
+		 *
+		 * @param string[] $selectors CSS selectors.
+		 */
+		$hidden = apply_filters(
+			'cpdf_hidden_selectors',
+			[
+				'.cpdf-button',
+				'.sharedaddy',
+				'.sd-sharing-enabled',
+				'.jp-relatedposts',
+				'#jp-relatedposts',
+				'.wp-block-jetpack-sharing-buttons',
+				'.addtoany_share_save_container',
+				'.comment-respond',
+				'#comments',
+				'.wp-block-comments',
+				'.wp-block-post-comments-form',
+				'.related-posts',
+				'.yarpp-related',
+			]
+		);
+		$hidden = array_filter( array_map( 'wp_strip_all_tags', (array) $hidden ) );
+		if ( $hidden ) {
+			wp_add_inline_style( 'cpdf-print', implode( ',', $hidden ) . '{display:none!important}' );
+		}
+
+		wp_add_inline_style(
+			'cpdf-print',
+			sprintf(
+				'@page{size:%1$s;margin:%2$spt}',
+				'letter' === $geometry['format'] ? 'letter' : 'A4',
+				$geometry['margin_pt']
+			)
+		);
+
+		$title    = wp_strip_all_tags( get_the_title( $post ) );
+		$filename = sanitize_file_name( $title );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view.
+		$mode = isset( $_GET['cpdf_mode'] ) ? sanitize_key( wp_unslash( $_GET['cpdf_mode'] ) ) : '';
+
+		$config = [
+			'format'         => $geometry['format'],
+			'marginPt'       => $geometry['margin_box'],
+			'contentWidthPx' => $geometry['content_px'],
+			'pageHeightPx'   => $geometry['height_px'],
+			'footer'         => $settings['footer_text'],
+			'filename'       => ( '' !== $filename ? $filename : 'document' ) . '.pdf',
+			'title'          => $title,
+			'author'         => get_the_author_meta( 'display_name', (int) $post->post_author ),
+			'mode'           => 'print' === $mode ? 'print' : 'pdf',
+			'fonts'          => [
+				[
+					'family' => 'CPDF Sans',
+					'weight' => 400,
+					'url'    => $base_url . 'modules/Export/assets/fonts/NotoSans-Regular.ttf',
+				],
+				[
+					'family' => 'CPDF Sans',
+					'weight' => 700,
+					'url'    => $base_url . 'modules/Export/assets/fonts/NotoSans-Bold.ttf',
+				],
+			],
+			'i18n'           => [
+				'preparing' => __( 'Preparing PDF…', 'content-pdf' ),
+				/* translators: 1: current page, 2: total pages */
+				'rendering' => __( 'Rendering page %1$d of %2$d…', 'content-pdf' ),
+				'done'      => __( 'PDF downloaded.', 'content-pdf' ),
+				'failed'    => __( 'PDF export failed — opening the print dialog instead.', 'content-pdf' ),
+			],
+		];
+
+		/**
+		 * Filters the export config passed to the engine.
+		 *
+		 * @param array   $config Config.
+		 * @param WP_Post $post   Post being exported.
+		 */
+		$config = (array) apply_filters( 'cpdf_export_config', $config, $post );
+
+		/**
+		 * Filters the PDF engine.
+		 *
+		 * @param Engine $engine Engine instance.
+		 */
+		$engine = apply_filters( 'cpdf_engine', $this->engine );
+		if ( ! $engine instanceof Engine ) {
+			$engine = $this->engine;
+		}
+		$engine->enqueue_print_assets( $config );
+
+		/**
+		 * Fires after the print page assets are enqueued. Compatibility modules add CSS/JS here,
+		 * e.g. a script that registers `window.cpdfHooks.beforeExport` functions.
+		 *
+		 * @param WP_Post $post   Post being exported.
+		 * @param array   $config Export config.
+		 */
+		do_action( 'cpdf_print_enqueue', $post, $config );
+	}
+
+	/**
+	 * Theme scripts expect their header/nav markup and may throw on the print page.
+	 * Dequeue scripts loaded from the theme directories (filterable).
+	 */
+	public function dequeue_theme_scripts(): void {
+		$scripts    = wp_scripts();
+		$theme_urls = [ get_template_directory_uri(), get_stylesheet_directory_uri() ];
+		$handles    = [];
+
+		foreach ( $scripts->queue as $handle ) {
+			$src = isset( $scripts->registered[ $handle ] ) ? (string) $scripts->registered[ $handle ]->src : '';
+			foreach ( $theme_urls as $theme_url ) {
+				if ( '' !== $src && str_starts_with( $src, $theme_url ) ) {
+					$handles[] = $handle;
+				}
+			}
+		}
+
+		/**
+		 * Script handles removed from the print page.
+		 *
+		 * @param string[] $handles Handles.
+		 */
+		foreach ( (array) apply_filters( 'cpdf_dequeue_scripts', array_unique( $handles ) ) as $handle ) {
+			wp_dequeue_script( $handle );
+		}
+	}
+}

@@ -4,6 +4,9 @@
 		".",
 		"https://downloads.wordpress.org/plugin/plugin-check.2.2.0.zip"
 	],
+	"themes": [
+		"https://downloads.wordpress.org/theme/twentytwentyone.zip"
+	],
 	"config": {
 		"WP_DEBUG": true,
 		"WP_DEBUG_LOG": true,

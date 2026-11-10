@@ -1,0 +1,202 @@
+/*
+ * Content PDF — print page styles.
+ * The browser lays out the article at the PDF content width; dompdf.js then reads that layout.
+ */
+
+@font-face {
+	font-family: "CPDF Sans";
+	src: url("../fonts/NotoSans-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "CPDF Sans";
+	src: url("../fonts/NotoSans-Bold.ttf") format("truetype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: block;
+}
+
+html,
+body.cpdf-print {
+	margin: 0;
+	padding: 0;
+}
+
+/* White paper by default; the `cpdf_keep_theme_background` filter keeps the theme colour. */
+html:has(body.cpdf-print:not(.cpdf-theme-background)),
+body.cpdf-print:not(.cpdf-theme-background) {
+	background: #fff;
+}
+
+body.cpdf-print .wp-site-blocks {
+	margin: 0;
+	padding: 0;
+}
+
+/*
+ * Fixed width = page width − margins, so line breaks match the PDF page.
+ * Typography, colours and spacing are left to the theme.
+ */
+.cpdf-article {
+	/* Let constrained/wide blocks fill the page instead of the theme's content size. */
+	--wp--style--global--content-size: 100%;
+	--wp--style--global--wide-size: 100%;
+	/* Twenty Twenty-One-style width variables are based on 100vw; pin them to the article. */
+	--responsive--aligndefault-width: 100%;
+	--responsive--alignwide-width: 100%;
+	--responsive--alignfull-width: 100%;
+	/* The gutter is part of the page margin; it keeps list markers and overhangs from being clipped. */
+	box-sizing: content-box;
+	width: var(--cpdf-content-width, 680px);
+	max-width: none;
+	margin: 0;
+	padding: 0 var(--cpdf-gutter, 0px);
+}
+
+/* Classic theme wrappers (see templates/print.php): keep their styling, drop their page layout. */
+.cpdf-article .site,
+.cpdf-article .site-content,
+.cpdf-article .content-area,
+.cpdf-article .site-main,
+.cpdf-article .site-main > article,
+.cpdf-article .entry-header {
+	width: auto;
+	max-width: none;
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+	float: none;
+}
+
+.cpdf-article .site-content,
+.cpdf-article .site-main {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.cpdf-article .entry-header {
+	margin-top: 0;
+	border: 0;
+}
+
+/*
+ * No motion: the export reads computed styles once, and in the hidden export iframe transitions
+ * never advance (a progress bar would stay at 0).
+ */
+.cpdf-article *,
+.cpdf-article *::before,
+.cpdf-article *::after {
+	transition: none !important;
+}
+
+/* dompdf.js embeds only fonts it is given, so every text node must use the registered family. */
+.cpdf-article,
+.cpdf-article * {
+	font-family: "CPDF Sans", sans-serif !important;
+}
+
+.cpdf-article > .alignwide,
+.cpdf-article > .alignfull,
+.cpdf-article .entry-content > .alignwide,
+.cpdf-article .entry-content > .alignfull {
+	width: auto;
+	max-width: 100% !important;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+/* Classic themes cap content children at a vw-based width; the article already is the column. */
+.cpdf-article .entry-content > *:not(.alignleft):not(.alignright):not(.wp-block-separator) {
+	max-width: 100% !important;
+}
+
+.cpdf-article .has-global-padding {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.cpdf-article > .wp-block-post-title {
+	margin-top: 0;
+}
+
+.cpdf-article img,
+.cpdf-article svg,
+.cpdf-article figure {
+	max-width: 100%;
+	height: auto;
+}
+
+/* dompdf.js draws list markers as glyphs; circle/square are not in Noto Sans. */
+.cpdf-article ul,
+.cpdf-article ul ul,
+.cpdf-article ul ul ul {
+	list-style-type: disc;
+}
+
+.cpdf-article pre {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+/* Set by print-export.js on elements whose hidden pseudo-element has text content. */
+.cpdf-no-before::before,
+.cpdf-no-after::after {
+	content: none !important;
+}
+
+/* Text version of iframes/videos/embeds (built by print-export.js). */
+.cpdf-embed-placeholder {
+	display: block;
+	box-sizing: border-box;
+	padding: 12px 16px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #f6f6f6;
+	color: #111;
+	text-decoration: none;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	word-break: break-all;
+}
+
+.cpdf-embed-placeholder img {
+	display: block;
+	width: 100%;
+	margin-bottom: 8px;
+}
+
+.cpdf-status {
+	position: fixed;
+	right: 12px;
+	bottom: 12px;
+	margin: 0;
+	padding: 6px 10px;
+	border-radius: 4px;
+	background: #1e1e1e;
+	color: #fff;
+	font: 13px/1.4 system-ui, sans-serif;
+	z-index: 10;
+}
+
+.cpdf-status:empty {
+	display: none;
+}
+
+@media print {
+	.cpdf-status {
+		display: none !important;
+	}
+
+	.cpdf-article {
+		width: auto;
+		padding: 0;
+	}
+
+	.cpdf-page-break {
+		break-before: page;
+	}
+}
