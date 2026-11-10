@@ -7,7 +7,8 @@
   "scripts": {
     "start": "wp-scripts start",
     "build": "wp-scripts build",
-    "wp-env": "wp-env"
+    "wp-env": "wp-env",
+    "test:php": "wp-env run tests-cli --env-cwd=wp-content/plugins/content-pdf vendor/bin/phpunit tests/unit"
   },
   "devDependencies": {
     "@wordpress/env": "^12.1.0",
