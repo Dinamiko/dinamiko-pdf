@@ -1,0 +1,41 @@
+<!-- wp:paragraph -->
+<p>Video, audio and iframes cannot go into a PDF. On the print page, Content PDF replaces each one with a box that links to the original media, using the poster image when there is one.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">YouTube embed</h2>
+<!-- /wp:heading -->
+
+<!-- wp:embed {"url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+https://www.youtube.com/watch?v=aqz-KE-bpKQ
+</div><figcaption class="wp-element-caption">Big Buck Bunny, © Blender Foundation (CC BY 3.0).</figcaption></figure>
+<!-- /wp:embed -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Video block with a poster</h2>
+<!-- /wp:heading -->
+
+<!-- wp:video -->
+<figure class="wp-block-video"><video controls poster="{{img:poster:url}}" src="https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"></video><figcaption class="wp-element-caption">A self-hosted style video block.</figcaption></figure>
+<!-- /wp:video -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Audio block</h2>
+<!-- /wp:heading -->
+
+<!-- wp:audio -->
+<figure class="wp-block-audio"><audio controls src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Example.ogg"></audio><figcaption class="wp-element-caption">An audio block. Check how the player looks in the PDF.</figcaption></figure>
+<!-- /wp:audio -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Custom HTML iframe</h2>
+<!-- /wp:heading -->
+
+<!-- wp:html -->
+<iframe title="OpenStreetMap: Barcelona" width="100%" height="320" src="https://www.openstreetmap.org/export/embed.html?bbox=2.10%2C41.35%2C2.23%2C41.42&amp;layer=mapnik" style="border:0"></iframe>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>Text after the embeds keeps flowing normally.</p>
+<!-- /wp:paragraph -->

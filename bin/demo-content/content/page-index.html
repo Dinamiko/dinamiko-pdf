@@ -1,0 +1,41 @@
+<!-- wp:paragraph {"fontSize":"large"} -->
+<p class="has-large-font-size">Demo content for the Content PDF plugin: core blocks, theme patterns, synced patterns and templates. Open any item and click “Download PDF”, or use the direct links below.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Demo items</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">{{items}}</ul>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">What to look for</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>The PDF has only the content: no header, footer or sidebar, whichever template the page uses.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Theme styles (colours, spacing, font sizes) match the page; the font is replaced by Noto Sans.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Blocks with the <code>cpdf-page-break</code> class start a new page.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Videos and iframes become links.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Theme patterns and the custom template are specific to Twenty Twenty-Five. With a classic theme (Twenty Twenty-One) those pages render without them.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph {"fontSize":"small"} -->
+<p class="has-small-font-size">Rebuild with <code>npm run demo:seed</code>, remove with <code>npm run demo:clean</code>.</p>
+<!-- /wp:paragraph -->

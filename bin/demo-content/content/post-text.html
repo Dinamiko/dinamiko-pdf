@@ -1,0 +1,140 @@
+<!-- wp:paragraph -->
+<p>This post uses the core text blocks so you can compare the page with its PDF. Every paragraph supports <strong>bold</strong>, <em>italic</em>, <s>strikethrough</s>, <code>inline code</code>, <a href="https://wordpress.org/">links</a>, <mark style="background-color:#fff3a3" class="has-inline-color">highlighted text</mark>, H<sub>2</sub>O subscripts and E = mc<sup>2</sup> superscripts.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Headings</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">A third-level heading</h3>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">A fourth-level heading</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"fontSize":"large"} -->
+<p class="has-large-font-size">A paragraph with the theme's large font size preset.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"dropCap":true} -->
+<p class="has-drop-cap">Drop caps start this paragraph. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Lists</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>An unordered list item</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>An item with a nested list<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Nested item one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Nested item two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>A final item with <strong>bold</strong> text</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Install the plugin</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Choose the post types under Settings → Content PDF</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Click “Download PDF” on any post</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Quotes and verse</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>Simplicity is prerequisite for reliability.</p>
+<!-- /wp:paragraph --><cite>Edsger W. Dijkstra</cite></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>A pullquote draws the eye to a key sentence in the article.</p><cite>The editor</cite></blockquote></figure>
+<!-- /wp:pullquote -->
+
+<!-- wp:verse -->
+<pre class="wp-block-verse">The page is white, the ink is black,
+the layout holds on every track;
+what the browser draws on screen
+the PDF keeps, clean and lean.</pre>
+<!-- /wp:verse -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Code and preformatted text</h2>
+<!-- /wp:heading -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>add_filter( 'cpdf_show_title', '__return_false' );
+
+add_filter( 'cpdf_hidden_selectors', function ( array $selectors ): array {
+	$selectors[] = '.share-buttons';
+	return $selectors;
+} );</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:preformatted -->
+<pre class="wp-block-preformatted">Preformatted text keeps    its spacing
+and line breaks exactly as typed.</pre>
+<!-- /wp:preformatted -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Tables</h2>
+<!-- /wp:heading -->
+
+<!-- wp:table {"hasFixedLayout":true,"className":"is-style-stripes"} -->
+<figure class="wp-block-table is-style-stripes"><table class="has-fixed-layout"><thead><tr><th>Plan</th><th>Pages</th><th>Price</th></tr></thead><tbody><tr><td>Starter</td><td>10</td><td>€0</td></tr><tr><td>Professional</td><td>500</td><td>€29</td></tr><tr><td>Agency</td><td>Unlimited</td><td>€99</td></tr></tbody><tfoot><tr><td>All plans</td><td>A4 and Letter</td><td>Per year</td></tr></tfoot></table><figcaption class="wp-element-caption">A striped table with header, body and footer.</figcaption></figure>
+<!-- /wp:table -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Buttons, separators and details</h2>
+<!-- /wp:heading -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://wordpress.org/">Primary button</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline"} -->
+<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="https://wordpress.org/">Outline button</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->
+
+<!-- wp:details -->
+<details class="wp-block-details"><summary>Details block (click to expand on screen)</summary><!-- wp:paragraph {"placeholder":"Type / to add a hidden block"} -->
+<p>Collapsed content inside a details block.</p>
+<!-- /wp:paragraph --></details>
+<!-- /wp:details -->
+
+<!-- wp:spacer {"height":"32px"} -->
+<div style="height:32px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:block {"ref":{{block:disclaimer}}} /-->

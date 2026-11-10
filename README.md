@@ -51,7 +51,7 @@ The print page uses the normal WordPress query, so drafts and private posts are 
 
 ## Development
 
-See `CLAUDE.md` for commands and architecture. To update the vendored dompdf.js, change the version in `package.json`, then run `npm install && npm run copy-vendor`.
+See `CLAUDE.md` for commands and architecture. With wp-env running, `npm run demo:seed` fills the local site with demo content (core blocks, theme and synced patterns, templates) and `npm run demo:clean` removes it. To update the vendored dompdf.js, change the version in `package.json`, then run `npm install && npm run copy-vendor`.
 
 ## Credits
 

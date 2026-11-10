@@ -1,0 +1,175 @@
+<!-- wp:paragraph -->
+<p>Images, galleries, covers and layout blocks. The print page lays them out at the PDF content width, so columns and galleries keep their arrangement in the PDF.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Images</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {"id":{{img:desert:id}},"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="{{img:desert:url}}" alt="Desert" class="wp-image-{{img:desert:id}}"/><figcaption class="wp-element-caption">A full-width image with a caption.</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":{{img:portrait1:id}},"width":"240px","sizeSlug":"medium","linkDestination":"none","align":"left"} -->
+<figure class="wp-block-image alignleft size-medium is-resized"><img src="{{img:portrait1:url}}" alt="Portrait A" class="wp-image-{{img:portrait1:id}}" style="width:240px"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>This paragraph wraps around a left-aligned image. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada. Nullam ac erat ante. Integer sit amet tortor in nulla vulputate laoreet. Mauris fermentum, nibh in feugiat malesuada, ipsum est hendrerit risus, at aliquam ligula sapien ac nisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Sed vel lectus. Donec odio tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit ullamcorper pulvinar. Vestibulum fermentum tortor id mi. Pellentesque ipsum. Nulla non arcu lacinia neque faucibus fringilla.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":{{img:square1:id}},"width":"200px","sizeSlug":"medium","linkDestination":"none","align":"right","className":"is-style-rounded"} -->
+<figure class="wp-block-image alignright size-medium is-resized is-style-rounded"><img src="{{img:square1:url}}" alt="Square 1" class="wp-image-{{img:square1:id}}" style="width:200px"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>A rounded image floats on the right of this paragraph. Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor fringilla.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"className":"cpdf-page-break"} -->
+<h2 class="wp-block-heading cpdf-page-break">Gallery</h2>
+<!-- /wp:heading -->
+
+<!-- wp:gallery {"columns":3,"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-3 is-cropped"><!-- wp:image {"id":{{img:square1:id}},"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="{{img:square1:url}}" alt="Square 1" class="wp-image-{{img:square1:id}}"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":{{img:square2:id}},"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="{{img:square2:url}}" alt="Square 2" class="wp-image-{{img:square2:id}}"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":{{img:square3:id}},"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="{{img:square3:url}}" alt="Square 3" class="wp-image-{{img:square3:id}}"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":{{img:forest:id}},"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="{{img:forest:url}}" alt="Forest" class="wp-image-{{img:forest:id}}"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":{{img:ocean:id}},"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="{{img:ocean:url}}" alt="Ocean" class="wp-image-{{img:ocean:id}}"/></figure>
+<!-- /wp:image --><figcaption class="blocks-gallery-caption wp-element-caption">A three-column cropped gallery.</figcaption></figure>
+<!-- /wp:gallery -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Cover</h2>
+<!-- /wp:heading -->
+
+<!-- wp:cover {"url":"{{img:hero:url}}","id":{{img:hero:id}},"dimRatio":40,"minHeight":360,"minHeightUnit":"px","isDark":true,"layout":{"type":"constrained"}} -->
+<div class="wp-block-cover is-dark" style="min-height:360px"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-40 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-{{img:hero:id}}" alt="" src="{{img:hero:url}}" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:heading {"textAlign":"center","level":3,"textColor":"base"} -->
+<h3 class="wp-block-heading has-text-align-center has-base-color has-text-color">Cover block with an image and overlay</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"align":"center","textColor":"base"} -->
+<p class="has-text-align-center has-base-color has-text-color">Text on top of a background image.</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Media &amp; Text</h2>
+<!-- /wp:heading -->
+
+<!-- wp:media-text {"mediaId":{{img:portrait2:id}},"mediaLink":"{{img:portrait2:url}}","mediaType":"image","mediaWidth":40} -->
+<div class="wp-block-media-text is-stacked-on-mobile" style="grid-template-columns:40% auto"><figure class="wp-block-media-text__media"><img src="{{img:portrait2:url}}" alt="Portrait B" class="wp-image-{{img:portrait2:id}} size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Image beside text</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The media &amp; text block puts an image and content side by side. On narrow screens it stacks; in the PDF it keeps the side-by-side layout because the content width is fixed.</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Columns</h2>
+<!-- /wp:heading -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Fast</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The PDF is generated in the browser. Nothing is sent to an external service.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Faithful</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Theme styles and theme.json presets carry over to the PDF.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Selectable</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Text stays vector text, so it can be selected and searched.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"66.66%"} -->
+<div class="wp-block-column" style="flex-basis:66.66%"><!-- wp:paragraph -->
+<p>Uneven columns: this one takes two thirds of the width. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"33.33%"} -->
+<div class="wp-block-column" style="flex-basis:33.33%"><!-- wp:paragraph -->
+<p>One third.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Groups, rows and stacks</h2>
+<!-- /wp:heading -->
+
+<!-- wp:group {"style":{"spacing":{"padding":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}},"backgroundColor":"contrast","textColor":"base","layout":{"type":"constrained"}} -->
+<div class="wp-block-group has-base-color has-contrast-background-color has-text-color has-background" style="padding-top:var(--wp--preset--spacing--40);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--40);padding-left:var(--wp--preset--spacing--40)"><!-- wp:paragraph -->
+<p>A group with dark background and light text, using the theme's colour presets.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|30"}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"style":{"spacing":{"padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20","left":"var:preset|spacing|20","right":"var:preset|spacing|20"}}},"backgroundColor":"accent-1"} -->
+<p class="has-accent-1-background-color has-background" style="padding-top:var(--wp--preset--spacing--20);padding-right:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20);padding-left:var(--wp--preset--spacing--20)">Row item 1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"spacing":{"padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20","left":"var:preset|spacing|20","right":"var:preset|spacing|20"}}},"backgroundColor":"accent-2"} -->
+<p class="has-accent-2-background-color has-background" style="padding-top:var(--wp--preset--spacing--20);padding-right:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20);padding-left:var(--wp--preset--spacing--20)">Row item 2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"style":{"spacing":{"padding":{"top":"var:preset|spacing|20","bottom":"var:preset|spacing|20","left":"var:preset|spacing|20","right":"var:preset|spacing|20"}}},"backgroundColor":"accent-3"} -->
+<p class="has-accent-3-background-color has-background" style="padding-top:var(--wp--preset--spacing--20);padding-right:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20);padding-left:var(--wp--preset--spacing--20)">Row item 3</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"layout":{"type":"flex","orientation":"vertical"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Stack item one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Stack item two</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:image {"id":{{img:ocean:id}},"sizeSlug":"full","linkDestination":"none","align":"wide"} -->
+<figure class="wp-block-image alignwide size-full"><img src="{{img:ocean:url}}" alt="Ocean" class="wp-image-{{img:ocean:id}}"/><figcaption class="wp-element-caption">A wide-aligned image.</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:block {"ref":{{block:disclaimer}}} /-->

@@ -11,6 +11,8 @@
     "test:php": "wp-env run tests-cli --env-cwd=wp-content/plugins/content-pdf vendor/bin/phpunit tests/unit",
     "test:e2e": "wp-scripts test-playwright --config tests/e2e/playwright.config.js",
     "test:e2e:debug": "wp-scripts test-playwright --config tests/e2e/playwright.config.js --ui",
+    "demo:seed": "wp-env run cli --env-cwd=wp-content/plugins/content-pdf wp eval-file bin/demo-content/demo.php seed",
+    "demo:clean": "wp-env run cli --env-cwd=wp-content/plugins/content-pdf wp eval-file bin/demo-content/demo.php clean",
     "lint:php": "composer lint:php",
     "lint:php:fix": "composer lint:php:fix",
     "copy-vendor": "node bin/copy-vendor.mjs"
