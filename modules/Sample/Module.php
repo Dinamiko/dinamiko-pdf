@@ -24,7 +24,7 @@ class Module implements ServiceModule, ExecutableModule {
 		add_action( 'admin_enqueue_scripts', static function () use ( $container ) {
 			/** @var Properties $properties */
 			$properties = $container->get( Package::PROPERTIES );
-			$asset_file = $properties->basePath() . 'build/sample.asset.php';
+			$asset_file = $properties->basePath() . 'modules/Sample/build/index.asset.php';
 			if ( ! is_readable( $asset_file ) ) {
 				return;
 			}
@@ -32,7 +32,7 @@ class Module implements ServiceModule, ExecutableModule {
 
 			wp_register_script(
 				'cpdf-sample',
-				$properties->baseUrl() . 'build/sample.js',
+				$properties->baseUrl() . 'modules/Sample/build/index.js',
 				$asset['dependencies'],
 				$asset['version'],
 				true
