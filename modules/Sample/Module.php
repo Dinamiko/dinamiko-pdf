@@ -1,4 +1,11 @@
 <?php
+/**
+ * Sample module.
+ *
+ * @package Dinamiko\ContentPdf
+ */
+
+declare( strict_types=1 );
 
 namespace Dinamiko\ContentPdf\Sample;
 
@@ -9,36 +16,56 @@ use Inpsyde\Modularity\Package;
 use Inpsyde\Modularity\Properties\Properties;
 use Psr\Container\ContainerInterface;
 
+/**
+ * Shows an admin notice and enqueues the sample script.
+ */
 class Module implements ServiceModule, ExecutableModule {
 	use ModuleClassNameIdTrait;
 
+	/**
+	 * Returns the module's service factories.
+	 *
+	 * @return array<string, callable>
+	 */
 	public function services(): array {
 		return [];
 	}
 
+	/**
+	 * Registers the module's WordPress hooks.
+	 *
+	 * @param ContainerInterface $container The plugin container.
+	 * @return bool
+	 */
 	public function run( ContainerInterface $container ): bool {
-		add_action( 'admin_notices', function () {
-			echo 'Sample message here.';
-		} );
-
-		add_action( 'admin_enqueue_scripts', static function () use ( $container ) {
-			/** @var Properties $properties */
-			$properties = $container->get( Package::PROPERTIES );
-			$asset_file = $properties->basePath() . 'modules/Sample/build/index.asset.php';
-			if ( ! is_readable( $asset_file ) ) {
-				return;
+		add_action(
+			'admin_notices',
+			function () {
+				echo 'Sample message here.';
 			}
-			$asset = require $asset_file;
+		);
 
-			wp_register_script(
-				'cpdf-sample',
-				$properties->baseUrl() . 'modules/Sample/build/index.js',
-				$asset['dependencies'],
-				$asset['version'],
-				true
-			);
-			wp_enqueue_script( 'cpdf-sample' );
-		} );
+		add_action(
+			'admin_enqueue_scripts',
+			static function () use ( $container ) {
+				/** @var Properties $properties */
+				$properties = $container->get( Package::PROPERTIES );
+				$asset_file = $properties->basePath() . 'modules/Sample/build/index.asset.php';
+				if ( ! is_readable( $asset_file ) ) {
+					return;
+				}
+				$asset = require $asset_file;
+
+				wp_register_script(
+					'cpdf-sample',
+					$properties->baseUrl() . 'modules/Sample/build/index.js',
+					$asset['dependencies'],
+					$asset['version'],
+					true
+				);
+				wp_enqueue_script( 'cpdf-sample' );
+			}
+		);
 
 		return true;
 	}

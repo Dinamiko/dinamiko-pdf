@@ -16,7 +16,7 @@ Content PDF is a WordPress plugin (PHP 8.1+, namespace `Dinamiko\ContentPdf`) bu
 - `npm run test:e2e`: runs the Playwright e2e tests (`tests/e2e/specs`) in Chromium against the wp-env tests site (`http://localhost:8889`, override with `WP_BASE_URL`). wp-env is started automatically if it isn't running. Run `npm run build` first if JS changed, because the tests load `build/`. `npm run test:e2e:debug` opens the Playwright UI.
 - Single e2e test: `npm run test:e2e -- tests/e2e/specs/sample.spec.js -g "admin notice"`
 - First-time setup for e2e: `npx playwright install chromium`.
-- No lint or static-analysis scripts are configured yet.
+- `npm run lint:php` (or `composer lint:php`): runs PHP_CodeSniffer with WordPress Coding Standards and PHPCompatibilityWP (PHP 8.1+) on the host. `npm run lint:php:fix` auto-fixes with phpcbf. Config is in `phpcs.xml.dist`.
 
 ## Architecture
 
@@ -26,4 +26,3 @@ Content PDF is a WordPress plugin (PHP 8.1+, namespace `Dinamiko\ContentPdf`) bu
 - **Prefixes**: hooks, filters, and script handles use `cpdf` (`cpdf_modules`, `cpdf-sample`). The text domain is `content-pdf`.
 - **Tests**: unit tests go in `tests/unit/` (autoload-dev namespace `Dinamiko\ContentPdf\Tests\Unit\`). There is no `phpunit.xml`; the test path is passed on the command line.
 - **E2E tests**: `tests/e2e/playwright.config.js` extends `@wordpress/scripts/config/playwright.config.js` and only overrides `testDir`. Specs import `test`/`expect` from `@wordpress/e2e-test-utils-playwright`, which provides fixtures such as `admin` and `requestUtils`. Global setup logs in as admin and saves the storage state, so specs start authenticated. Results, traces and failure screenshots go to `artifacts/`, which is gitignored.
-- `modules/Container.php` has a stray plugin header that conflicts with the main file (Requires PHP 7.4, Version 0.1.0). The real header is the one in `content-pdf.php`.

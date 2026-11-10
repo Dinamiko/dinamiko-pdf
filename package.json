@@ -10,7 +10,9 @@
     "wp-env": "wp-env",
     "test:php": "wp-env run tests-cli --env-cwd=wp-content/plugins/content-pdf vendor/bin/phpunit tests/unit",
     "test:e2e": "wp-scripts test-playwright --config tests/e2e/playwright.config.js",
-    "test:e2e:debug": "wp-scripts test-playwright --config tests/e2e/playwright.config.js --ui"
+    "test:e2e:debug": "wp-scripts test-playwright --config tests/e2e/playwright.config.js --ui",
+    "lint:php": "composer lint:php",
+    "lint:php:fix": "composer lint:php:fix"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",

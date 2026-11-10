@@ -1,14 +1,8 @@
 <?php
 /**
- * Plugin Name:       Content PDF
- * Description:       Lets visitors download any post, page or custom post type as a PDF, generated in the browser.
- * Version:           0.1.0
- * Requires at least: 6.5
- * Requires PHP:      7.4
- * Author:            dinamiko
- * License:           MIT
- * License URI:       https://opensource.org/license/mit
- * Text Domain:       content-pdf
+ * Static access to the plugin's PSR-11 container.
+ *
+ * @package Dinamiko\ContentPdf
  */
 
 declare( strict_types=1 );
@@ -18,9 +12,23 @@ namespace Dinamiko\ContentPdf;
 use LogicException;
 use Psr\Container\ContainerInterface;
 
+/**
+ * Holds the container built when the plugin package boots.
+ */
 class Container {
+	/**
+	 * The plugin container, set on boot.
+	 *
+	 * @var ContainerInterface|null
+	 */
 	private static $container = null;
 
+	/**
+	 * Returns the plugin container.
+	 *
+	 * @return ContainerInterface
+	 * @throws LogicException When called before the plugin has booted.
+	 */
 	public static function container(): ContainerInterface {
 		if ( ! self::$container ) {
 			throw new LogicException( 'No container, probably called too early when the plugin is not initialized yet.' );
@@ -29,6 +37,12 @@ class Container {
 		return self::$container;
 	}
 
+	/**
+	 * Alias of container().
+	 *
+	 * @return ContainerInterface
+	 * @throws LogicException When called before the plugin has booted.
+	 */
 	public static function get_container(): ContainerInterface {
 		return self::container();
 	}
