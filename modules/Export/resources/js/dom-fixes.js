@@ -90,6 +90,67 @@ export function fixHiddenContent( root ) {
 	} );
 }
 
+const DROP_CAP_PROPS = [
+	'float',
+	'font-family',
+	'font-size',
+	'font-style',
+	'font-weight',
+	'line-height',
+	'text-transform',
+	'color',
+	'vertical-align',
+	'margin-top',
+	'margin-right',
+	'margin-bottom',
+	'margin-left',
+	'padding-top',
+	'padding-right',
+	'padding-bottom',
+	'padding-left',
+];
+
+/**
+ * dompdf.js 2.0.x cannot see `::first-letter`, so drop caps (`.has-drop-cap`) come out as a
+ * normal-sized letter in a column of its own. Replace the pseudo-element with a real span that
+ * carries its computed styles.
+ *
+ * @param {Element} root Exported element.
+ */
+export function fixDropCaps( root ) {
+	root.querySelectorAll( '.has-drop-cap' ).forEach( ( p ) => {
+		const walker = document.createTreeWalker( p, NodeFilter.SHOW_TEXT );
+		let node;
+		while ( ( node = walker.nextNode() ) && ! /\S/.test( node.data ) ) {
+			// Skip whitespace-only text nodes.
+		}
+		if ( ! node ) {
+			return;
+		}
+		const cs = window.getComputedStyle( p, '::first-letter' );
+		const styles = DROP_CAP_PROPS.map( ( prop ) => [
+			prop,
+			cs.getPropertyValue( prop ),
+		] );
+
+		const start = node.data.search( /\S/ );
+		// One character, or a surrogate pair.
+		const letter = String.fromCodePoint( node.data.codePointAt( start ) );
+		const letterNode = node.splitText( start );
+		letterNode.splitText( letter.length );
+
+		const span = document.createElement( 'span' );
+		span.className = 'cpdf-drop-cap';
+		span.textContent = letter;
+		styles.forEach( ( [ prop, value ] ) =>
+			span.style.setProperty( prop, value )
+		);
+		// Without the class the ::first-letter rule no longer applies on top of the span.
+		p.classList.remove( 'has-drop-cap' );
+		letterNode.replaceWith( span );
+	} );
+}
+
 const KEEP_TOGETHER = [
 	'figure',
 	'img',
@@ -104,18 +165,54 @@ const KEEP_TOGETHER = [
 ].join( ',' );
 
 /**
+ * A box with a background or border that crosses a page edge leaves a sliver of it (e.g. its
+ * bottom padding) on the next page. Keep such boxes together when they are small enough.
+ *
+ * @param {Element} root      Exported element.
+ * @param {number}  maxHeight Boxes up to this height (px) are kept together.
+ */
+export function keepBoxesTogether( root, maxHeight ) {
+	root.querySelectorAll( '*' ).forEach( ( el ) => {
+		const cs = window.getComputedStyle( el );
+		if (
+			cs.display.startsWith( 'inline' ) ||
+			el.offsetHeight > maxHeight
+		) {
+			return;
+		}
+		const hasBackground =
+			cs.backgroundImage !== 'none' ||
+			! /^(transparent|rgba\(.*,\s*0\))$/.test( cs.backgroundColor );
+		const hasBorder = [ 'Top', 'Right', 'Bottom', 'Left' ].some(
+			( side ) =>
+				parseFloat( cs[ 'border' + side + 'Width' ] ) > 0 &&
+				cs[ 'border' + side + 'Style' ] !== 'none'
+		);
+		if ( hasBackground || hasBorder ) {
+			el.setAttribute( 'divisionDisable', '' );
+		}
+	} );
+}
+
+/**
  * Prepare the exported element: embeds, dompdf workarounds, page-break hints.
  *
- * @param {Element} root Exported element.
+ * @param {Element} root         Exported element.
+ * @param {number}  pageHeightPx Page height in CSS px (0 if unknown).
  */
-export function prepareDom( root ) {
+export function prepareDom( root, pageHeightPx = 0 ) {
 	replaceEmbeds( root );
+	fixDropCaps( root );
 	fixHiddenContent( root );
 	fixInlineSpaces( root );
 
 	root.querySelectorAll( KEEP_TOGETHER ).forEach( ( el ) => {
 		el.setAttribute( 'divisionDisable', '' );
 	} );
+
+	if ( pageHeightPx > 0 ) {
+		keepBoxesTogether( root, pageHeightPx / 2 );
+	}
 
 	// Keep headings with the block that follows them (best effort: tag both as unsplittable).
 	root.querySelectorAll( 'h1, h2, h3, h4, h5, h6' ).forEach( ( h ) => {
@@ -126,7 +223,10 @@ export function prepareDom( root ) {
 		}
 	} );
 
+	// dompdf.js 2.0.x adds about 20 blank pages when an element is both a page break and
+	// unsplittable (e.g. a heading or figure with the class), so the page break wins.
 	root.querySelectorAll( '.cpdf-page-break' ).forEach( ( el ) => {
 		el.setAttribute( 'pageBreak', '' );
+		el.removeAttribute( 'divisionDisable' );
 	} );
 }

@@ -212,7 +212,8 @@ class PrintEndpoint {
 			)
 		);
 
-		$title    = wp_strip_all_tags( get_the_title( $post ) );
+		// get_the_title() is texturized and HTML-encoded ("&#8220;"); the PDF filename and metadata need plain text.
+		$title    = html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 		$filename = sanitize_file_name( $title );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view.

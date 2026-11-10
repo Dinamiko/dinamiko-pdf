@@ -106,7 +106,7 @@ async function run() {
 		} );
 		await inlineBackgroundImages( article, 15000 );
 		await waitForImages( article, 5000 );
-		prepareDom( article );
+		prepareDom( article, config.pageHeightPx || 0 );
 
 		const fontConfig = await loadFonts( config.fonts );
 		const options = {

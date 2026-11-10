@@ -45,6 +45,20 @@ const BLOCK_CONTENT = `
 <!-- /wp:table -->
 `;
 
+const PAGE_BREAK_CONTENT = `
+<!-- wp:paragraph {"className":"has-drop-cap"} -->
+<p class="has-drop-cap">Drop cap paragraph on the first page.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"className":"cpdf-page-break"} -->
+<h2 class="wp-block-heading cpdf-page-break">Second page</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Text on the second page.</p>
+<!-- /wp:paragraph -->
+`;
+
 function printUrl( link ) {
 	const url = new URL( link );
 	url.searchParams.set( 'cpdf_print', '1' );
@@ -55,11 +69,18 @@ async function expectPdfDownload( download, filename ) {
 	expect( download.suggestedFilename() ).toBe( filename );
 	const bytes = fs.readFileSync( await download.path() );
 	expect( bytes.subarray( 0, 5 ).toString() ).toBe( '%PDF-' );
+	return bytes;
+}
+
+function pageCount( bytes ) {
+	const match = bytes.toString( 'latin1' ).match( /\/Count (\d+)/ );
+	return match ? Number( match[ 1 ] ) : 0;
 }
 
 test.describe( 'PDF export', () => {
 	let post;
 	let page;
+	let breakPost;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyfive' );
@@ -73,6 +94,11 @@ test.describe( 'PDF export', () => {
 		page = await requestUtils.createPage( {
 			title: 'Shortcode Page',
 			content: '<!-- wp:shortcode -->[content_pdf_button label="Get PDF"]<!-- /wp:shortcode -->',
+			status: 'publish',
+		} );
+		breakPost = await requestUtils.createPost( {
+			title: 'Page "break" test',
+			content: PAGE_BREAK_CONTENT,
 			status: 'publish',
 		} );
 	} );
@@ -144,6 +170,25 @@ test.describe( 'PDF export', () => {
 			.getByRole( 'button', { name: 'Download PDF' } )
 			.click();
 		await expectPdfDownload( await downloadPromise, 'Blocks-Export.pdf' );
+	} );
+
+	test( 'a heading page break starts one new page', async ( {
+		page: browserPage,
+	} ) => {
+		const downloadPromise = browserPage.waitForEvent( 'download' );
+		await browserPage.goto( printUrl( breakPost.link ) );
+		// The title's quotes are texturized to entities; the filename must not contain them.
+		const bytes = await expectPdfDownload(
+			await downloadPromise,
+			'Page-break-test.pdf'
+		);
+		expect( pageCount( bytes ) ).toBe( 2 );
+
+		// The drop cap's ::first-letter is replaced with a real element for the exporter.
+		await expect( browserPage.locator( '.cpdf-drop-cap' ) ).toHaveText(
+			'D'
+		);
+		await expect( browserPage.locator( '.has-drop-cap' ) ).toHaveCount( 0 );
 	} );
 
 	test( 'classic theme uses the classic wrappers and exports', async ( {

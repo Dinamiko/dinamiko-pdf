@@ -47,7 +47,7 @@ The print page uses the normal WordPress query, so drafts and private posts are 
 - **Cross-origin images** (CDNs) need CORS headers, or they may be missing from the PDF.
 - **Content Security Policy**: a strict CSP must allow `worker-src blob:` and `script-src 'wasm-unsafe-eval'`. Without them, the plugin falls back to the print dialog.
 - Iframes, videos and embeds are replaced with a link.
-- The export script works around a few bugs in dompdf.js 2.0.6: hidden elements, CSS background images, and spaces after inline elements. List markers are forced to discs.
+- The export script works around a few bugs in dompdf.js 2.0.6: hidden elements, CSS background images, spaces after inline elements, drop caps (`::first-letter`), and page breaks on headings. Small boxes with a background or border are kept on one page. List markers are forced to discs.
 
 ## Development
 
