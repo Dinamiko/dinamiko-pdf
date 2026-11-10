@@ -1,0 +1,22 @@
+{
+    "name": "dinamiko/content-pdf",
+    "description": "WordPress PDF Generator",
+    "type": "wordpress-plugin",
+    "require": {
+        "inpsyde/modularity": "^1.12"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Dinamiko\\ContentPdf\\": "modules/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dinamiko\\ContentPdf\\Tests\\Unit\\": "tests/unit/"
+        }
+    }
+}

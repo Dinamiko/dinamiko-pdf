@@ -1,0 +1,16 @@
+{
+  "name": "content-pdf",
+  "version": "0.0.1",
+  "description": "WordPress PDF Generator",
+  "author": "Dinamiko",
+  "license": "MIT",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "wp-env": "wp-env"
+  },
+  "devDependencies": {
+    "@wordpress/env": "^12.1.0",
+    "@wordpress/scripts": "^35.0.0"
+  }
+}
