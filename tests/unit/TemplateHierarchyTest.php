@@ -51,4 +51,27 @@ class TemplateHierarchyTest extends TestCase {
 			TemplateHierarchy::candidates( '', 'slug', 1 )
 		);
 	}
+
+	public function test_header_and_footer_names(): void {
+		$this->assertSame(
+			[
+				'content-pdf/header-post-hello-world.php',
+				'content-pdf/header-post-42.php',
+				'content-pdf/header-post.php',
+				'content-pdf/header.php',
+			],
+			TemplateHierarchy::candidates( 'post', 'hello-world', 42, 'header' )
+		);
+		$this->assertSame(
+			[ 'content-pdf/footer-page.php', 'content-pdf/footer.php' ],
+			TemplateHierarchy::candidates( 'page', '', 0, 'footer' )
+		);
+	}
+
+	public function test_unknown_name_falls_back_to_print(): void {
+		$this->assertSame(
+			[ 'content-pdf/print.php' ],
+			TemplateHierarchy::candidates( '', '', 0, '../evil' )
+		);
+	}
 }

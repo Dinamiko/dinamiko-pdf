@@ -113,6 +113,8 @@ class PrintEndpoint {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ], 999 );
 		add_action( 'wp_print_scripts', [ $this, 'dequeue_theme_scripts' ], 999 );
 		add_action( 'wp_print_footer_scripts', [ $this, 'dequeue_theme_scripts' ], 1 );
+		// In wp_footer, so theme print templates (which must call wp_footer()) get the regions too.
+		add_action( 'wp_footer', [ $this, 'render_regions' ], 1 );
 
 		$title          = get_the_title( $post );
 		$geometry       = $this->settings->geometry();
@@ -156,28 +158,151 @@ class PrintEndpoint {
 	}
 
 	/**
-	 * Theme template names for the print page, most specific first:
-	 * content-pdf/print-{post_type}-{slug}.php, print-{post_type}-{id}.php,
-	 * print-{post_type}.php, print.php.
+	 * Theme template names for the print page (or its header/footer), most specific first:
+	 * content-pdf/{name}-{post_type}-{slug}.php, {name}-{post_type}-{id}.php,
+	 * {name}-{post_type}.php, {name}.php.
 	 *
 	 * @param WP_Post $post Post being exported.
+	 * @param string  $name Template name: `print`, `header` or `footer`.
 	 * @return string[]
 	 */
-	public function template_candidates( WP_Post $post ): array {
-		$candidates = TemplateHierarchy::candidates( $post->post_type, $post->post_name, $post->ID );
+	public function template_candidates( WP_Post $post, string $name = 'print' ): array {
+		$candidates = TemplateHierarchy::candidates( $post->post_type, $post->post_name, $post->ID, $name );
 
 		/**
 		 * Filters the theme template names tried for the print page, most specific first.
 		 *
 		 * @param string[] $candidates Paths relative to the theme directory.
 		 * @param WP_Post  $post       Post being exported.
+		 * @param string   $name       Template name: `print`, `header` or `footer`.
 		 */
 		return array_values(
 			array_filter(
-				(array) apply_filters( 'cpdf_print_template_hierarchy', $candidates, $post ),
+				(array) apply_filters( 'cpdf_print_template_hierarchy', $candidates, $post, $name ),
 				'is_string'
 			)
 		);
+	}
+
+	/**
+	 * Output the header and footer markup. It is never displayed: the exporter reads the slots
+	 * and the logo from it and draws them on every PDF page.
+	 */
+	public function render_regions(): void {
+		$post = get_post();
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		$settings = $this->settings->get();
+		$values   = $this->placeholder_values( $post );
+		$labels   = [ 'left', 'center', 'right' ];
+
+		// Slot style defaults from the settings; templates and theme CSS can override them.
+		printf(
+			'<div class="cpdf-regions" aria-hidden="true" style="%s">',
+			esc_attr(
+				sprintf(
+					'--cpdf-header-font-size:%dpx;--cpdf-footer-font-size:%dpx;--cpdf-region-color:%s',
+					(int) $settings['header_font_size'],
+					(int) $settings['footer_font_size'],
+					(string) $settings['hf_color']
+				)
+			)
+		);
+		foreach ( Settings::REGION_SLOTS as $region => $keys ) {
+			$slots = [];
+			foreach ( $keys as $i => $key ) {
+				$slots[ $labels[ $i ] ] = Placeholders::replace( (string) $settings[ $key ], $values );
+			}
+			$logo = 'header' === $region ? $this->logo( $settings ) : null;
+
+			$template = locate_template( $this->template_candidates( $post, $region ) );
+
+			/**
+			 * Filters the header/footer template path.
+			 *
+			 * @param string  $template Absolute path.
+			 * @param string  $region   `header` or `footer`.
+			 * @param WP_Post $post     Post being exported.
+			 */
+			$template = (string) apply_filters(
+				'cpdf_region_template',
+				$template ? $template : __DIR__ . '/templates/' . $region . '.php',
+				$region,
+				$post
+			);
+
+			$this->include_region_template( $template, $post, $settings, $region, $slots, $logo );
+		}
+		echo '</div>';
+	}
+
+	/**
+	 * Include a header/footer template with its variables in scope.
+	 *
+	 * @param string                    $template Absolute path.
+	 * @param WP_Post                   $post     Post being exported.
+	 * @param array<string, mixed>      $settings Settings.
+	 * @param string                    $region   `header` or `footer`.
+	 * @param array<string, string>     $slots    Slot texts (left, center, right), placeholders resolved.
+	 * @param array<string, mixed>|null $logo     Logo (url, width, height, alt) or null.
+	 */
+	private function include_region_template( string $template, WP_Post $post, array $settings, string $region, array $slots, ?array $logo ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- variables for the template.
+		if ( '' !== $template && is_readable( $template ) ) {
+			include $template;
+		}
+	}
+
+	/**
+	 * Values for the {title}, {site}, {date} and {url} placeholders.
+	 *
+	 * @param WP_Post $post Post being exported.
+	 * @return array<string, string>
+	 */
+	public function placeholder_values( WP_Post $post ): array {
+		$decode = static fn( string $text ): string => html_entity_decode( wp_strip_all_tags( $text ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+		/**
+		 * Filters the header/footer placeholder values.
+		 *
+		 * @param array<string, string> $values Values by placeholder name (title, site, date, url).
+		 * @param WP_Post               $post   Post being exported.
+		 */
+		return (array) apply_filters(
+			'cpdf_placeholder_values',
+			[
+				'title' => $decode( get_the_title( $post ) ),
+				'site'  => $decode( (string) get_bloginfo( 'name' ) ),
+				'date'  => (string) get_the_date( '', $post ),
+				'url'   => (string) get_permalink( $post ),
+			],
+			$post
+		);
+	}
+
+	/**
+	 * The header logo from the settings.
+	 *
+	 * @param array<string, mixed> $settings Settings.
+	 * @return array{url: string, width: int, height: int, alt: string}|null
+	 */
+	private function logo( array $settings ): ?array {
+		$id  = (int) $settings['header_logo_id'];
+		$src = $id ? wp_get_attachment_image_src( $id, 'large' ) : false;
+		if ( ! $src ) {
+			return null;
+		}
+
+		$height = (int) $settings['header_logo_height'];
+		$width  = $src[2] > 0 ? (int) round( $height * $src[1] / $src[2] ) : $height;
+
+		return [
+			'url'    => (string) $src[0],
+			'width'  => $width,
+			'height' => $height,
+			'alt'    => (string) get_post_meta( $id, '_wp_attachment_image_alt', true ),
+		];
 	}
 
 	/**
@@ -193,11 +318,13 @@ class PrintEndpoint {
 		$geometry = $this->settings->geometry();
 		$base_url = (string) $this->properties->baseUrl();
 
+		// The file time busts browser caches when the CSS changes without a version bump.
+		$css_file = $this->properties->basePath() . 'modules/Export/assets/css/print.css';
 		wp_enqueue_style(
 			'cpdf-print',
 			$base_url . 'modules/Export/assets/css/print.css',
 			[],
-			$this->properties->version()
+			$this->properties->version() . ( is_readable( $css_file ) ? '.' . filemtime( $css_file ) : '' )
 		);
 
 		/**
@@ -247,9 +374,22 @@ class PrintEndpoint {
 		$config = [
 			'format'         => $geometry['format'],
 			'marginPt'       => $geometry['margin_box'],
+			'pagePt'         => $geometry['page_pt'],
 			'contentWidthPx' => $geometry['content_px'],
 			'pageHeightPx'   => $geometry['height_px'],
-			'footer'         => $settings['footer_text'],
+			'gutterPx'       => $geometry['gutter_px'],
+			'regions'        => [
+				// Fallbacks; slot styles are read from the header/footer markup.
+				'fontSize'      => [
+					'header' => (int) $settings['header_font_size'],
+					'footer' => (int) $settings['footer_font_size'],
+				],
+				'color'         => (string) $settings['hf_color'],
+				'fontFamily'    => 'CPDF Sans',
+				'skipFirstPage' => (bool) $settings['hf_skip_first_page'],
+				// Extra header height (mm → pt).
+				'headerExtraPt' => round( (int) $settings['header_spacing_mm'] * 72 / 25.4, 2 ),
+			],
 			'filename'       => ( '' !== $filename ? $filename : 'document' ) . '.pdf',
 			'title'          => $title,
 			'author'         => get_the_author_meta( 'display_name', (int) $post->post_author ),

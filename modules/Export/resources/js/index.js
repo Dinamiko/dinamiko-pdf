@@ -10,10 +10,12 @@ import { waitForImages, inlineBackgroundImages } from './images';
 import { prepareDom } from './dom-fixes';
 import { loadFonts } from './fonts';
 import { runHooks } from './hooks';
+import { buildRegions } from './regions';
 
 const config = window.cpdfConfig || {};
 const i18n = config.i18n || {};
 const article = document.querySelector( '.cpdf-article' );
+const regionsEl = document.querySelector( '.cpdf-regions' );
 const statusEl = document.querySelector( '.cpdf-status' );
 const embedded = window.parent !== window;
 
@@ -106,7 +108,16 @@ async function run() {
 		} );
 		await inlineBackgroundImages( article, 15000 );
 		await waitForImages( article, 5000 );
-		prepareDom( article, config.pageHeightPx || 0 );
+		if ( regionsEl ) {
+			// The header logo.
+			await waitForImages( regionsEl, 10000 );
+		}
+		// Header and footer (after the hooks, which may change their markup or the config).
+		const regions = buildRegions( document, config );
+		prepareDom(
+			article,
+			Math.max( 0, ( config.pageHeightPx || 0 ) - regions.extraHeightPx )
+		);
 
 		const fontConfig = await loadFonts( config.fonts );
 		const options = {
@@ -120,7 +131,6 @@ async function run() {
 			)
 				? window.getComputedStyle( document.body ).backgroundColor
 				: '#ffffff',
-			marginPt: config.marginPt || 0,
 			fontConfig,
 			metadata: {
 				title: config.title || document.title,
@@ -141,15 +151,7 @@ async function run() {
 				}
 			},
 		};
-		if ( config.footer ) {
-			options.pageConfig = {
-				footer: {
-					content: config.footer,
-					contentFontSize: 9,
-					contentColor: '#666666',
-				},
-			};
-		}
+		Object.assign( options, regions.options );
 
 		const blob = await engine.render( article, options );
 		const filename = config.filename || 'document.pdf';

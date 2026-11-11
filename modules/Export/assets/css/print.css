@@ -169,6 +169,38 @@ body.cpdf-print .wp-site-blocks {
 	margin-bottom: 8px;
 }
 
+/*
+ * Header/footer markup (templates/header.php, footer.php): read by the exporter, never displayed.
+ * Not display:none, so computed font sizes and colours are still resolved.
+ */
+.cpdf-regions {
+	position: absolute;
+	left: -10000px;
+	top: 0;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	visibility: hidden;
+}
+
+.cpdf-regions [data-cpdf-slot] {
+	font-weight: 400;
+	font-style: normal;
+	color: var(--cpdf-region-color, #666);
+}
+
+.cpdf-regions [data-cpdf-region="header"] [data-cpdf-slot] {
+	font-size: var(--cpdf-header-font-size, 16px);
+}
+
+.cpdf-regions [data-cpdf-region="footer"] [data-cpdf-slot] {
+	font-size: var(--cpdf-footer-font-size, 10px);
+}
+
+.cpdf-regions .cpdf-region-logo {
+	max-width: none;
+}
+
 .cpdf-status {
 	position: fixed;
 	right: 12px;

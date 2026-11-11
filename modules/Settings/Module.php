@@ -12,6 +12,7 @@ namespace Dinamiko\ContentPdf\Settings;
 use Inpsyde\Modularity\Module\ExecutableModule;
 use Inpsyde\Modularity\Module\ModuleClassNameIdTrait;
 use Inpsyde\Modularity\Module\ServiceModule;
+use Inpsyde\Modularity\Package;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -29,7 +30,8 @@ class Module implements ServiceModule, ExecutableModule {
 		return [
 			Settings::class     => static fn(): Settings => new Settings(),
 			SettingsPage::class => static fn( ContainerInterface $container ): SettingsPage => new SettingsPage(
-				$container->get( Settings::class )
+				$container->get( Settings::class ),
+				$container->get( Package::PROPERTIES )
 			),
 		];
 	}
@@ -45,6 +47,12 @@ class Module implements ServiceModule, ExecutableModule {
 			'admin_menu',
 			static function () use ( $container ): void {
 				$container->get( SettingsPage::class )->add_page();
+			}
+		);
+		add_action(
+			'admin_enqueue_scripts',
+			static function ( $hook_suffix ) use ( $container ): void {
+				$container->get( SettingsPage::class )->enqueue_assets( (string) $hook_suffix );
 			}
 		);
 		add_action(
