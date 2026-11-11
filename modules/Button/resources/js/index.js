@@ -4,6 +4,9 @@
  * Loads the print page in an off-screen iframe (it needs real layout, so not display:none),
  * listens for progress via postMessage and downloads the Blob the print page sends back.
  * If the export fails, the print page is opened in a new tab with the print dialog.
+ *
+ * With data-cpdf-action="view" the print page opens in a new tab instead (?cpdf_mode=view)
+ * and shows the PDF there. It must open synchronously in the click, or popup blockers stop it.
  */
 const strings = window.cpdfButton || {};
 const TIMEOUT_MS = 120000;
@@ -20,10 +23,14 @@ function download( blob, filename ) {
 	setTimeout( () => URL.revokeObjectURL( url ), 30000 );
 }
 
-function printUrl( url ) {
+function modeUrl( url, mode ) {
 	const u = new URL( url, window.location.href );
-	u.searchParams.set( 'cpdf_mode', 'print' );
+	u.searchParams.set( 'cpdf_mode', mode );
 	return u.href;
+}
+
+function printUrl( url ) {
+	return modeUrl( url, 'print' );
 }
 
 function start( button ) {
@@ -108,8 +115,19 @@ function start( button ) {
 
 document.addEventListener( 'click', ( event ) => {
 	const button = event.target.closest && event.target.closest( '.cpdf-button' );
-	if ( button ) {
-		event.preventDefault();
-		start( button );
+	if ( ! button ) {
+		return;
 	}
+	event.preventDefault();
+	if ( button.getAttribute( 'data-cpdf-action' ) === 'view' ) {
+		const win = window.open(
+			modeUrl( button.getAttribute( 'data-cpdf-url' ), 'view' ),
+			'_blank'
+		);
+		if ( win ) {
+			return;
+		}
+		// Popup blocked: download instead.
+	}
+	start( button );
 } );

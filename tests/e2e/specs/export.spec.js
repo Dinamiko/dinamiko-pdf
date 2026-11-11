@@ -172,6 +172,50 @@ test.describe( 'PDF export', () => {
 		await expectPdfDownload( await downloadPromise, 'Blocks-Export.pdf' );
 	} );
 
+	test( 'view mode shows the PDF in the tab instead of downloading', async ( {
+		page: browserPage,
+	} ) => {
+		await browserPage.goto( printUrl( post.link ) + '&cpdf_mode=view' );
+
+		const viewer = browserPage.locator( 'iframe.cpdf-viewer' );
+		await expect( viewer ).toHaveAttribute( 'src', /^blob:/, {
+			timeout: 60000,
+		} );
+		const link = browserPage.locator( '.cpdf-viewer-toolbar a' );
+		await expect( link ).toHaveAttribute( 'download', 'Blocks-Export.pdf' );
+		// The page hands the PDF to the viewer instead of downloading it. (Headless Chromium has no
+		// PDF viewer and saves the iframe's PDF as a download, so downloads are not asserted.)
+		await expect( browserPage.locator( '.cpdf-article' ) ).toBeHidden();
+
+		// The toolbar link downloads the same PDF with the real filename.
+		const downloadPromise = browserPage.waitForEvent( 'download' );
+		await link.click();
+		await expectPdfDownload( await downloadPromise, 'Blocks-Export.pdf' );
+	} );
+
+	test( 'a view button opens the PDF in a new tab', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const viewPage = await requestUtils.createPage( {
+			title: 'View Page',
+			content: `<!-- wp:shortcode -->[content_pdf_button id="${ post.id }" action="view"]<!-- /wp:shortcode -->`,
+			status: 'publish',
+		} );
+		await browserPage.goto( viewPage.link );
+
+		const popupPromise = browserPage.waitForEvent( 'popup' );
+		await browserPage.getByRole( 'button', { name: 'View PDF' } ).click();
+		const popup = await popupPromise;
+		expect( popup.url() ).toContain( 'cpdf_mode=view' );
+		await expect( popup.locator( 'iframe.cpdf-viewer' ) ).toHaveAttribute(
+			'src',
+			/^blob:/,
+			{ timeout: 60000 }
+		);
+		await popup.close();
+	} );
+
 	test( 'a heading page break starts one new page', async ( {
 		page: browserPage,
 	} ) => {

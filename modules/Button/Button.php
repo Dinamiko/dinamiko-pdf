@@ -116,32 +116,40 @@ class Button {
 		}
 		$atts = shortcode_atts(
 			[
-				'label' => '',
-				'id'    => 0,
+				'label'  => '',
+				'id'     => 0,
+				'action' => '',
 			],
 			$atts,
 			self::SHORTCODE
 		);
 		$post = $atts['id'] ? get_post( (int) $atts['id'] ) : get_post();
-		return $post instanceof WP_Post ? $this->render( $post, (string) $atts['label'] ) : '';
+		return $post instanceof WP_Post ? $this->render( $post, (string) $atts['label'], (string) $atts['action'] ) : '';
 	}
 
 	/**
 	 * Button markup. Uses core button block classes so themes style it.
 	 *
-	 * @param WP_Post $post  Post.
-	 * @param string  $label Optional label.
+	 * @param WP_Post $post   Post.
+	 * @param string  $label  Optional label.
+	 * @param string  $action `download` or `view`; empty uses the setting.
 	 * @return string
 	 */
-	public function render( WP_Post $post, string $label = '' ): string {
+	public function render( WP_Post $post, string $label = '', string $action = '' ): string {
 		wp_enqueue_script( self::HANDLE );
 		wp_enqueue_style( self::HANDLE );
 
-		$label = '' !== $label ? $label : __( 'Download PDF', 'content-pdf' );
+		if ( ! in_array( $action, Settings::BUTTON_ACTIONS, true ) ) {
+			$action = (string) $this->settings->get()['button_action'];
+		}
+		if ( '' === $label ) {
+			$label = 'view' === $action ? __( 'View PDF', 'content-pdf' ) : __( 'Download PDF', 'content-pdf' );
+		}
 
 		return sprintf(
-			'<div class="cpdf-button-wrap wp-block-buttons"><div class="wp-block-button"><button type="button" class="cpdf-button wp-block-button__link wp-element-button" data-cpdf-url="%1$s">%2$s</button></div></div>',
+			'<div class="cpdf-button-wrap wp-block-buttons"><div class="wp-block-button"><button type="button" class="cpdf-button wp-block-button__link wp-element-button" data-cpdf-url="%1$s" data-cpdf-action="%2$s">%3$s</button></div></div>',
 			esc_url( $this->print_endpoint->url( $post ) ),
+			esc_attr( $action ),
 			esc_html( $label )
 		);
 	}

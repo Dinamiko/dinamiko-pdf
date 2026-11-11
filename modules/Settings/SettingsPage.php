@@ -63,9 +63,10 @@ class SettingsPage {
 		add_settings_section( 'cpdf_main', '', '__return_false', self::PAGE );
 
 		$fields = [
-			'post_types' => __( 'Show button on', 'content-pdf' ),
-			'paper'      => __( 'Paper size', 'content-pdf' ),
-			'margin_mm'  => __( 'Page margins (mm)', 'content-pdf' ),
+			'post_types'    => __( 'Show button on', 'content-pdf' ),
+			'button_action' => __( 'Button action', 'content-pdf' ),
+			'paper'         => __( 'Paper size', 'content-pdf' ),
+			'margin_mm'     => __( 'Page margins (mm)', 'content-pdf' ),
 		];
 		foreach ( $fields as $id => $label ) {
 			add_settings_field( 'cpdf_' . $id, $label, [ $this, 'field_' . $id ], self::PAGE, 'cpdf_main' );
@@ -174,6 +175,30 @@ class SettingsPage {
 				esc_html( $type->labels->name )
 			);
 		}
+	}
+
+	/**
+	 * Button action field.
+	 */
+	public function field_button_action(): void {
+		$current = $this->settings->get()['button_action'];
+		$labels  = [
+			'download' => __( 'Download the PDF', 'content-pdf' ),
+			'view'     => __( 'Open the PDF in a new tab', 'content-pdf' ),
+		];
+		foreach ( $labels as $value => $label ) {
+			printf(
+				'<label style="display:block"><input type="radio" name="%1$s[button_action]" value="%2$s" %3$s> %4$s</label>',
+				esc_attr( Settings::OPTION ),
+				esc_attr( $value ),
+				checked( $current, $value, false ),
+				esc_html( $label )
+			);
+		}
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__( 'The shortcode can override this with action="download" or action="view".', 'content-pdf' )
+		);
 	}
 
 	/**

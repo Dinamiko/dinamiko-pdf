@@ -63,6 +63,10 @@ Yes. Content PDF uses your theme's styles, so headings, colors, columns, images 
 
 Yes. Use the `[content_pdf_button]` shortcode in any post, page or widget. Change the text with `[content_pdf_button label="Save as PDF"]`.
 
+= Can visitors view the PDF in the browser instead of downloading it? =
+
+Yes. Under **Settings → Content PDF**, set **Button action** to "Open the PDF in a new tab". The PDF then opens in the browser's PDF viewer. A single button can override the setting with `[content_pdf_button action="view"]` or `action="download"`.
+
 = Can I add page numbers? =
 
 Yes. Under **Settings → Content PDF**, the footer shows "Page 1 / 3" by default, and you can change the text.

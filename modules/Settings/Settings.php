@@ -17,6 +17,11 @@ class Settings {
 	public const OPTION = 'cpdf_settings';
 
 	/**
+	 * What the button does: download the PDF or open it in a new tab.
+	 */
+	public const BUTTON_ACTIONS = [ 'download', 'view' ];
+
+	/**
 	 * Header and footer text slots.
 	 */
 	public const REGION_SLOTS = [
@@ -49,6 +54,7 @@ class Settings {
 	public static function defaults(): array {
 		return [
 			'post_types'         => [ 'post' ],
+			'button_action'      => 'download',
 			'paper'              => 'a4',
 			'margin_mm'          => 15,
 			'header_logo_id'     => 0,
@@ -140,6 +146,7 @@ class Settings {
 
 		$output = [
 			'post_types'         => array_values( array_intersect( $post_types, $public ) ),
+			'button_action'      => isset( $input['button_action'] ) && in_array( $input['button_action'], self::BUTTON_ACTIONS, true ) ? $input['button_action'] : $defaults['button_action'],
 			'paper'              => isset( Geometry::PAPER_SIZES[ $paper ] ) ? $paper : $defaults['paper'],
 			'margin_mm'          => min( 50, $margin ),
 			'header_logo_id'     => $logo_id,

@@ -393,7 +393,8 @@ class PrintEndpoint {
 			'filename'       => ( '' !== $filename ? $filename : 'document' ) . '.pdf',
 			'title'          => $title,
 			'author'         => get_the_author_meta( 'display_name', (int) $post->post_author ),
-			'mode'           => 'print' === $mode ? 'print' : 'pdf',
+			// pdf: download; view: show the PDF in this tab; print: browser print dialog.
+			'mode'           => in_array( $mode, [ 'print', 'view' ], true ) ? $mode : 'pdf',
 			'fonts'          => [
 				[
 					'family' => 'CPDF Sans',
@@ -412,6 +413,7 @@ class PrintEndpoint {
 				'rendering' => __( 'Rendering page %1$d of %2$d…', 'content-pdf' ),
 				'done'      => __( 'PDF downloaded.', 'content-pdf' ),
 				'failed'    => __( 'PDF export failed — opening the print dialog instead.', 'content-pdf' ),
+				'download'  => __( 'Download PDF', 'content-pdf' ),
 			],
 		];
 

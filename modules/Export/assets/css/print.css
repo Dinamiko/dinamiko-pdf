@@ -218,6 +218,42 @@ body.cpdf-print .wp-site-blocks {
 	display: none;
 }
 
+/* ?cpdf_mode=view: the finished PDF replaces the page (see showPdf() in resources/js/index.js). */
+body.cpdf-viewing {
+	overflow: hidden;
+}
+
+body.cpdf-viewing > :not(.cpdf-viewer):not(.cpdf-viewer-toolbar) {
+	display: none !important;
+}
+
+.cpdf-viewer {
+	position: fixed;
+	inset: 40px 0 0;
+	width: 100%;
+	height: calc(100% - 40px);
+	border: 0;
+	background: #525659;
+}
+
+.cpdf-viewer-toolbar {
+	position: fixed;
+	inset: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	box-sizing: border-box;
+	height: 40px;
+	padding: 0 16px;
+	background: #1e1e1e;
+	font: 13px/1.4 system-ui, sans-serif;
+}
+
+.cpdf-viewer-toolbar a {
+	color: #fff;
+	text-decoration: underline;
+}
+
 @media print {
 	.cpdf-status {
 		display: none !important;

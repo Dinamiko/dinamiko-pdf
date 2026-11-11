@@ -61,6 +61,33 @@ function download( blob, filename ) {
 	setTimeout( () => URL.revokeObjectURL( url ), 30000 );
 }
 
+/**
+ * Show the PDF in this tab, in the browser's PDF viewer. Viewers save blob: PDFs under a
+ * random name, so a toolbar link downloads it with the real filename.
+ *
+ * @param {Blob}   blob     PDF.
+ * @param {string} filename File name.
+ */
+function showPdf( blob, filename ) {
+	const url = URL.createObjectURL( blob );
+
+	const toolbar = document.createElement( 'div' );
+	toolbar.className = 'cpdf-viewer-toolbar';
+	const link = document.createElement( 'a' );
+	link.href = url;
+	link.download = filename;
+	link.textContent = i18n.download || filename;
+	toolbar.appendChild( link );
+
+	const frame = document.createElement( 'iframe' );
+	frame.className = 'cpdf-viewer';
+	frame.title = config.title || document.title;
+	frame.src = url;
+
+	document.body.classList.add( 'cpdf-viewing' );
+	document.body.append( toolbar, frame );
+}
+
 function fallback( error ) {
 	if ( error ) {
 		// eslint-disable-next-line no-console
@@ -158,6 +185,9 @@ async function run() {
 
 		if ( embedded ) {
 			send( { status: 'done', text: i18n.done, blob, filename } );
+		} else if ( config.mode === 'view' ) {
+			showPdf( blob, filename );
+			send( { status: 'done', text: '' } );
 		} else {
 			download( blob, filename );
 			send( { status: 'done', text: i18n.done } );
