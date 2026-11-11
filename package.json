@@ -16,7 +16,8 @@
     "playground": "wp-playground-cli server --mount=.:/wordpress/wp-content/plugins/content-pdf --blueprint=bin/playground/blueprint.json",
     "lint:php": "composer lint:php",
     "lint:php:fix": "composer lint:php:fix",
-    "copy-vendor": "node bin/copy-vendor.mjs"
+    "copy-vendor": "node bin/copy-vendor.mjs",
+    "dist": "npm run build && node bin/dist.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",
