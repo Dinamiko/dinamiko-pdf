@@ -58,24 +58,26 @@ class Settings {
 	 */
 	public static function defaults(): array {
 		return [
-			'post_types'         => [ 'post' ],
-			'button_action'      => 'download',
-			'paper'              => 'a4',
-			'margin_mm'          => 15,
-			'header_logo_id'     => 0,
-			'header_logo_height' => 48,
-			'header_left'        => '',
-			'header_center'      => '',
-			'header_right'       => '{title}',
-			'footer_left'        => '{site}',
-			'footer_center'      => '',
+			'post_types'          => [ 'post' ],
+			'button_action'       => 'download',
+			'paper'               => 'a4',
+			'margin_mm'           => 15,
+			'show_title'          => true,
+			'show_featured_image' => false,
+			'header_logo_id'      => 0,
+			'header_logo_height'  => 48,
+			'header_left'         => '',
+			'header_center'       => '',
+			'header_right'        => '{title}',
+			'footer_left'         => '{site}',
+			'footer_center'       => '',
 			// Page placeholders are resolved by dompdf.js, not PHP.
-			'footer_right'       => 'Page ${currentPage} / ${totalPages}',
-			'header_spacing_mm'  => 8,
-			'header_font_size'   => 16,
-			'footer_font_size'   => 10,
-			'hf_color'           => '#666666',
-			'hf_skip_first_page' => false,
+			'footer_right'        => 'Page ${currentPage} / ${totalPages}',
+			'header_spacing_mm'   => 8,
+			'header_font_size'    => 16,
+			'footer_font_size'    => 10,
+			'hf_color'            => '#666666',
+			'hf_skip_first_page'  => false,
 		];
 	}
 
@@ -95,29 +97,31 @@ class Settings {
 		];
 
 		$properties = [
-			'post_types'         => [
+			'post_types'          => [
 				'type'  => 'array',
 				'items' => [ 'type' => 'string' ],
 			],
-			'button_action'      => [
+			'button_action'       => [
 				'type' => 'string',
 				'enum' => self::BUTTON_ACTIONS,
 			],
-			'paper'              => [
+			'paper'               => [
 				'type' => 'string',
 				'enum' => array_keys( Geometry::PAPER_SIZES ),
 			],
-			'margin_mm'          => $integer( 0, self::MARGIN_MAX ),
-			'header_logo_id'     => [
+			'margin_mm'           => $integer( 0, self::MARGIN_MAX ),
+			'show_title'          => [ 'type' => 'boolean' ],
+			'show_featured_image' => [ 'type' => 'boolean' ],
+			'header_logo_id'      => [
 				'type'    => 'integer',
 				'minimum' => 0,
 			],
-			'header_logo_height' => $integer( self::LOGO_HEIGHT_MIN, self::LOGO_HEIGHT_MAX ),
-			'header_spacing_mm'  => $integer( 0, self::HEADER_SPACING_MAX ),
-			'header_font_size'   => $integer( self::FONT_SIZE_MIN, self::FONT_SIZE_MAX ),
-			'footer_font_size'   => $integer( self::FONT_SIZE_MIN, self::FONT_SIZE_MAX ),
-			'hf_color'           => [ 'type' => 'string' ],
-			'hf_skip_first_page' => [ 'type' => 'boolean' ],
+			'header_logo_height'  => $integer( self::LOGO_HEIGHT_MIN, self::LOGO_HEIGHT_MAX ),
+			'header_spacing_mm'   => $integer( 0, self::HEADER_SPACING_MAX ),
+			'header_font_size'    => $integer( self::FONT_SIZE_MIN, self::FONT_SIZE_MAX ),
+			'footer_font_size'    => $integer( self::FONT_SIZE_MIN, self::FONT_SIZE_MAX ),
+			'hf_color'            => [ 'type' => 'string' ],
+			'hf_skip_first_page'  => [ 'type' => 'boolean' ],
 		];
 		foreach ( array_merge( ...array_values( self::REGION_SLOTS ) ) as $key ) {
 			$properties[ $key ] = [ 'type' => 'string' ];
@@ -201,15 +205,18 @@ class Settings {
 		$color       = isset( $input['hf_color'] ) ? sanitize_hex_color( (string) $input['hf_color'] ) : '';
 
 		$output = [
-			'post_types'         => array_values( array_intersect( $post_types, $public ) ),
-			'button_action'      => isset( $input['button_action'] ) && in_array( $input['button_action'], self::BUTTON_ACTIONS, true ) ? $input['button_action'] : $defaults['button_action'],
-			'paper'              => isset( Geometry::PAPER_SIZES[ $paper ] ) ? $paper : $defaults['paper'],
-			'margin_mm'          => min( self::MARGIN_MAX, $margin ),
-			'header_logo_id'     => $logo_id,
-			'header_logo_height' => max( self::LOGO_HEIGHT_MIN, min( self::LOGO_HEIGHT_MAX, $logo_height ) ),
-			'header_spacing_mm'  => min( self::HEADER_SPACING_MAX, $spacing ),
-			'hf_color'           => $color ? $color : $defaults['hf_color'],
-			'hf_skip_first_page' => ! empty( $input['hf_skip_first_page'] ),
+			'post_types'          => array_values( array_intersect( $post_types, $public ) ),
+			'button_action'       => isset( $input['button_action'] ) && in_array( $input['button_action'], self::BUTTON_ACTIONS, true ) ? $input['button_action'] : $defaults['button_action'],
+			'paper'               => isset( Geometry::PAPER_SIZES[ $paper ] ) ? $paper : $defaults['paper'],
+			'margin_mm'           => min( self::MARGIN_MAX, $margin ),
+			// A missing key keeps the title: only an explicit false hides it.
+			'show_title'          => isset( $input['show_title'] ) ? (bool) $input['show_title'] : $defaults['show_title'],
+			'show_featured_image' => ! empty( $input['show_featured_image'] ),
+			'header_logo_id'      => $logo_id,
+			'header_logo_height'  => max( self::LOGO_HEIGHT_MIN, min( self::LOGO_HEIGHT_MAX, $logo_height ) ),
+			'header_spacing_mm'   => min( self::HEADER_SPACING_MAX, $spacing ),
+			'hf_color'            => $color ? $color : $defaults['hf_color'],
+			'hf_skip_first_page'  => ! empty( $input['hf_skip_first_page'] ),
 		];
 
 		foreach ( array_keys( self::REGION_SLOTS ) as $region ) {

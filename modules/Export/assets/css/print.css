@@ -119,8 +119,24 @@ body.cpdf-print .wp-site-blocks {
 	padding-right: 0;
 }
 
-.cpdf-article > .wp-block-post-title {
+.cpdf-article > .wp-block-post-title,
+.cpdf-article > .cpdf-featured-image:first-child {
 	margin-top: 0;
+}
+
+/* Featured image (show_featured_image setting): full content width, between title and content. */
+.cpdf-article .cpdf-featured-image {
+	width: auto;
+	max-width: 100% !important;
+	margin-left: 0;
+	margin-right: 0;
+	margin-bottom: 1.5em;
+}
+
+.cpdf-article .cpdf-featured-image img {
+	display: block;
+	width: 100%;
+	height: auto;
 }
 
 .cpdf-article img,

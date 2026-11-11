@@ -119,14 +119,25 @@ class PrintEndpoint {
 		$title          = get_the_title( $post );
 		$geometry       = $this->settings->geometry();
 		$is_block_theme = wp_is_block_theme();
+		$settings       = $this->settings->get();
 
 		/**
 		 * Whether the print page shows the post title above the content.
 		 *
-		 * @param bool    $show Default true.
+		 * @param bool    $show Default from the `show_title` setting.
 		 * @param WP_Post $post Post being exported.
 		 */
-		$show_title   = (bool) apply_filters( 'cpdf_show_title', true, $post );
+		$show_title = (bool) apply_filters( 'cpdf_show_title', (bool) $settings['show_title'], $post );
+
+		/**
+		 * Whether the print page shows the featured image above the content.
+		 *
+		 * @param bool    $show Default from the `show_featured_image` setting.
+		 * @param WP_Post $post Post being exported.
+		 */
+		$show_featured_image = (bool) apply_filters( 'cpdf_show_featured_image', (bool) $settings['show_featured_image'], $post );
+		$featured_image      = $show_featured_image && has_post_thumbnail( $post ) ? get_the_post_thumbnail( $post, 'large' ) : '';
+
 		$body_classes = [ 'cpdf-print' ];
 
 		/**

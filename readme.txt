@@ -31,7 +31,7 @@ The PDF looks like your website, not a plain text dump. Your theme's font sizes,
 * **Real, professional PDFs.** Text stays sharp and selectable, so readers can search, copy and highlight it.
 * **Private by design.** The PDF is created right in the reader's browser. No third-party service, no API keys, no account, and your content never leaves your site.
 * **Light on your server.** Your hosting does none of the heavy lifting, so even busy sites stay fast.
-* **Simple settings.** Choose A4 or Letter paper, set the margins and add a footer with page numbers.
+* **Simple settings.** Choose A4 or Letter paper, set the margins, show or hide the post title and featured image, and add a footer with page numbers.
 * **Place the button anywhere.** Add it automatically, or drop the `[content_pdf_button]` shortcode wherever you like, with your own label.
 * **You decide where pages break.** Add the `cpdf-page-break` class to any block to start it on a new page.
 * **Always works.** If an older browser can't create the PDF, the print dialog opens instead, so nobody is left without a copy.

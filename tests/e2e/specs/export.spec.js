@@ -1,4 +1,6 @@
 const fs = require( 'fs' );
+const os = require( 'os' );
+const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const BLOCK_CONTENT = `
@@ -233,6 +235,75 @@ test.describe( 'PDF export', () => {
 			'D'
 		);
 		await expect( browserPage.locator( '.has-drop-cap' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'settings hide the title and show the featured image', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const { cpdf_settings: original } = await requestUtils.rest( {
+			path: '/wp/v2/settings',
+		} );
+		const setSettings = ( values ) =>
+			requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: { cpdf_settings: { ...original, ...values } },
+			} );
+
+		// 40×20 red PNG.
+		const imagePath = path.join( os.tmpdir(), 'cpdf-featured.png' );
+		fs.writeFileSync(
+			imagePath,
+			Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAACgAAAAUCAIAAABwJOjsAAAAJElEQVR42mM4o6Q0IIhh1OJRi0ctHrV41OJRi0ctHrV45FgMAJxAUi7Hems4AAAAAElFTkSuQmCC',
+				'base64'
+			)
+		);
+		const media = await requestUtils.uploadMedia( imagePath );
+		const featuredPost = await requestUtils.createPost( {
+			title: 'Featured Export',
+			content: BLOCK_CONTENT,
+			status: 'publish',
+			featured_media: media.id,
+		} );
+
+		try {
+			await browserPage.route(
+				'**/modules/Export/build/index.js*',
+				( route ) => route.abort()
+			);
+			const article = browserPage.locator( '.cpdf-article' );
+
+			// Defaults: title on, featured image off.
+			await browserPage.goto( printUrl( featuredPost.link ) );
+			await expect( article.locator( '.wp-block-post-title' ) ).toHaveText(
+				'Featured Export'
+			);
+			await expect( article.locator( '.cpdf-featured-image' ) ).toHaveCount(
+				0
+			);
+
+			await setSettings( { show_title: false, show_featured_image: true } );
+			await browserPage.goto( printUrl( featuredPost.link ) );
+			await expect( article.locator( '.wp-block-post-title' ) ).toHaveCount(
+				0
+			);
+			await expect(
+				article.locator( '.cpdf-featured-image img' )
+			).toBeVisible();
+			await browserPage.unroute( '**/modules/Export/build/index.js*' );
+
+			const downloadPromise = browserPage.waitForEvent( 'download' );
+			await browserPage.goto( printUrl( featuredPost.link ) );
+			await expectPdfDownload(
+				await downloadPromise,
+				'Featured-Export.pdf'
+			);
+		} finally {
+			await setSettings( {} );
+			await requestUtils.deleteMedia( media.id );
+		}
 	} );
 
 	test( 'classic theme uses the classic wrappers and exports', async ( {

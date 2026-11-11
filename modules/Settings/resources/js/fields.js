@@ -61,6 +61,22 @@ export const fields = [
 		limits.marginMax
 	),
 	{
+		id: 'show_title',
+		label: __( 'Show the post title', 'content-pdf' ),
+		type: 'boolean',
+		Edit: 'toggle',
+	},
+	{
+		id: 'show_featured_image',
+		label: __( 'Show the featured image', 'content-pdf' ),
+		description: __(
+			'Printed below the title, at the full content width.',
+			'content-pdf'
+		),
+		type: 'boolean',
+		Edit: 'toggle',
+	},
+	{
 		id: 'header_logo_id',
 		label: __( 'Header logo', 'content-pdf' ),
 		description: __(

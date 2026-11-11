@@ -21,6 +21,7 @@
  * @var bool     $is_block_theme Whether the active theme is a block theme.
  * @var string[] $body_classes   Extra body classes.
  * @var bool     $show_title     Whether to print the post title.
+ * @var string   $featured_image Featured image markup, or empty when it is turned off or missing.
  *
  * @package Dinamiko\ContentPdf
  */
@@ -47,6 +48,11 @@ $cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) 
 				<?php if ( $show_title ) : ?>
 					<h1 class="wp-block-post-title"><?php echo wp_kses_post( $title ); ?></h1>
 				<?php endif; ?>
+				<?php if ( $featured_image ) : ?>
+					<figure class="wp-block-post-featured-image cpdf-featured-image">
+						<?php echo $featured_image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_the_post_thumbnail() output. ?>
+					</figure>
+				<?php endif; ?>
 				<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the_content output. ?>
 			</article>
 		</main>
@@ -58,9 +64,16 @@ $cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) 
 					<div id="primary" class="content-area">
 						<main id="main" class="site-main">
 							<article id="post-<?php echo (int) $post->ID; ?>" <?php post_class( '', $post ); ?>>
-								<?php if ( $show_title ) : ?>
+								<?php if ( $show_title || $featured_image ) : ?>
 									<header class="entry-header">
-										<h1 class="entry-title"><?php echo wp_kses_post( $title ); ?></h1>
+										<?php if ( $show_title ) : ?>
+											<h1 class="entry-title"><?php echo wp_kses_post( $title ); ?></h1>
+										<?php endif; ?>
+										<?php if ( $featured_image ) : ?>
+											<div class="post-thumbnail cpdf-featured-image">
+												<?php echo $featured_image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_the_post_thumbnail() output. ?>
+											</div>
+										<?php endif; ?>
 									</header>
 								<?php endif; ?>
 								<div class="entry-content">

@@ -39,6 +39,12 @@ test.describe( 'Settings page', () => {
 		await page
 			.getByRole( 'checkbox', { name: /Hide the header and footer/ } )
 			.check();
+		await page
+			.getByRole( 'checkbox', { name: 'Show the post title' } )
+			.uncheck();
+		await page
+			.getByRole( 'checkbox', { name: 'Show the featured image' } )
+			.check();
 
 		await expect( save ).toBeEnabled();
 		await save.click();
@@ -59,6 +65,12 @@ test.describe( 'Settings page', () => {
 		).toHaveValue( 'E2E footer' );
 		await expect(
 			page.getByRole( 'checkbox', { name: /Hide the header and footer/ } )
+		).toBeChecked();
+		await expect(
+			page.getByRole( 'checkbox', { name: 'Show the post title' } )
+		).not.toBeChecked();
+		await expect(
+			page.getByRole( 'checkbox', { name: 'Show the featured image' } )
 		).toBeChecked();
 	} );
 

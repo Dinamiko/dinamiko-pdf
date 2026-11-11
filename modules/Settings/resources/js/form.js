@@ -1,5 +1,5 @@
 /**
- * DataForm layout: two cards, with the header/footer slots in rows.
+ * DataForm layout: three cards, with the header/footer slots in rows.
  */
 import { __ } from '@wordpress/i18n';
 
@@ -13,6 +13,12 @@ export const form = {
 			label: __( 'General', 'content-pdf' ),
 			layout: { type: 'card', isCollapsible: false },
 			children: [ 'post_types', 'button_action', 'paper', 'margin_mm' ],
+		},
+		{
+			id: 'content',
+			label: __( 'Content', 'content-pdf' ),
+			layout: { type: 'card', isCollapsible: false },
+			children: [ 'show_title', 'show_featured_image' ],
 		},
 		{
 			id: 'regions',
