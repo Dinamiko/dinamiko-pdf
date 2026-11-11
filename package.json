@@ -13,6 +13,7 @@
     "test:e2e:debug": "wp-scripts test-playwright --config tests/e2e/playwright.config.js --ui",
     "demo:seed": "wp-env run cli --env-cwd=wp-content/plugins/content-pdf wp eval-file bin/demo-content/demo.php seed",
     "demo:clean": "wp-env run cli --env-cwd=wp-content/plugins/content-pdf wp eval-file bin/demo-content/demo.php clean",
+    "playground": "wp-playground-cli server --mount=.:/wordpress/wp-content/plugins/content-pdf --blueprint=bin/playground/blueprint.json",
     "lint:php": "composer lint:php",
     "lint:php:fix": "composer lint:php:fix",
     "copy-vendor": "node bin/copy-vendor.mjs"
@@ -22,6 +23,7 @@
     "@wordpress/e2e-test-utils-playwright": "^2.1.0",
     "@wordpress/env": "^12.1.0",
     "@wordpress/scripts": "^35.0.0",
+    "@wp-playground/cli": "^3.1.64",
     "dompdf.js": "2.0.6"
   }
 }

@@ -95,6 +95,12 @@ The print page uses the normal WordPress query, so drafts and private posts are 
 - Iframes, videos and embeds are replaced with a link.
 - The export script works around a few bugs in dompdf.js 2.0.6: hidden elements, CSS background images, spaces after inline elements, drop caps (`::first-letter`), and page breaks on headings. Small boxes with a background or border are kept on one page. List markers are forced to discs.
 
+## Try it in WordPress Playground
+
+`npm run playground` starts a throwaway WordPress in [Playground](https://wordpress.org/playground/) (no Docker) on `http://127.0.0.1:9400`. It mounts this working copy as the plugin, runs the demo seeder and logs you in. Run `composer install` and `npm run build` first. The blueprint is `bin/playground/blueprint.json`.
+
+The wordpress.org "Live Preview" uses `.wordpress-org/blueprints/blueprint.json`, which installs the plugin from the directory and runs the same seeder. To publish it, copy that file to `assets/blueprints/blueprint.json` in the plugin's SVN repository, then enable the preview for everyone in the plugin's **Advanced** view on wordpress.org (until then only committers see it). The seeder runs from the installed plugin, so the release zip must include `bin/demo-content/` (and `vendor/` from `composer install --no-dev`).
+
 ## Development
 
 See `CLAUDE.md` for commands and architecture. With wp-env running, `npm run demo:seed` fills the local site with demo content (core blocks, theme and synced patterns, templates) and `npm run demo:clean` removes it. To update the vendored dompdf.js, change the version in `package.json`, then run `npm install && npm run copy-vendor`.

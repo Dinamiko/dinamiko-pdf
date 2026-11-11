@@ -1,0 +1,22 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/",
+	"preferredVersions": {
+		"php": "8.3",
+		"wp": "latest"
+	},
+	"features": {
+		"networking": true
+	},
+	"login": true,
+	"steps": [
+		{
+			"step": "activatePlugin",
+			"pluginPath": "content-pdf/content-pdf.php"
+		},
+		{
+			"step": "wp-cli",
+			"command": "wp eval-file wp-content/plugins/content-pdf/bin/demo-content/demo.php seed"
+		}
+	]
+}
