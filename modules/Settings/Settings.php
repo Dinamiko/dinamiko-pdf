@@ -47,6 +47,11 @@ class Settings {
 	public const HEADER_SPACING_MAX = 40;
 
 	/**
+	 * Maximum page margin in mm.
+	 */
+	public const MARGIN_MAX = 50;
+
+	/**
 	 * Default values.
 	 *
 	 * @return array<string, mixed>
@@ -71,6 +76,57 @@ class Settings {
 			'footer_font_size'   => 10,
 			'hf_color'           => '#666666',
 			'hf_skip_first_page' => false,
+		];
+	}
+
+	/**
+	 * JSON schema of the option, used by the REST API (`/wp/v2/settings`).
+	 *
+	 * The REST API validates against it before `sanitize()` runs, so it must accept every value
+	 * `defaults()` and `sanitize()` produce.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function schema(): array {
+		$integer = static fn( int $min, int $max ): array => [
+			'type'    => 'integer',
+			'minimum' => $min,
+			'maximum' => $max,
+		];
+
+		$properties = [
+			'post_types'         => [
+				'type'  => 'array',
+				'items' => [ 'type' => 'string' ],
+			],
+			'button_action'      => [
+				'type' => 'string',
+				'enum' => self::BUTTON_ACTIONS,
+			],
+			'paper'              => [
+				'type' => 'string',
+				'enum' => array_keys( Geometry::PAPER_SIZES ),
+			],
+			'margin_mm'          => $integer( 0, self::MARGIN_MAX ),
+			'header_logo_id'     => [
+				'type'    => 'integer',
+				'minimum' => 0,
+			],
+			'header_logo_height' => $integer( self::LOGO_HEIGHT_MIN, self::LOGO_HEIGHT_MAX ),
+			'header_spacing_mm'  => $integer( 0, self::HEADER_SPACING_MAX ),
+			'header_font_size'   => $integer( self::FONT_SIZE_MIN, self::FONT_SIZE_MAX ),
+			'footer_font_size'   => $integer( self::FONT_SIZE_MIN, self::FONT_SIZE_MAX ),
+			'hf_color'           => [ 'type' => 'string' ],
+			'hf_skip_first_page' => [ 'type' => 'boolean' ],
+		];
+		foreach ( array_merge( ...array_values( self::REGION_SLOTS ) ) as $key ) {
+			$properties[ $key ] = [ 'type' => 'string' ];
+		}
+
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'properties'           => $properties,
 		];
 	}
 
@@ -148,7 +204,7 @@ class Settings {
 			'post_types'         => array_values( array_intersect( $post_types, $public ) ),
 			'button_action'      => isset( $input['button_action'] ) && in_array( $input['button_action'], self::BUTTON_ACTIONS, true ) ? $input['button_action'] : $defaults['button_action'],
 			'paper'              => isset( Geometry::PAPER_SIZES[ $paper ] ) ? $paper : $defaults['paper'],
-			'margin_mm'          => min( 50, $margin ),
+			'margin_mm'          => min( self::MARGIN_MAX, $margin ),
 			'header_logo_id'     => $logo_id,
 			'header_logo_height' => max( self::LOGO_HEIGHT_MIN, min( self::LOGO_HEIGHT_MAX, $logo_height ) ),
 			'header_spacing_mm'  => min( self::HEADER_SPACING_MAX, $spacing ),

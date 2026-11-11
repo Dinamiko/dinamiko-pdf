@@ -56,10 +56,18 @@ class Module implements ServiceModule, ExecutableModule {
 			}
 		);
 		add_action(
-			'admin_init',
+			'init',
 			static function () use ( $container ): void {
 				$container->get( SettingsPage::class )->register();
 			}
+		);
+		add_filter(
+			'rest_pre_get_setting',
+			static function ( $value, $name ) use ( $container ) {
+				return $container->get( SettingsPage::class )->rest_value( $value, (string) $name );
+			},
+			10,
+			2
 		);
 
 		return true;

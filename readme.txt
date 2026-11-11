@@ -1,7 +1,7 @@
 === Content PDF ===
 Contributors: dinamiko
 Tags: pdf, wordpress pdf generator, pdf generator, woocommerce pdf, post to pdf
-Requires at least: 6.5
+Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.1.0

@@ -6,7 +6,7 @@
  * Author:      Dinamiko
  * License:     MIT
  * Text Domain: content-pdf
- * Requires at least: 6.5
+ * Requires at least: 6.8
  * Requires PHP: 8.1
  *
  * @package Dinamiko\ContentPdf
