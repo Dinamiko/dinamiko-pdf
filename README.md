@@ -1,111 +1,46 @@
 # Content PDF
 
-Lets visitors download any post, page or custom post type as a PDF. The PDF is generated in the visitor's browser by the bundled [dompdf.js](https://github.com/lmn1919/dompdf.js), with no external services.
+A WordPress plugin that lets visitors download any post, page or custom post type as a PDF that looks like the site. The PDF is generated in the visitor's browser by the bundled [dompdf.js](https://github.com/lmn1919/dompdf.js), with no external services. Text stays real, selectable text.
 
-## How it works
+- Works with block themes and classic themes, and keeps the look of core blocks and theme.json styles.
+- Leaves out the site header, navigation, sidebars, footer, comments and share buttons.
+- A4 or Letter, margins, title and featured image, and a header and footer with a logo, page numbers and placeholders.
+- An automatic button or the `[content_pdf_button]` shortcode, which can download the PDF or open it in a new tab.
+- Themes can supply their own print, header and footer templates, and plugins can extend the output through hooks.
+- Falls back to the browser's print dialog when the browser can't create the PDF.
+- Respects drafts, private and password-protected posts, and keeps PDF pages out of search engines.
 
-A "Download PDF" button loads a content-only version of the post (`?cpdf_print=1`) in a hidden frame. That page renders the post content with the theme's styles at the PDF content width. dompdf.js then turns the computed layout into a vector PDF with selectable text. Core blocks (columns, galleries, tables, quotes, groups and so on) and theme.json styles look the same as on screen.
+<!-- SCREENSHOT: docs/images/hero.png. Where: a post and its PDF side by side. Setup: block demo (`npm run demo:seed`), post "Media and layout blocks". Show: the page on the left and the PDF on the right. -->
 
-The print page supports both block themes and classic themes:
+## Documentation
 
-- **Block themes**: the content is wrapped in `.wp-site-blocks` / `.entry-content.is-layout-constrained`, and the title uses `.wp-block-post-title`.
-- **Classic themes**: the content uses the common classic structure (`#page.site`, `main.site-main`, `article`, `.entry-header .entry-title`, `.entry-content`).
+- [User guide](docs/user-guide.md)
+- [Developer guide](docs/developer-guide.md): templates, hooks, add-ons
+- [Known limitations](docs/limitations.md)
+- [Testing](docs/testing.md)
+- [Releasing to wordpress.org](docs/release.md)
 
-The theme's header, footer and sidebars are removed. The plugin replaces the font (see the limitations), the page background (white paper by default) and the page width (paper width minus margins).
+## Quick start (development)
 
-If the browser cannot run the exporter, the plugin opens the browser's print dialog on the same content-only page instead. This happens when the browser has no Web Workers or WebAssembly, when a strict CSP blocks them, or when the export fails.
+Requirements: PHP 8.1+, Composer, Node.js and Docker (for `wp-env`).
 
-## Usage
-
-- **Settings → Content PDF**: choose the post types that get the button automatically, the paper size (A4/Letter), the margins, and the footer text (placeholders `${currentPage}` and `${totalPages}`).
-- **Shortcode**: `[content_pdf_button]`. Optional attributes: `label="…"`, and `id="123"` to export another post.
-- Add the CSS class `cpdf-page-break` to any block to start it on a new page.
-- Open `https://example.com/any-post/?cpdf_print=1` to export directly, or add `&cpdf_mode=print` to get the print dialog instead.
-- A theme can supply its own print template. See [Custom print templates](#custom-print-templates).
-
-## Custom print templates
-
-The print page (what ends up in the PDF) can be replaced from the theme, in block themes and classic themes alike. Content PDF uses the first file that exists, checking the child theme and then the parent theme:
-
-1. `content-pdf/print-{post_type}-{slug}.php`, e.g. `print-post-hello-world.php`
-2. `content-pdf/print-{post_type}-{id}.php`, e.g. `print-page-42.php`
-3. `content-pdf/print-{post_type}.php`, e.g. `print-product.php`
-4. `content-pdf/print.php`
-5. The plugin's default, `modules/Export/templates/print.php`
-
-Start by copying the default template. It's a complete HTML document and must keep:
-
-- an element with the class `cpdf-article` and the width style shown below. Only this element is exported.
-- `wp_head()` and `wp_footer()`, which load the exporter and the theme/block styles.
-- `<p class="cpdf-status">` (optional), which shows the export progress.
-
-These variables are available: `$post` (`WP_Post`), `$content` (the post content after `the_content`), `$title`, `$geometry` (page size and margins), `$is_block_theme`, `$body_classes` and `$show_title`. Use `$post` for anything else, such as custom fields, the featured image or the author.
-
-```php
-<?php
-defined( 'ABSPATH' ) || exit;
-$cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) $geometry['content_px'], (int) $geometry['gutter_px'] );
-?>
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-	<meta charset="<?php bloginfo( 'charset' ); ?>">
-	<title><?php echo esc_html( wp_strip_all_tags( $title ) ); ?></title>
-	<?php wp_head(); ?>
-</head>
-<body <?php body_class( $body_classes ); ?>>
-	<p class="cpdf-status" role="status" aria-live="polite"></p>
-	<article class="entry-content cpdf-article" style="<?php echo esc_attr( $cpdf_width ); ?>">
-		<h1><?php echo wp_kses_post( $title ); ?></h1>
-		<?php echo get_the_post_thumbnail( $post, 'large' ); ?>
-		<p>Price: <?php echo esc_html( get_post_meta( $post->ID, 'price', true ) ); ?></p>
-		<?php echo $content; ?>
-	</article>
-	<?php wp_footer(); ?>
-</body>
-</html>
+```bash
+composer install
+npm install
+npm run build
+npm run wp-env start     # http://localhost:8888 (admin / password)
+npm run demo:seed        # block theme demo; npm run demo:seed:classic for the classic one
 ```
 
-Plugins can change the lookup list with `cpdf_print_template_hierarchy`, or return any absolute path from `cpdf_print_template`.
+Or, without Docker: `npm run playground` (WordPress Playground on `http://127.0.0.1:9400`, demo included).
 
-## Hooks
-
-| Hook | Type | Purpose |
-| --- | --- | --- |
-| `cpdf_modules` | filter | Add Modularity modules (e.g. premium add-ons) before the plugin boots. |
-| `cpdf_hidden_selectors` | filter | CSS selectors hidden on the print page (share buttons, related posts, comment forms). |
-| `cpdf_show_title` | filter | Whether the print page shows the post title (default `true`). |
-| `cpdf_keep_theme_background` | filter | Keep the theme's page background instead of white. |
-| `cpdf_print_template_hierarchy` | filter | Theme template names tried for the print page, most specific first. |
-| `cpdf_print_template` | filter | Absolute path of the print page template (after the theme lookup). |
-| `cpdf_export_config` | filter | Config passed to the exporter (paper, margins, footer, fonts, filename). |
-| `cpdf_engine` | filter | Replace the PDF engine (an `Dinamiko\ContentPdf\Export\Engine\Engine`). |
-| `cpdf_dequeue_scripts` | filter | Script handles removed from the print page (by default, scripts loaded from the theme). |
-| `cpdf_print_enqueue` | action | Add CSS/JS to the print page. A script can push functions `( article, helpers )` to `window.cpdfHooks.beforeExport`. They run before the export and may return a Promise. |
-
-## Privacy
-
-The print page uses the normal WordPress query, so drafts and private posts are only available to users who are allowed to read them. It sends `X-Robots-Tag: noindex, nofollow` and `Cache-Control: private, no-store`.
-
-## Known limitations
-
-- **Fonts**: the PDF uses the bundled Noto Sans (Regular and Bold) for all text, because dompdf.js only embeds the fonts it is given. Latin, Greek and Cyrillic are covered. Italic text is slanted synthetically.
-- **Cross-origin images** (CDNs) need CORS headers, or they may be missing from the PDF.
-- **Content Security Policy**: a strict CSP must allow `worker-src blob:` and `script-src 'wasm-unsafe-eval'`. Without them, the plugin falls back to the print dialog.
-- Iframes, videos and embeds are replaced with a link.
-- The export script works around a few bugs in dompdf.js 2.0.6: hidden elements, CSS background images, spaces after inline elements, drop caps (`::first-letter`), and page breaks on headings. Small boxes with a background or border are kept on one page. List markers are forced to discs.
-
-## Try it in WordPress Playground
-
-`npm run playground` starts a throwaway WordPress in [Playground](https://wordpress.org/playground/) (no Docker) on `http://127.0.0.1:9400`. It mounts this working copy as the plugin, runs the demo seeder and logs you in. Run `composer install` and `npm run build` first. The blueprint is `bin/playground/blueprint.json`.
-
-The wordpress.org "Live Preview" uses `.wordpress-org/blueprints/blueprint.json`, which installs the plugin from the directory and runs the same seeder. To publish it, copy that file to `assets/blueprints/blueprint.json` in the plugin's SVN repository, then enable the preview for everyone in the plugin's **Advanced** view on wordpress.org (until then only committers see it). The seeder runs from the installed plugin, so the release zip must include `bin/demo-content/` (and `vendor/` from `composer install --no-dev`).
-
-## Development
-
-See `CLAUDE.md` for commands and architecture. With wp-env running, `npm run demo:seed` fills the local site with demo content (core blocks, theme and synced patterns, templates) and `npm run demo:clean` removes it. To update the vendored dompdf.js, change the version in `package.json`, then run `npm install && npm run copy-vendor`.
+[`CLAUDE.md`](CLAUDE.md) lists every command and describes the architecture.
 
 ## Credits
 
 - dompdf.js, MIT licence (`modules/Export/assets/vendor/dompdf/LICENSE`). It is not related to the PHP library Dompdf.
 - Noto Sans, SIL Open Font License 1.1 (`modules/Export/assets/fonts/OFL.txt`).
+
+## License
+
+MIT

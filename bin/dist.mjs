@@ -19,8 +19,10 @@ const zipPath = join( distDir, `${ SLUG }.zip` );
 // source next to the minified build/. bin/demo-content/ is needed by the Live
 // Preview blueprint, which seeds from the installed plugin.
 const INCLUDE = [ `${ SLUG }.php`, 'readme.txt', 'modules/', 'bin/demo-content/' ];
-// Needed only to install production dependencies; removed afterwards.
+// Copied to install production dependencies. composer.json stays in the zip (wordpress.org
+// reviewers and Plugin Check expect it next to vendor/); the lock file is removed afterwards.
 const COMPOSER_FILES = [ 'composer.json', 'composer.lock' ];
+const COMPOSER_REMOVE = [ 'composer.lock' ];
 
 const fail = ( message ) => {
 	console.error( `dist: ${ message }` );
@@ -62,7 +64,7 @@ run(
 	[ 'install', '--no-dev', '--optimize-autoloader', '--no-interaction', '--no-progress', '--quiet' ],
 	stage
 );
-for ( const file of COMPOSER_FILES ) {
+for ( const file of COMPOSER_REMOVE ) {
 	rmSync( join( stage, file ), { force: true } );
 }
 

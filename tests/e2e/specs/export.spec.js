@@ -95,7 +95,8 @@ test.describe( 'PDF export', () => {
 		} );
 		page = await requestUtils.createPage( {
 			title: 'Shortcode Page',
-			content: '<!-- wp:shortcode -->[content_pdf_button label="Get PDF"]<!-- /wp:shortcode -->',
+			content:
+				'<!-- wp:shortcode -->[content_pdf_button label="Get PDF"]<!-- /wp:shortcode -->',
 			status: 'publish',
 		} );
 		breakPost = await requestUtils.createPost( {
@@ -133,8 +134,9 @@ test.describe( 'PDF export', () => {
 		page: browserPage,
 	} ) => {
 		// Keep the export from starting: block the exporter script.
-		await browserPage.route( '**/modules/Export/build/index.js*', ( route ) =>
-			route.abort()
+		await browserPage.route(
+			'**/modules/Export/build/index.js*',
+			( route ) => route.abort()
 		);
 		await browserPage.goto( printUrl( post.link ) );
 
@@ -147,8 +149,12 @@ test.describe( 'PDF export', () => {
 		await expect( article.locator( '.wp-block-columns' ) ).toHaveCount( 1 );
 		await expect( article.locator( 'table' ) ).toContainText( 'Cell B' );
 		await expect( browserPage.locator( '.cpdf-button' ) ).toBeHidden();
-		await expect( browserPage.locator( 'header.wp-block-template-part' ) ).toHaveCount( 0 );
-		await expect( browserPage.locator( 'footer.wp-block-template-part' ) ).toHaveCount( 0 );
+		await expect(
+			browserPage.locator( 'header.wp-block-template-part' )
+		).toHaveCount( 0 );
+		await expect(
+			browserPage.locator( 'footer.wp-block-template-part' )
+		).toHaveCount( 0 );
 
 		const config = await browserPage.evaluate( () => window.cpdfConfig );
 		expect( config.filename ).toBe( 'Blocks-Export.pdf' );
@@ -277,18 +283,21 @@ test.describe( 'PDF export', () => {
 
 			// Defaults: title on, featured image off.
 			await browserPage.goto( printUrl( featuredPost.link ) );
-			await expect( article.locator( '.wp-block-post-title' ) ).toHaveText(
-				'Featured Export'
-			);
-			await expect( article.locator( '.cpdf-featured-image' ) ).toHaveCount(
-				0
-			);
+			await expect(
+				article.locator( '.wp-block-post-title' )
+			).toHaveText( 'Featured Export' );
+			await expect(
+				article.locator( '.cpdf-featured-image' )
+			).toHaveCount( 0 );
 
-			await setSettings( { show_title: false, show_featured_image: true } );
+			await setSettings( {
+				show_title: false,
+				show_featured_image: true,
+			} );
 			await browserPage.goto( printUrl( featuredPost.link ) );
-			await expect( article.locator( '.wp-block-post-title' ) ).toHaveCount(
-				0
-			);
+			await expect(
+				article.locator( '.wp-block-post-title' )
+			).toHaveCount( 0 );
 			await expect(
 				article.locator( '.cpdf-featured-image img' )
 			).toBeVisible();
@@ -312,8 +321,9 @@ test.describe( 'PDF export', () => {
 	} ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 
-		await browserPage.route( '**/modules/Export/build/index.js*', ( route ) =>
-			route.abort()
+		await browserPage.route(
+			'**/modules/Export/build/index.js*',
+			( route ) => route.abort()
 		);
 		await browserPage.goto( printUrl( post.link ) );
 		const article = browserPage.locator( '.cpdf-article' );
@@ -344,10 +354,13 @@ test.describe( 'PDF export', () => {
 			status: 'publish',
 		} );
 
-		await browserPage.route( '**/modules/Export/build/index.js*', ( route ) =>
-			route.abort()
+		await browserPage.route(
+			'**/modules/Export/build/index.js*',
+			( route ) => route.abort()
 		);
-		const marker = browserPage.locator( '.cpdf-article .cpdf-test-template' );
+		const marker = browserPage.locator(
+			'.cpdf-article .cpdf-test-template'
+		);
 
 		// print-page.php matches every page.
 		await browserPage.goto( printUrl( page.link ) );
@@ -355,7 +368,9 @@ test.describe( 'PDF export', () => {
 
 		// print-post-{slug}.php matches only that post.
 		await browserPage.goto( printUrl( slugPost.link ) );
-		await expect( marker ).toHaveText( 'print-post-cpdf-hierarchy-post.php' );
+		await expect( marker ).toHaveText(
+			'print-post-cpdf-hierarchy-post.php'
+		);
 
 		// Other posts fall back to the plugin template.
 		await browserPage.goto( printUrl( post.link ) );
@@ -369,5 +384,47 @@ test.describe( 'PDF export', () => {
 		const downloadPromise = browserPage.waitForEvent( 'download' );
 		await browserPage.goto( printUrl( page.link ) );
 		await expectPdfDownload( await downloadPromise, 'Shortcode-Page.pdf' );
+	} );
+
+	test( 'password-protected posts need the password first', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const secret = 'Protected secret paragraph';
+		const protectedPost = await requestUtils.createPost( {
+			title: 'Protected Export',
+			content: `<!-- wp:paragraph --><p>${ secret }</p><!-- /wp:paragraph -->`,
+			status: 'publish',
+			password: 'cpdf',
+		} );
+
+		// Without the password: no button, and the print URL shows the password form, not the content.
+		await browserPage.goto( protectedPost.link );
+		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 0 );
+		await browserPage.goto( printUrl( protectedPost.link ) );
+		await expect( browserPage.locator( '.cpdf-article' ) ).toHaveCount( 0 );
+		await expect(
+			browserPage.locator( 'input[name="post_password"]' )
+		).toBeVisible();
+		expect( await browserPage.content() ).not.toContain( secret );
+
+		// After entering it: the button appears and the post exports.
+		await browserPage.goto( protectedPost.link );
+		await browserPage
+			.locator( 'input[name="post_password"]' )
+			.fill( 'cpdf' );
+		await browserPage
+			.locator( 'input[name="post_password"]' )
+			.press( 'Enter' );
+		await expect(
+			browserPage.getByRole( 'button', { name: 'Download PDF' } )
+		).toBeVisible();
+		const downloadPromise = browserPage.waitForEvent( 'download' );
+		await browserPage.goto( printUrl( protectedPost.link ) );
+		await expectPdfDownload(
+			await downloadPromise,
+			// WordPress prefixes protected titles (protected_title_format).
+			'Protected-Protected-Export.pdf'
+		);
 	} );
 } );

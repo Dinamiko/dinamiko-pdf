@@ -21,6 +21,16 @@
 			}
 		},
 		{
+			"step": "installTheme",
+			"themeData": {
+				"resource": "wordpress.org/themes",
+				"slug": "twentytwentyone"
+			},
+			"options": {
+				"activate": false
+			}
+		},
+		{
 			"step": "wp-cli",
 			"command": "wp eval-file wp-content/plugins/content-pdf/bin/demo-content/demo.php seed"
 		}

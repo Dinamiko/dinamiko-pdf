@@ -12,6 +12,7 @@
     "test:e2e": "wp-scripts test-playwright --config tests/e2e/playwright.config.js",
     "test:e2e:debug": "wp-scripts test-playwright --config tests/e2e/playwright.config.js --ui",
     "demo:seed": "wp-env run cli --env-cwd=wp-content/plugins/content-pdf wp eval-file bin/demo-content/demo.php seed",
+    "demo:seed:classic": "wp-env run cli --env-cwd=wp-content/plugins/content-pdf wp eval-file bin/demo-content/demo.php seed classic",
     "demo:clean": "wp-env run cli --env-cwd=wp-content/plugins/content-pdf wp eval-file bin/demo-content/demo.php clean",
     "playground": "wp-playground-cli server --mount=.:/wordpress/wp-content/plugins/content-pdf --blueprint=bin/playground/blueprint.json",
     "lint:php": "composer lint:php",

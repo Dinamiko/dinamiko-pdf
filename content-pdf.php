@@ -5,6 +5,7 @@
  * Version:     0.1.0
  * Author:      Dinamiko
  * License:     MIT
+ * License URI: https://opensource.org/licenses/MIT
  * Text Domain: content-pdf
  * Requires at least: 6.8
  * Requires PHP: 8.1

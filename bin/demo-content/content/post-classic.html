@@ -1,0 +1,43 @@
+<p>This post has no block markup, as it would if it had been written in the classic editor (or with the Classic Editor plugin). Many classic-theme sites have years of content like this. WordPress runs it through <code>wpautop</code>, so these lines become paragraphs, and the theme styles it through <code>.entry-content</code>.</p>
+
+<h2>Headings and text</h2>
+
+Plain lines without a &lt;p&gt; tag are wrapped in paragraphs automatically. Inline formatting works as usual: <strong>bold</strong>, <em>italic</em>, <a href="https://wordpress.org/">a link</a> and <code>inline code</code>.
+
+<h3>A list</h3>
+<ul>
+	<li>First item</li>
+	<li>Second item, with <strong>bold</strong> text</li>
+	<li>Third item</li>
+</ul>
+
+<ol>
+	<li>Step one</li>
+	<li>Step two</li>
+</ol>
+
+<blockquote>A blockquote from the classic editor, styled by the theme rather than by the quote block's styles.</blockquote>
+
+<h2>Image with a caption</h2>
+
+[caption id="" align="aligncenter" width="800"]<img src="{{img:square1:url}}" alt="Square 1" width="800" height="800" /> The classic [caption] shortcode.[/caption]
+
+<h2>Table</h2>
+
+<table>
+	<thead>
+		<tr><th>Plan</th><th>Pages</th><th>Price</th></tr>
+	</thead>
+	<tbody>
+		<tr><td>Basic</td><td>10</td><td>€9</td></tr>
+		<tr><td>Pro</td><td>100</td><td>€29</td></tr>
+	</tbody>
+</table>
+
+<h2 class="cpdf-page-break">A page break</h2>
+
+This heading has the <code>cpdf-page-break</code> class, added by hand in the text editor, so it starts a new page in the PDF.
+
+<!--more-->
+
+The <code>&lt;!--more--&gt;</code> tag above only affects archives; the PDF always contains the whole post.

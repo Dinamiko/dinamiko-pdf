@@ -73,6 +73,12 @@ class PrintEndpoint {
 			return;
 		}
 
+		// Password-protected posts: until the visitor enters the password, the normal page (with
+		// the password form) is shown instead, because render() exports the full post content.
+		if ( post_password_required( get_queried_object() ) ) {
+			return;
+		}
+
 		// The main query already enforced visibility; drafts/private posts 404 before this point.
 		$this->active = true;
 

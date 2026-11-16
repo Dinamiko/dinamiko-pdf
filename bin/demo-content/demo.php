@@ -4,17 +4,26 @@
  *
  * Run inside the wp-env `cli` container (see `npm run demo:seed` / `npm run demo:clean`):
  *
- *     wp eval-file bin/demo-content/demo.php seed   # clean, then create everything
- *     wp eval-file bin/demo-content/demo.php clean  # remove everything this script created
+ *     wp eval-file bin/demo-content/demo.php seed          # block theme demo (Twenty Twenty-Five)
+ *     wp eval-file bin/demo-content/demo.php seed classic  # classic theme demo (Twenty Twenty-One)
+ *     wp eval-file bin/demo-content/demo.php clean         # remove everything this script created
+ *
+ * `seed` cleans first, then activates the theme and creates the content. The classic demo
+ * leaves out everything that needs a block theme: theme and full-page patterns, synced
+ * patterns and the custom template.
  *
  * Every object it creates is tagged with the `_cpdf_demo` meta, so `clean` never touches
  * other content. Options it changes are backed up and restored by `clean`.
  *
  * Block markup lives in `content/*.html`. Placeholders resolved at seed time:
  * `{{img:key:id}}`, `{{img:key:url}}`, `{{block:key}}`, `{{post:key:id}}`, `{{post:key:url}}`.
+ * Post URLs are `?p=ID` / `?page_id=ID` links (see link()), so they keep working when the
+ * permalink structure changes after seeding.
  *
  * @package Dinamiko\ContentPdf
  */
+
+defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	return;
@@ -27,7 +36,10 @@ final class Cpdf_Demo_Content {
 
 	private const META       = '_cpdf_demo';
 	private const BACKUP     = 'cpdf_demo_backup';
-	private const THEME      = 'twentytwentyfive';
+	private const THEMES     = [
+		'block'   => 'twentytwentyfive',
+		'classic' => 'twentytwentyone',
+	];
 	private const CATEGORY   = 'Content PDF demo';
 	private const TEMPLATE   = 'cpdf-demo-landing';
 	private const FONT       = '/modules/Export/assets/fonts/NotoSans-Bold.ttf';
@@ -60,7 +72,8 @@ final class Cpdf_Demo_Content {
 	/**
 	 * Posts and pages, in creation order (later items can link to earlier ones).
 	 * key => [ type, title, content file, extra ].
-	 * Extra: `image` (featured image key), `template` (page template slug), `excerpt`.
+	 * Extra: `image` (featured image key), `template` (page template slug), `excerpt`,
+	 * `block_only` (block editor or Twenty Twenty-Five features: left out of the classic demo).
 	 */
 	private const ITEMS = [
 		'text'      => [ 'post', 'Core text blocks', 'post-text.html', [ 'image' => 'hero' ] ],
@@ -68,10 +81,27 @@ final class Cpdf_Demo_Content {
 		'longform'  => [ 'post', 'A long-form article with page breaks', 'post-longform.html', [ 'image' => 'ocean' ] ],
 		'embeds'    => [ 'post', 'Embeds, video and audio', 'post-embeds.html', [ 'image' => 'poster' ] ],
 		'languages' => [ 'post', 'Typography and languages', 'post-languages.html', [] ],
-		'patterns'  => [ 'page', 'Theme patterns', 'page-patterns.html', [] ],
-		'synced'    => [ 'page', 'Synced patterns', 'page-synced.html', [] ],
-		'business'  => [ 'page', 'Business home (full-page pattern, "Page No Title" template)', 'page-business.html', [ 'template' => 'page-no-title' ] ],
-		'landing'   => [ 'page', 'Event landing (custom template)', 'page-landing.html', [ 'template' => self::TEMPLATE ] ],
+		'classic'   => [ 'post', 'Classic editor content (no blocks)', 'post-classic.html', [ 'image' => 'desert' ] ],
+		'patterns'  => [ 'page', 'Theme patterns', 'page-patterns.html', [ 'block_only' => true ] ],
+		'synced'    => [ 'page', 'Synced patterns', 'page-synced.html', [ 'block_only' => true ] ],
+		'business'  => [
+			'page',
+			'Business home (full-page pattern, "Page No Title" template)',
+			'page-business.html',
+			[
+				'template'   => 'page-no-title',
+				'block_only' => true,
+			],
+		],
+		'landing'   => [
+			'page',
+			'Event landing (custom template)',
+			'page-landing.html',
+			[
+				'template'   => self::TEMPLATE,
+				'block_only' => true,
+			],
+		],
 		'shortcode' => [ 'page', 'Shortcode buttons', 'page-shortcode.html', [] ],
 	];
 
@@ -85,6 +115,13 @@ final class Cpdf_Demo_Content {
 		'block' => [],
 		'post'  => [],
 	];
+
+	/**
+	 * Demo flavour: `block` or `classic`.
+	 *
+	 * @var string
+	 */
+	private string $mode = 'block';
 
 	/**
 	 * Directory of this script.
@@ -104,8 +141,14 @@ final class Cpdf_Demo_Content {
 	 * Entry point.
 	 *
 	 * @param string $command `seed` or `clean`.
+	 * @param string $mode    `block` (default) or `classic`, for `seed`.
 	 */
-	public function run( string $command ): void {
+	public function run( string $command, string $mode = 'block' ): void {
+		if ( ! isset( self::THEMES[ $mode ] ) ) {
+			WP_CLI::error( "Unknown demo '{$mode}'. Use 'block' or 'classic'." );
+		}
+		$this->mode = $mode;
+
 		// Content is trusted (it is ours); keep iframes, inline styles, etc.
 		kses_remove_filters();
 		wp_set_current_user(
@@ -184,10 +227,15 @@ final class Cpdf_Demo_Content {
 	 * Create all demo content.
 	 */
 	private function seed(): void {
-		if ( get_stylesheet() !== self::THEME ) {
-			switch_theme( self::THEME );
-			WP_CLI::log( 'Activated ' . self::THEME . '.' );
+		$theme = self::THEMES[ $this->mode ];
+		if ( get_stylesheet() !== $theme ) {
+			if ( ! wp_get_theme( $theme )->exists() ) {
+				WP_CLI::error( "Theme '{$theme}' is not installed." );
+			}
+			switch_theme( $theme );
+			WP_CLI::log( "Activated {$theme}." );
 		}
+		$classic = 'classic' === $this->mode;
 
 		$this->backup_options( [ 'cpdf_settings', 'show_on_front', 'page_on_front' ] );
 
@@ -196,7 +244,7 @@ final class Cpdf_Demo_Content {
 		}
 		WP_CLI::log( sprintf( 'Created %d images.', count( self::IMAGES ) ) );
 
-		foreach ( self::BLOCKS as $key => [ $title, $file ] ) {
+		foreach ( $classic ? [] : self::BLOCKS as $key => [ $title, $file ] ) {
 			$this->ids['block'][ $key ] = $this->insert(
 				[
 					'post_type'    => 'wp_block',
@@ -206,7 +254,9 @@ final class Cpdf_Demo_Content {
 			);
 		}
 
-		$this->create_template();
+		if ( ! $classic ) {
+			$this->create_template();
+		}
 
 		$category = wp_insert_term( self::CATEGORY, 'category' );
 		if ( is_wp_error( $category ) ) {
@@ -215,6 +265,9 @@ final class Cpdf_Demo_Content {
 		add_term_meta( $category['term_id'], self::META, 1, true );
 
 		foreach ( self::ITEMS as $key => [ $type, $title, $file, $extra ] ) {
+			if ( $classic && ! empty( $extra['block_only'] ) ) {
+				continue;
+			}
 			$id = $this->insert(
 				[
 					'post_type'     => $type,
@@ -247,7 +300,7 @@ final class Cpdf_Demo_Content {
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_on_front', $index );
 
-		WP_CLI::success( sprintf( 'Demo content ready: %s', home_url( '/' ) ) );
+		WP_CLI::success( sprintf( 'Demo content (%s theme) ready: %s', $this->mode, home_url( '/' ) ) );
 	}
 
 	/**
@@ -295,7 +348,7 @@ final class Cpdf_Demo_Content {
 				'post_content' => $this->content( 'template-landing.html' ),
 			]
 		);
-		wp_set_object_terms( $id, self::THEME, 'wp_theme' );
+		wp_set_object_terms( $id, self::THEMES['block'], 'wp_theme' );
 	}
 
 	/**
@@ -312,6 +365,11 @@ final class Cpdf_Demo_Content {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local file.
 		$markup = (string) file_get_contents( $path );
 
+		// The classic demo has no synced patterns: drop the references to them.
+		if ( 'classic' === $this->mode ) {
+			$markup = (string) preg_replace( '/^<!-- wp:block \{"ref":\{\{block:[a-z0-9_-]+\}\}\} \/-->\n*/m', '', $markup );
+		}
+
 		return (string) preg_replace_callback(
 			'/\{\{(img|block|post):([a-z0-9_-]+)(?::(id|url))?\}\}/',
 			function ( array $m ): string {
@@ -324,27 +382,52 @@ final class Cpdf_Demo_Content {
 				if ( 'id' === $field ) {
 					return (string) $id;
 				}
-				return 'img' === $kind ? (string) wp_get_attachment_url( $id ) : (string) get_permalink( $id );
+				return 'img' === $kind ? (string) wp_get_attachment_url( $id ) : $this->link( $id );
 			},
 			$markup
 		);
 	}
 
 	/**
-	 * Front page: what the demo covers, with links to each item and its export URLs.
+	 * Permalink-independent URL of a post or page.
+	 *
+	 * The seeded markup stores URLs, so they must not depend on the permalink structure at seed
+	 * time. WordPress resolves `?p=` / `?page_id=` with any structure, and redirect_canonical()
+	 * forwards them (keeping extra query args such as `cpdf_print`) to the current pretty URL.
+	 *
+	 * @param int $id Post ID.
+	 * @return string URL.
+	 */
+	private function link( int $id ): string {
+		return add_query_arg( 'page' === get_post_type( $id ) ? 'page_id' : 'p', $id, home_url( '/' ) );
+	}
+
+	/**
+	 * Front page: what the demo covers, with links to each item and its export URLs, grouped by
+	 * the themes each item works with.
 	 *
 	 * @return string Block markup.
 	 */
 	private function index_content(): string {
-		$items = '';
-		foreach ( self::ITEMS as $key => [ $type, $title ] ) {
+		$lists = [
+			'items_any'   => '',
+			'items_block' => '',
+		];
+		foreach ( self::ITEMS as $key => [ $type, $title, , $extra ] ) {
+			if ( ! isset( $this->ids['post'][ $key ] ) ) {
+				continue;
+			}
 			$id    = $this->ids['post'][ $key ];
-			$url   = get_permalink( $id );
+			$url   = $this->link( $id );
 			$pdf   = add_query_arg( 'cpdf_print', '1', $url );
 			$print = add_query_arg( 'cpdf_mode', 'print', $pdf );
+			$list  = empty( $extra['block_only'] ) ? 'items_any' : 'items_block';
 
-			$items .= sprintf(
-				"<!-- wp:list-item -->\n<li><a href=\"%s\">%s</a> (%s): <a href=\"%s\">download PDF</a> · <a href=\"%s\">print dialog</a></li>\n<!-- /wp:list-item -->\n\n",
+			$li = '<li><a href="%s">%s</a> (%s): <a href="%s">download PDF</a> · <a href="%s">print dialog</a></li>';
+
+			$lists[ $list ] .= sprintf(
+				// The classic index is plain HTML; the block index uses list-item blocks.
+				'classic' === $this->mode ? "\t{$li}\n" : "<!-- wp:list-item -->\n{$li}\n<!-- /wp:list-item -->\n\n",
 				esc_url( $url ),
 				esc_html( $title ),
 				esc_html( $type ),
@@ -353,7 +436,11 @@ final class Cpdf_Demo_Content {
 			);
 		}
 
-		return str_replace( '{{items}}', rtrim( $items ), $this->content( 'page-index.html' ) );
+		$markup = $this->content( 'classic' === $this->mode ? 'page-index-classic.html' : 'page-index.html' );
+		foreach ( $lists as $placeholder => $items ) {
+			$markup = str_replace( '{{' . $placeholder . '}}', rtrim( $items ), $markup );
+		}
+		return $markup;
 	}
 
 	/**
@@ -435,4 +522,4 @@ final class Cpdf_Demo_Content {
 	}
 }
 
-( new Cpdf_Demo_Content() )->run( (string) ( $args[0] ?? 'seed' ) );
+( new Cpdf_Demo_Content() )->run( (string) ( $args[0] ?? 'seed' ), (string) ( $args[1] ?? 'block' ) );

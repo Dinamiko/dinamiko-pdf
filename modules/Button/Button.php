@@ -133,9 +133,14 @@ class Button {
 	 * @param WP_Post $post   Post.
 	 * @param string  $label  Optional label.
 	 * @param string  $action `download` or `view`; empty uses the setting.
-	 * @return string
+	 * @return string Markup, or an empty string while the post's password is required.
 	 */
 	public function render( WP_Post $post, string $label = '', string $action = '' ): string {
+		// The print page isn't available until the visitor has entered the password.
+		if ( post_password_required( $post ) ) {
+			return '';
+		}
+
 		wp_enqueue_script( self::HANDLE );
 		wp_enqueue_style( self::HANDLE );
 

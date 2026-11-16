@@ -6,6 +6,7 @@ Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.1.0
 License: MIT
+License URI: https://opensource.org/licenses/MIT
 
 Give your readers a beautiful "Download PDF" button. Posts and pages become clean, print-ready PDFs that look just like your site.
 
@@ -31,15 +32,17 @@ The PDF looks like your website, not a plain text dump. Your theme's font sizes,
 * **Real, professional PDFs.** Text stays sharp and selectable, so readers can search, copy and highlight it.
 * **Private by design.** The PDF is created right in the reader's browser. No third-party service, no API keys, no account, and your content never leaves your site.
 * **Light on your server.** Your hosting does none of the heavy lifting, so even busy sites stay fast.
-* **Simple settings.** Choose A4 or Letter paper, set the margins, show or hide the post title and featured image, and add a footer with page numbers.
+* **Simple settings.** Choose A4 or Letter paper, set the margins, and show or hide the post title and featured image.
+* **Branded header and footer.** Add your logo, the post title, site name, date, link and page numbers to every page.
+* **Download or view.** The button can download the PDF or open it in a new tab.
 * **Place the button anywhere.** Add it automatically, or drop the `[content_pdf_button]` shortcode wherever you like, with your own label.
 * **You decide where pages break.** Add the `cpdf-page-break` class to any block to start it on a new page.
 * **Always works.** If an older browser can't create the PDF, the print dialog opens instead, so nobody is left without a copy.
-* **Respects private content.** Drafts and private posts stay visible only to people allowed to read them, and PDF pages are hidden from search engines.
+* **Respects private content.** Drafts, private and password-protected posts stay visible only to people allowed to read them, and PDF pages are hidden from search engines.
 
 = Made for designers and developers too =
 
-Need a branded layout, a cover image or extra details such as prices or authors? Your theme can provide its own PDF template, for all content or for a single post type or post.
+Need a branded layout, a cover image or extra details such as prices or authors? Your theme can provide its own PDF, header and footer templates, for all content or for a single post type or post. Filters and actions let plugins change what goes into the PDF. Documentation: https://github.com/Dinamiko/content-pdf/tree/main/docs
 
 == Installation ==
 
@@ -67,9 +70,9 @@ Yes. Use the `[content_pdf_button]` shortcode in any post, page or widget. Chang
 
 Yes. Under **Settings → Content PDF**, set **Button action** to "Open the PDF in a new tab". The PDF then opens in the browser's PDF viewer. A single button can override the setting with `[content_pdf_button action="view"]` or `action="download"`.
 
-= Can I add page numbers? =
+= Can I add page numbers, a logo or the post title to every page? =
 
-Yes. Under **Settings → Content PDF**, the footer shows "Page 1 / 3" by default, and you can change the text.
+Yes. Under **Settings → Content PDF**, the header and footer each have a left, center and right slot. They accept `{title}`, `{site}`, `{date}`, `{url}`, `${currentPage}` and `${totalPages}`. By default the header shows the post title and the footer shows the site name and "Page 1 / 3". You can also add a logo to the header, change the font sizes and color, and hide both on the first page.
 
 = Does it work with pages and custom post types? =
 
@@ -79,19 +82,27 @@ Yes. Choose any public content type in the settings, such as posts, pages, produ
 
 Yes. The text is real text, not an image, so it can be selected, searched and copied.
 
+= Can I choose where pages break? =
+
+Yes. Add the `cpdf-page-break` CSS class to a block (Block → Advanced → Additional CSS class(es)) to start it on a new page.
+
+= Which fonts does the PDF use? =
+
+The PDF uses the bundled Noto Sans font, which covers Latin, Greek and Cyrillic. Sizes, colors and spacing come from your theme.
+
 = What about videos and embeds? =
 
 Videos and embedded content can't play on paper, so they are replaced with a link to the original.
 
 = Is it safe for private content? =
 
-Yes. Drafts and private posts can only be downloaded by people who are allowed to read them, and PDF pages are never indexed by search engines.
+Yes. Drafts and private posts can only be downloaded by people who are allowed to read them, password-protected posts need the password first, and PDF pages are never indexed by search engines.
 
 == Screenshots ==
 
 1. The "Download PDF" button on a blog post.
 2. The PDF keeps your theme's look: columns, images, tables and quotes.
-3. Simple settings: content types, paper size, margins and footer.
+3. Settings: content types, paper, margins, header and footer.
 
 == Changelog ==
 

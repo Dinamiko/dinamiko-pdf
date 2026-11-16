@@ -1,26 +1,64 @@
 <!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Demo content for the Content PDF plugin: core blocks, theme patterns, synced patterns and templates. Open any item and click “Download PDF”, or use the direct links below.</p>
+<p class="has-large-font-size">Content PDF demo for a block theme (Twenty Twenty-Five). Open any item and click “Download PDF”, or use the direct links below.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>There is also a classic theme demo (Twenty Twenty-One) with only the content a classic site would have. Build it with <code>npm run demo:seed:classic</code>, and switch back with <code>npm run demo:seed</code>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 class="wp-block-heading">Demo items</h2>
+<h2 class="wp-block-heading">Also in the classic demo</h2>
 <!-- /wp:heading -->
 
+<!-- wp:paragraph -->
+<p>Core blocks, shortcodes and classic-editor HTML. These export with any theme, so the classic demo has them too (without the synced disclaimer at the end of some posts). Compare the PDFs from both demos.</p>
+<!-- /wp:paragraph -->
+
 <!-- wp:list -->
-<ul class="wp-block-list">{{items}}</ul>
+<ul class="wp-block-list">{{items_any}}</ul>
 <!-- /wp:list -->
 
 <!-- wp:heading -->
-<h2 class="wp-block-heading">What to look for</h2>
+<h2 class="wp-block-heading">Block theme demo only</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Theme patterns, full-page patterns, synced patterns and a custom block template. These are block theme features, so the classic demo leaves them out.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">{{items_block}}</ul>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">What to expect with a block theme</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This demo activates Twenty Twenty-Five.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>The PDF contains only the post content. Whichever template the page uses (including “Page No Title” and the custom landing template), the template parts such as the header, navigation and footer are left out.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Colours, spacing and font sizes come from <code>theme.json</code> global styles and the block styles, so columns, galleries, cover blocks and patterns look as they do on the page.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>The title uses the theme's post title style (<code>.wp-block-post-title</code>).</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">With every theme</h2>
 <!-- /wp:heading -->
 
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li>The PDF has only the content: no header, footer or sidebar, whichever template the page uses.</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li>Theme styles (colours, spacing, font sizes) match the page; the font is replaced by Noto Sans.</li>
+<li>All text uses the bundled Noto Sans font, and the page background is white.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
@@ -28,14 +66,14 @@
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>Videos and iframes become links.</li>
+<li>Videos, audio and iframes become links to the original.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>Theme patterns and the custom template are specific to Twenty Twenty-Five. With a classic theme (Twenty Twenty-One) those pages render without them.</li>
+<li>The header and footer set under <strong>Settings → Content PDF</strong> appear on every PDF page.</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph {"fontSize":"small"} -->
-<p class="has-small-font-size">Rebuild with <code>npm run demo:seed</code>, remove with <code>npm run demo:clean</code>.</p>
+<p class="has-small-font-size">Rebuild with <code>npm run demo:seed</code> (block) or <code>npm run demo:seed:classic</code> (classic), remove with <code>npm run demo:clean</code>.</p>
 <!-- /wp:paragraph -->
