@@ -16,10 +16,12 @@ use WP_Post;
 
 /**
  * Adds the button before or after the content of enabled post types and provides [content_pdf_button].
+ * The "PDF Button" block (ButtonBlock module) renders through render() too.
  */
 class Button {
 
 	public const SHORTCODE = 'content_pdf_button';
+	public const BLOCK     = 'content-pdf/button';
 	public const HANDLE    = 'cpdf-button';
 
 	private const BUILD_DIR = 'modules/Button/build/';
@@ -99,7 +101,8 @@ class Button {
 		if ( ! in_array( $post->post_type, $settings['post_types'], true ) ) {
 			return $content;
 		}
-		if ( has_shortcode( $post->post_content, self::SHORTCODE ) ) {
+		// A post that places its own button (shortcode or block) doesn't get a second one.
+		if ( has_shortcode( $post->post_content, self::SHORTCODE ) || has_block( self::BLOCK, $post ) ) {
 			return $content;
 		}
 		$button = $this->render( $post );

@@ -9,7 +9,7 @@ Run everything here before a release. The automated suites need the local WordPr
 | PHP coding standards | `npm run lint:php` | WordPress Coding Standards, PHP 8.1+ compatibility. |
 | JS build | `npm run build` | The committed `modules/*/build/` must not change afterwards (`git status`). |
 | Unit tests | `npm run test:php` | `Geometry`, `Placeholders`, settings schema and migration, `TemplateHierarchy`. |
-| End-to-end tests | `npm run test:e2e` | Button and shortcode, print page in block and classic themes, download and view modes, page breaks, title/featured image settings, template hierarchy, password-protected posts, settings REST validation. |
+| End-to-end tests | `npm run test:e2e` | Button, shortcode and PDF Button block, print page in block and classic themes, download and view modes, page breaks, title/featured image settings, template hierarchy, password-protected posts, settings REST validation. |
 | Plugin Check | see [Release](release.md#2-plugin-check) | wordpress.org requirements, on the release zip. |
 
 Run `npm run build` before the e2e tests if the JS changed, because the tests load `build/`. To run a single test: `npm run test:e2e -- tests/e2e/specs/export.spec.js -g "classic theme"`.
@@ -49,13 +49,15 @@ Run it in a real browser (Chrome, Firefox and Safari if possible) on both demos.
 - [ ] Every PDF downloads. The content uses Twenty Twenty-One's styles (title, links, tables), and the masthead, menu and footer are absent.
 - [ ] "Classic editor content (no blocks)": paragraphs, lists, the captioned image and the table render, and the `cpdf-page-break` heading starts a new page.
 
-### Button and shortcode
+### Button, shortcode and block
 
 - [ ] The "Download PDF" button appears at the end of posts and pages (both are enabled by the demo) and shows progress while it works.
 - [ ] "Shortcode buttons" page: the custom label works, and `id="…"` downloads the other post.
 - [ ] **Button action → Open the PDF in a new tab**: the button opens a tab that shows the PDF, and its download link saves it with the right name. Allow pop-ups if the browser asks.
 - [ ] `[content_pdf_button action="view"]` and `action="download"` override the setting.
 - [ ] With a post type unchecked in **Show button on**, its posts have no automatic button.
+- [ ] "Shortcode buttons" page, **PDF Button block** section: the block's custom label works, and the view block opens the media post in a new tab.
+- [ ] In the editor, the **PDF Button** block shows the default label as a placeholder, and the label, **Button action** and **Post ID** settings are saved. A post with the block has no automatic button.
 
 ### Settings
 

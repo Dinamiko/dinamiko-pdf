@@ -159,6 +159,74 @@ test.describe( 'PDF export', () => {
 		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 1 );
 	} );
 
+	test( 'renders the PDF Button block instead of the automatic button', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const blockPost = await requestUtils.createPost( {
+			title: 'Block Button Post',
+			content:
+				'<!-- wp:paragraph --><p>Intro.</p><!-- /wp:paragraph -->' +
+				'<!-- wp:content-pdf/button {"label":"Save \\u0026amp; share","action":"view"} /-->',
+			status: 'publish',
+		} );
+		await browserPage.goto( blockPost.link );
+		const button = browserPage.getByRole( 'button', {
+			name: 'Save & share',
+		} );
+		await expect( button ).toBeVisible();
+		await expect( button ).toHaveAttribute( 'data-cpdf-action', 'view' );
+		// Posts get the automatic button, but not when the content has the block.
+		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 1 );
+
+		// The block is not printed in the PDF.
+		await browserPage.route(
+			'**/modules/Export/build/index.js*',
+			( route ) => route.abort()
+		);
+		await browserPage.goto( printUrl( blockPost.link ) );
+		await expect( browserPage.locator( '.cpdf-article' ) ).toContainText(
+			'Intro.'
+		);
+		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'the PDF Button block exports another post by ID', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const blockPage = await requestUtils.createPage( {
+			title: 'Block Page',
+			content: `<!-- wp:content-pdf/button {"postId":${ post.id }} /-->`,
+			status: 'publish',
+		} );
+		await browserPage.goto( blockPage.link );
+		const downloadPromise = browserPage.waitForEvent( 'download' );
+		await browserPage
+			.getByRole( 'button', { name: 'Download PDF' } )
+			.click();
+		await expectPdfDownload( await downloadPromise, 'Blocks-Export.pdf' );
+	} );
+
+	test( 'the PDF Button block can be added in the editor', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'content-pdf/button' } );
+		const block = editor.canvas.locator(
+			'[data-type="content-pdf/button"]'
+		);
+		await expect( block ).toBeVisible();
+		await expect(
+			block.getByRole( 'textbox', { name: 'Button text' } )
+		).toBeVisible();
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			admin.page.getByRole( 'combobox', { name: 'Button action' } )
+		).toBeVisible();
+	} );
+
 	test( 'print page shows only the content (block theme)', async ( {
 		page: browserPage,
 	} ) => {

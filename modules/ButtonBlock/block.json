@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "content-pdf/button",
+	"title": "PDF Button",
+	"category": "widgets",
+	"icon": "pdf",
+	"description": "A button that downloads the post as a PDF, or opens it in a new tab.",
+	"keywords": [ "pdf", "download", "print", "export" ],
+	"textdomain": "content-pdf",
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"action": {
+			"type": "string",
+			"enum": [ "", "download", "view" ],
+			"default": ""
+		},
+		"postId": {
+			"type": "integer",
+			"default": 0
+		}
+	},
+	"usesContext": [ "postId" ],
+	"supports": {
+		"html": false,
+		"customClassName": false
+	},
+	"editorScript": "file:./build/index.js"
+}

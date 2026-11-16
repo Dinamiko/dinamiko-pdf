@@ -35,7 +35,8 @@ function plugin(): Package {
 		$package    = Package::new( $properties )
 			->addModule( new Settings\Module() )
 			->addModule( new Export\Module() )
-			->addModule( new Button\Module() );
+			->addModule( new Button\Module() )
+			->addModule( new ButtonBlock\Module() );
 
 		/**
 		 * Extra modules (e.g. premium add-ons) to add to the package before it boots.

@@ -22,7 +22,7 @@ Requirements: WordPress 6.8 or later, PHP 8.1 or later.
 
 | Setting | Default | Values | What it does |
 | --- | --- | --- | --- |
-| Show button on | Posts | Any public post type | Post types that get the button automatically at the end of the content. Leave all unchecked to use only the shortcode. |
+| Show button on | Posts | Any public post type | Post types that get the button automatically at the end of the content. Leave all unchecked to use only the shortcode or the block. |
 | Button action | Download the PDF | Download / Open in a new tab | **Download** creates the PDF in a hidden frame and downloads it. **Open in a new tab** shows the PDF in the browser's viewer, with a download link. |
 | Paper size | A4 | A4, Letter | PDF page size. |
 | Page margins (mm) | 15 | 0 to 50 | Margin on all four sides. The content width is the paper width minus the margins. |
@@ -142,6 +142,17 @@ Example: `{site} · {date}` on the left, `Page ${currentPage} of ${totalPages}` 
 ```
 
 The button uses the core button classes (`wp-block-button__link wp-element-button`), so it looks like the theme's buttons.
+
+## The block
+
+The **PDF Button** block does the same as the shortcode, from the block editor. Add it from the inserter (search for "PDF"), in a post, a page, a template or a template part. Type the button text on the button itself; leave it empty for "Download PDF" ("View PDF" in view mode).
+
+| Block setting | Default | Description |
+| --- | --- | --- |
+| Button action | Use the plugin setting | Download the PDF, or open it in a new tab. |
+| Post ID | Current post | Export another post or page by ID. Inside a Query Loop, the button exports each post in the loop. |
+
+When a post contains the block, the automatic button is not added, so the button doesn't appear twice. The block is not printed in the PDF.
 
 ## Page breaks
 
