@@ -35,7 +35,7 @@ The PDF looks like your website, not a plain text dump. Your theme's font sizes,
 * **Simple settings.** Choose A4 or Letter paper, set the margins, and show or hide the post title and featured image.
 * **Branded header and footer.** Add your logo, the post title, site name, date, link and page numbers to every page.
 * **Download or view.** The button can download the PDF or open it in a new tab.
-* **Place the button anywhere.** Add it automatically, or drop the `[content_pdf_button]` shortcode wherever you like, with your own label.
+* **Place the button anywhere.** Add it automatically before or after the content, or drop the `[content_pdf_button]` shortcode wherever you like, with your own label.
 * **You decide where pages break.** Add the `cpdf-page-break` class to any block to start it on a new page.
 * **Always works.** If an older browser can't create the PDF, the print dialog opens instead, so nobody is left without a copy.
 * **Respects private content.** Drafts, private and password-protected posts stay visible only to people allowed to read them, and PDF pages are hidden from search engines.
@@ -64,7 +64,7 @@ Yes. Content PDF uses your theme's styles, so headings, colors, columns, images 
 
 = Can I add the button somewhere else? =
 
-Yes. Use the `[content_pdf_button]` shortcode in any post, page or widget. Change the text with `[content_pdf_button label="Save as PDF"]`.
+Yes. Under **Settings → Content PDF**, **Button position** puts the automatic button before or after the content. For any other spot, use the `[content_pdf_button]` shortcode in any post, page or widget. Change the text with `[content_pdf_button label="Save as PDF"]`.
 
 = Can visitors view the PDF in the browser instead of downloading it? =
 

@@ -12,7 +12,13 @@ export const form = {
 			id: 'general',
 			label: __( 'General', 'content-pdf' ),
 			layout: { type: 'card', isCollapsible: false },
-			children: [ 'post_types', 'button_action', 'paper', 'margin_mm' ],
+			children: [
+				'post_types',
+				'button_action',
+				'button_position',
+				'paper',
+				'margin_mm',
+			],
 		},
 		{
 			id: 'content',

@@ -15,7 +15,7 @@ use Inpsyde\Modularity\Properties\Properties;
 use WP_Post;
 
 /**
- * Appends the button to content of enabled post types and provides [content_pdf_button].
+ * Adds the button before or after the content of enabled post types and provides [content_pdf_button].
  */
 class Button {
 
@@ -75,7 +75,7 @@ class Button {
 	}
 
 	/**
-	 * Append the button to the main post content of enabled post types.
+	 * Add the button before or after the main post content of enabled post types.
 	 *
 	 * @param string $content Content.
 	 * @return string
@@ -95,13 +95,15 @@ class Button {
 		if ( ! $post instanceof WP_Post || get_queried_object_id() !== $post->ID ) {
 			return $content;
 		}
-		if ( ! in_array( $post->post_type, $this->settings->get()['post_types'], true ) ) {
+		$settings = $this->settings->get();
+		if ( ! in_array( $post->post_type, $settings['post_types'], true ) ) {
 			return $content;
 		}
 		if ( has_shortcode( $post->post_content, self::SHORTCODE ) ) {
 			return $content;
 		}
-		return $content . $this->render( $post );
+		$button = $this->render( $post );
+		return 'before' === $settings['button_position'] ? $button . $content : $content . $button;
 	}
 
 	/**

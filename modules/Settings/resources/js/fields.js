@@ -47,6 +47,27 @@ export const fields = [
 		isValid: { required: true, elements: true },
 	},
 	{
+		id: 'button_position',
+		label: __( 'Button position', 'content-pdf' ),
+		description: __(
+			'Where the automatic button goes. The shortcode places it wherever you put it.',
+			'content-pdf'
+		),
+		type: 'text',
+		Edit: 'radio',
+		elements: [
+			{
+				value: 'before',
+				label: __( 'Before the content', 'content-pdf' ),
+			},
+			{
+				value: 'after',
+				label: __( 'After the content', 'content-pdf' ),
+			},
+		],
+		isValid: { required: true, elements: true },
+	},
+	{
 		id: 'paper',
 		label: __( 'Paper size', 'content-pdf' ),
 		type: 'text',

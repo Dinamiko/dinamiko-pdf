@@ -22,6 +22,11 @@ class Settings {
 	public const BUTTON_ACTIONS = [ 'download', 'view' ];
 
 	/**
+	 * Where the automatic button goes: before or after the post content.
+	 */
+	public const BUTTON_POSITIONS = [ 'before', 'after' ];
+
+	/**
 	 * Header and footer text slots.
 	 */
 	public const REGION_SLOTS = [
@@ -60,6 +65,7 @@ class Settings {
 		return [
 			'post_types'          => [ 'post' ],
 			'button_action'       => 'download',
+			'button_position'     => 'after',
 			'paper'               => 'a4',
 			'margin_mm'           => 15,
 			'show_title'          => true,
@@ -107,6 +113,10 @@ class Settings {
 			'button_action'       => [
 				'type' => 'string',
 				'enum' => self::BUTTON_ACTIONS,
+			],
+			'button_position'     => [
+				'type' => 'string',
+				'enum' => self::BUTTON_POSITIONS,
 			],
 			'paper'               => [
 				'type' => 'string',
@@ -214,6 +224,7 @@ class Settings {
 		$output = [
 			'post_types'          => array_values( array_intersect( $post_types, $public ) ),
 			'button_action'       => isset( $input['button_action'] ) && in_array( $input['button_action'], self::BUTTON_ACTIONS, true ) ? $input['button_action'] : $defaults['button_action'],
+			'button_position'     => isset( $input['button_position'] ) && in_array( $input['button_position'], self::BUTTON_POSITIONS, true ) ? $input['button_position'] : $defaults['button_position'],
 			'paper'               => isset( Geometry::PAPER_SIZES[ $paper ] ) ? $paper : $defaults['paper'],
 			'margin_mm'           => min( self::MARGIN_MAX, $margin ),
 			// A missing key keeps the title: only an explicit false hides it.

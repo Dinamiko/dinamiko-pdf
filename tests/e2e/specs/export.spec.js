@@ -117,6 +117,35 @@ test.describe( 'PDF export', () => {
 		await expect(
 			browserPage.getByRole( 'button', { name: 'Download PDF' } )
 		).toBeVisible();
+		await expect(
+			browserPage.locator( '.wp-block-post-content > :last-child' )
+		).toHaveClass( /cpdf-button-wrap/ );
+	} );
+
+	test( 'the position setting puts the button before the content', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const { cpdf_settings: original } = await requestUtils.rest( {
+			path: '/wp/v2/settings',
+		} );
+		await requestUtils.rest( {
+			path: '/wp/v2/settings',
+			method: 'POST',
+			data: { cpdf_settings: { ...original, button_position: 'before' } },
+		} );
+		try {
+			await browserPage.goto( post.link );
+			await expect(
+				browserPage.locator( '.wp-block-post-content > :first-child' )
+			).toHaveClass( /cpdf-button-wrap/ );
+		} finally {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: { cpdf_settings: original },
+			} );
+		}
 	} );
 
 	test( 'renders the shortcode button on a page', async ( {
