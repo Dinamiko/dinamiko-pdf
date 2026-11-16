@@ -1,0 +1,84 @@
+<!doctype html>
+<!--
+	Screenshot 1 scene, rendered at 1600x1000 by bin/wporg-assets.mjs: a capture of the end of a demo post
+	in a browser frame, with the "Download PDF" button highlighted, a cursor clicking it and the download notice.
+	Tokens: {{IMAGE}} (capture, shown at 1280x715 CSS px), {{BX}} {{BY}} {{BW}} {{BH}} (button box in the capture),
+	{{FILENAME}}, {{SIZE}}.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+	html, body { margin: 0; }
+	body {
+		width: 1600px; height: 1000px; overflow: hidden; position: relative;
+		background: linear-gradient(120deg, #1d35b4 0%, #3858e9 55%, #6f86ff 100%);
+		font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+	}
+	.browser {
+		position: absolute; left: 160px; top: 120px; width: 1280px; border-radius: 14px; overflow: hidden;
+		background: #fff; box-shadow: 0 40px 80px rgba(0, 0, 0, .3);
+	}
+	.bar { height: 44px; background: #eef0f6; display: flex; align-items: center; gap: 8px; padding: 0 18px; }
+	.bar i { width: 12px; height: 12px; border-radius: 50%; }
+	.bar i:nth-child(1) { background: #ff5f57; }
+	.bar i:nth-child(2) { background: #febc2e; }
+	.bar i:nth-child(3) { background: #28c840; }
+	.url {
+		margin-left: 18px; flex: 1; max-width: 620px; height: 26px; border-radius: 13px; background: #fff;
+		color: #5b6275; font-size: 14px; line-height: 26px; padding: 0 14px;
+	}
+	.shot { display: block; width: 1280px; height: 715px; }
+
+	/* Positioned in capture coordinates, inside .stage (which sits over the capture). */
+	.stage { position: absolute; left: 160px; top: 164px; width: 1280px; height: 715px; pointer-events: none; }
+	.ring {
+		position: absolute; left: calc({{BX}}px - 8px); top: calc({{BY}}px - 8px);
+		width: calc({{BW}}px + 16px); height: calc({{BH}}px + 16px); border-radius: 999px;
+		box-shadow: 0 0 0 3px #3858e9, 0 0 0 16px rgba(56, 88, 233, .14);
+	}
+	.cursor { position: absolute; left: calc({{BX}}px + {{BW}}px - 34px); top: calc({{BY}}px + {{BH}}px * .5); width: 52px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .25)); }
+
+	.download {
+		position: absolute; right: 22px; top: 18px; width: 380px; background: #fff; border-radius: 14px;
+		box-shadow: 0 18px 40px rgba(20, 30, 80, .25); padding: 18px 20px; box-sizing: border-box;
+		display: flex; align-items: center; gap: 16px;
+	}
+	.file {
+		position: relative; flex: none; width: 44px; height: 54px; background: #e8453c; border-radius: 6px;
+		clip-path: polygon(0 0, 30px 0, 100% 14px, 100% 100%, 0 100%);
+		color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: flex-end; justify-content: center;
+		padding-bottom: 9px; box-sizing: border-box;
+	}
+	.meta { flex: 1; min-width: 0; }
+	.name { font-size: 17px; font-weight: 600; color: #1e1e1e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.size { font-size: 14px; color: #5b6275; margin-top: 4px; }
+	.check {
+		flex: none; width: 30px; height: 30px; border-radius: 50%; background: #1fa463; color: #fff;
+		display: flex; align-items: center; justify-content: center;
+	}
+</style>
+</head>
+<body>
+	<div class="browser">
+		<div class="bar"><i></i><i></i><i></i><div class="url">yoursite.com/blog/core-text-blocks/</div></div>
+		<img class="shot" src="{{IMAGE}}">
+	</div>
+	<div class="stage">
+		<div class="ring"></div>
+		<svg class="cursor" viewBox="0 0 22 25" fill="#fff" stroke="#1e1e1e" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">
+			<path d="M5 2.5a1.5 1.5 0 0 1 3 0V10l1-.2V8.5a1.5 1.5 0 0 1 3 0v1.6l.6-.1a1.5 1.5 0 0 1 2.4 1.2l.3-.1a1.5 1.5 0 0 1 2.2 1.3v4.6c0 2.9-2.3 5.5-5.4 5.5H9.8c-1.6 0-3-.8-3.9-2.1L2.3 14.6a1.6 1.6 0 0 1 2.3-2.2L5 12.8z"/>
+		</svg>
+		<div class="download">
+			<div class="file">PDF</div>
+			<div class="meta">
+				<div class="name">{{FILENAME}}</div>
+				<div class="size">{{SIZE}} · Done</div>
+			</div>
+			<div class="check">
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

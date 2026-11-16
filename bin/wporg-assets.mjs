@@ -3,6 +3,7 @@
  *
  *   node bin/wporg-assets.mjs --brand        # icon PNGs from icon.svg, banners from bin/wporg-assets/banner.html
  *   node bin/wporg-assets.mjs --screenshots  # screenshot-1..6.png from the wp-env dev site
+ *   node bin/wporg-assets.mjs --screenshot-1 # only screenshot-1.png, without reseeding (block demo must be seeded)
  *
  * --screenshots needs wp-env running and `pdftoppm` (poppler) on the host. It reseeds the demo
  * (block theme, then classic for screenshot 6) and leaves the block demo seeded at the end.
@@ -21,8 +22,8 @@ const width = 1600;
 const height = 1000;
 
 const args = process.argv.slice( 2 );
-if ( ! args.includes( '--brand' ) && ! args.includes( '--screenshots' ) ) {
-	console.error( 'Usage: node bin/wporg-assets.mjs --brand | --screenshots' );
+if ( ! [ '--brand', '--screenshots', '--screenshot-1' ].some( ( arg ) => args.includes( arg ) ) ) {
+	console.error( 'Usage: node bin/wporg-assets.mjs --brand | --screenshots | --screenshot-1' );
 	process.exit( 1 );
 }
 
@@ -33,6 +34,8 @@ try {
 	}
 	if ( args.includes( '--screenshots' ) ) {
 		await screenshots();
+	} else if ( args.includes( '--screenshot-1' ) ) {
+		await buttonScene();
 	}
 } finally {
 	await browser.close();
@@ -77,22 +80,16 @@ async function screenshots() {
 	execSync( 'which pdftoppm', { stdio: 'ignore' } );
 
 	seed( 'demo:seed' );
+
+	// 1. The button at the end of a post, staged in a browser frame.
+	await buttonScene();
+
 	const visitor = await browser.newContext( { viewport: { width, height } } );
 	const page = await visitor.newPage();
 
-	// 1. The button on a post.
-	await page.goto( await demoLink( page, 'Core text blocks' ) );
-	let button = page.locator( '.cpdf-button' ).first();
-	await button.evaluate( ( el ) => {
-		el.scrollIntoView( { block: 'end' } );
-		window.scrollBy( 0, 120 );
-	} );
-	await button.hover();
-	await save( page, 'screenshot-1.png' );
-
 	// 2. The PDF of a media-heavy post.
 	await page.goto( await demoLink( page, 'Media and layout blocks' ) );
-	button = page.locator( '.cpdf-button' ).first();
+	const button = page.locator( '.cpdf-button' ).first();
 	await spread( page, await downloadPdf( page, button ), 'screenshot-2.png' );
 	await visitor.close();
 
@@ -131,6 +128,57 @@ async function screenshots() {
 }
 
 /**
+ * Screenshot 1: the end of a demo post in a browser frame, with the "Download PDF" button highlighted,
+ * a cursor clicking it and the browser's download notice with the real filename and size.
+ * Only the post's "Tables" section is kept, so the view shows a table followed by the button.
+ */
+async function buttonScene() {
+	// A narrower viewport, scaled up to the 1280px frame, makes the post text larger.
+	const context = await browser.newContext( { viewport: { width: 1056, height: 590 }, deviceScaleFactor: 2.5 } );
+	const page = await context.newPage();
+	await page.goto( await demoLink( page, 'Core text blocks' ) );
+	const button = page.locator( '.cpdf-button' ).first();
+	await button.evaluate( ( el ) => {
+		// Keep only the "Tables" section and the button: the post then reads as a table followed by the button.
+		const wrap = el.closest( '.cpdf-button-wrap' );
+		let section = false;
+		for ( const child of wrap.parentElement.children ) {
+			const text = child.textContent.trim();
+			section = ( section || text === 'Tables' ) && text !== 'Buttons, separators and details';
+			if ( child !== wrap && ! section ) {
+				child.style.display = 'none';
+			}
+		}
+		// Start the view just above the "Tables" heading (extra space below lets the page scroll that far).
+		const heading = [ ...wrap.parentElement.children ].find( ( child ) => child.textContent.trim() === 'Tables' );
+		document.body.style.paddingBottom = '1000px';
+		window.scrollTo( 0, heading.getBoundingClientRect().top + window.scrollY - 36 );
+	} );
+	const box = await button.boundingBox();
+	const image = ( await page.screenshot() ).toString( 'base64' );
+	const pdf = await downloadPdf( page, button );
+	await context.close();
+
+	const zoom = 1280 / 1056;
+	const tokens = {
+		IMAGE: `data:image/png;base64,${ image }`,
+		BX: Math.round( box.x * zoom ),
+		BY: Math.round( box.y * zoom ),
+		BW: Math.round( box.width * zoom ),
+		BH: Math.round( box.height * zoom ),
+		FILENAME: path.basename( pdf ),
+		SIZE: `${ Math.max( 1, Math.round( fs.statSync( pdf ).size / 1024 ) ) } KB`,
+	};
+	const html = fs
+		.readFileSync( path.join( root, 'bin/wporg-assets/screenshot-1.html' ), 'utf8' )
+		.replace( /\{\{(\w+)\}\}/g, ( match, key ) => String( tokens[ key ] ?? match ) );
+	const scene = await browser.newPage( { viewport: { width, height } } );
+	await scene.setContent( html );
+	await save( scene, 'screenshot-1.png' );
+	await scene.close();
+}
+
+/**
  * Runs a demo seed npm script.
  *
  * @param {string} script npm script name.
@@ -157,14 +205,14 @@ async function demoLink( page, title ) {
  *
  * @param {import('playwright').Page}    page   Page.
  * @param {import('playwright').Locator} button Button.
- * @return {Promise<string>} PDF file path.
+ * @return {Promise<string>} PDF file path (named like the download).
  */
 async function downloadPdf( page, button ) {
 	const [ download ] = await Promise.all( [
 		page.waitForEvent( 'download', { timeout: 120000 } ),
 		button.click(),
 	] );
-	const file = path.join( fs.mkdtempSync( path.join( os.tmpdir(), 'cpdf-' ) ), 'out.pdf' );
+	const file = path.join( fs.mkdtempSync( path.join( os.tmpdir(), 'cpdf-' ) ), download.suggestedFilename() );
 	await download.saveAs( file );
 	return file;
 }
