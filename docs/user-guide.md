@@ -28,8 +28,18 @@ Requirements: WordPress 6.8 or later, PHP 8.1 or later.
 | Page margins (mm) | 15 | 0 to 50 | Margin on all four sides. The content width is the paper width minus the margins. |
 | Show the post title | On | On/Off | Prints the post title above the content. |
 | Show the featured image | Off | On/Off | Prints the featured image below the title, at the full content width. |
-| PDF font | Noto Sans | Registered fonts | Typeface for all text, including the header and footer. Developers can register more fonts with the `cpdf_fonts` filter. |
-| Heading font | Same as the PDF font | Registered fonts | Typeface for the post title and the headings (h1–h6), for themes that use a different font for headings. |
+| PDF font | Noto Sans | Noto Sans, Font Library fonts with TTF files, fonts from `cpdf_fonts` | Typeface for all text, including the header and footer. See [Adding fonts](#adding-fonts). |
+| Heading font | Same as the PDF font | Same list as PDF font | Typeface for the post title and the headings (h1–h6), for themes that use a different font for headings. |
+
+### Adding fonts
+
+The font selects list the bundled Noto Sans and the fonts in the WordPress **Font Library**:
+
+1. Go to **Appearance → Editor → Styles → Typography** and open **Manage fonts** (the Font Library). In WordPress 6.8 it is part of the Site Editor, so it is available with block themes.
+2. Under **Upload**, add the font's `.ttf` files: Regular, and preferably Bold. Italic files are optional.
+3. Go back to **Settings → Content PDF** and choose the family as the PDF font or the heading font.
+
+Only TrueType (`.ttf`) files can be embedded in the PDF. Families that only have WOFF/WOFF2 files aren't listed. A variable font is used at its default weight, so bold text isn't really bold. Upload static Regular and Bold files instead. Developers can also register fonts in code with the `cpdf_fonts` filter (see the [developer guide](developer-guide.md#fonts)).
 
 ### Header and footer
 

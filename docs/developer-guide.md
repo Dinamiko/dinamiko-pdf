@@ -128,7 +128,13 @@ Only `{title}`, `{site}`, `{date}` and `{url}` are replaced. For other data (aut
 
 ## Fonts
 
-The PDF engine embeds only the TrueType files it is given, so the print page forces every text node to the selected fonts: the body font (`cpdf-body` in CSS) everywhere, and the heading font (`cpdf-heading`) on the post title and `h1`–`h6`. Noto Sans is bundled. Register more families with `cpdf_fonts`, then pick them under **Settings → Content PDF**:
+The PDF engine embeds only the TrueType files it is given, so the print page forces every text node to the selected fonts: the body font (`cpdf-body` in CSS) everywhere, and the heading font (`cpdf-heading`) on the post title and `h1`–`h6`. The list of fonts comes from three places, and on a slug clash the later one wins:
+
+1. Noto Sans, which is bundled and always available.
+2. Font Library families (`wp_font_family` / `wp_font_face` posts) that have at least one `.ttf` face. They're keyed by the family slug. WOFF/WOFF2 sources are skipped, and a weight range such as `100 900` is registered as 400 (`Fonts::from_library()`).
+3. Families added with the `cpdf_fonts` filter, which receives the list from 1 and 2. This also means the filter can remove or change Font Library entries.
+
+Pick the fonts under **Settings → Content PDF**. Registering a family in code:
 
 ```php
 add_filter( 'cpdf_fonts', function ( array $fonts ): array {

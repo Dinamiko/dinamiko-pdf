@@ -4,12 +4,13 @@ The PDF is created in the browser by [dompdf.js](https://github.com/lmn1919/domp
 
 ## Fonts
 
-All text uses the fonts selected in the settings, because dompdf.js only embeds the fonts it is given: one for body text and, optionally, one for headings. The bundled default is **Noto Sans** (Regular and Bold). Developers can register other TrueType fonts with the `cpdf_fonts` filter (see the [developer guide](developer-guide.md#fonts)). Font sizes, weights, colors and spacing come from the theme. The theme's own typefaces don't, unless you register their TTF files.
+All text uses the fonts selected in the settings, because dompdf.js only embeds the fonts it is given: one for body text and, optionally, one for headings. The bundled default is **Noto Sans** (Regular and Bold). Fonts uploaded to the WordPress Font Library with TTF files can be selected too (see the [user guide](user-guide.md#adding-fonts)), and developers can register fonts with the `cpdf_fonts` filter (see the [developer guide](developer-guide.md#fonts)). Font sizes, weights, colors and spacing come from the theme. The theme's own typefaces don't, unless you register their TTF files.
 
 - Noto Sans covers Latin, Greek and Cyrillic.
 - Noto Sans doesn't cover CJK, Arabic, Hebrew, Devanagari, Thai or emoji, so those characters may be missing. Register a font that covers them.
 - Italic text is slanted synthetically unless the font has an italic file registered. Noto Sans doesn't.
-- WOFF and WOFF2 files aren't supported, only TTF.
+- WOFF and WOFF2 files aren't supported, only TTF. Font Library families that only have WOFF/WOFF2 files aren't listed.
+- A variable TTF is embedded at its default instance, so it has no real bold.
 
 ## Images
 

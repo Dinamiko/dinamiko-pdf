@@ -10,7 +10,8 @@ declare( strict_types=1 );
 namespace Dinamiko\ContentPdf\Settings;
 
 /**
- * Bundled Noto Sans plus any families registered through the `cpdf_fonts` filter.
+ * Bundled Noto Sans, the Font Library families that have TrueType files, and any families
+ * registered through the `cpdf_fonts` filter.
  *
  * The PDF engine (dompdf.js) embeds only the TrueType files it is given, so every family lists
  * its TTF files with their weight and style.
@@ -47,9 +48,10 @@ class Fonts {
 			return $this->fonts;
 		}
 
+		// The bundled font wins a slug clash with the Font Library.
 		$fonts = [
 			self::DEFAULT => self::bundled( $this->base_url ),
-		];
+		] + self::from_library( $this->library_families() );
 
 		/**
 		 * Filters the fonts available for the PDF.
@@ -103,6 +105,131 @@ class Fonts {
 				],
 			],
 		];
+	}
+
+	/**
+	 * Font Library families (`wp_font_family` posts) with their faces (`wp_font_face` posts).
+	 *
+	 * @return list<array{name: string, slug: string, faces: list<array<string, mixed>>}>
+	 */
+	private function library_families(): array {
+		if ( ! post_type_exists( 'wp_font_family' ) ) {
+			return [];
+		}
+
+		$families = get_posts(
+			[
+				'post_type'              => 'wp_font_family',
+				'post_status'            => 'publish',
+				'posts_per_page'         => 100,
+				'orderby'                => 'title',
+				'order'                  => 'ASC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			]
+		);
+		if ( ! $families ) {
+			return [];
+		}
+
+		$faces     = get_posts(
+			[
+				'post_type'              => 'wp_font_face',
+				'post_status'            => 'publish',
+				'post_parent__in'        => wp_list_pluck( $families, 'ID' ),
+				'posts_per_page'         => 1000, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- faces of at most 100 families.
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			]
+		);
+		$by_family = [];
+		foreach ( $faces as $face ) {
+			$settings = json_decode( $face->post_content, true );
+			if ( is_array( $settings ) ) {
+				$by_family[ $face->post_parent ][] = $settings;
+			}
+		}
+
+		$output = [];
+		foreach ( $families as $family ) {
+			$settings = json_decode( $family->post_content, true );
+			$output[] = [
+				'name'  => $family->post_title,
+				'slug'  => is_array( $settings ) && isset( $settings['slug'] ) ? (string) $settings['slug'] : $family->post_name,
+				'faces' => $by_family[ $family->ID ] ?? [],
+			];
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Registry entries for Font Library families. Pure, so it can be unit tested.
+	 *
+	 * Only TrueType sources are kept, because the PDF engine cannot embed WOFF/WOFF2. A face with a
+	 * weight range (a variable font, e.g. "100 900") is registered as 400 when the range includes
+	 * it, otherwise at its lowest weight. Families without a TTF face are left out.
+	 *
+	 * @param list<array{name: string, slug: string, faces: list<array<string, mixed>>}> $families Families, see library_families().
+	 * @return array<string, array{label: string, files: list<array{url: string, weight: int, style: string}>}>
+	 */
+	public static function from_library( array $families ): array {
+		$output = [];
+
+		foreach ( $families as $family ) {
+			$files = [];
+			foreach ( $family['faces'] as $face ) {
+				$srcs = isset( $face['src'] ) ? (array) $face['src'] : [];
+				$ttf  = current(
+					array_filter(
+						$srcs,
+						// The path ends in .ttf, before any query string or fragment.
+						static fn( $src ): bool => is_string( $src ) && (bool) preg_match( '/\.ttf(?:[?#].*)?$/i', $src )
+					)
+				);
+				if ( false === $ttf ) {
+					continue;
+				}
+				$files[] = [
+					'url'    => $ttf,
+					'weight' => self::library_weight( $face['fontWeight'] ?? '400' ),
+					'style'  => isset( $face['fontStyle'] ) && 'italic' === $face['fontStyle'] ? 'italic' : 'normal',
+				];
+			}
+
+			$slug = (string) $family['slug'];
+			if ( $files && '' !== $slug ) {
+				$output[ $slug ] = [
+					'label' => '' !== $family['name'] ? $family['name'] : $slug,
+					'files' => $files,
+				];
+			}
+		}
+
+		return $output;
+	}
+
+	/**
+	 * A single weight from a Font Library `fontWeight` ("400", "bold", "100 900").
+	 *
+	 * @param mixed $weight Font weight.
+	 * @return int
+	 */
+	private static function library_weight( mixed $weight ): int {
+		$weight = strtolower( trim( (string) $weight ) );
+		if ( 'bold' === $weight ) {
+			return 700;
+		}
+		if ( ! preg_match_all( '/\d+/', $weight, $matches ) ) {
+			return 400;
+		}
+		$range = array_map( 'intval', $matches[0] );
+		$min   = min( $range );
+		$max   = max( $range );
+
+		return ( $min <= 400 && 400 <= $max ) ? 400 : $min;
 	}
 
 	/**

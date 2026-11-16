@@ -458,6 +458,100 @@ test.describe( 'PDF export', () => {
 		}
 	} );
 
+	test( 'Font Library families with TTF files can be selected', async ( {
+		admin,
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const ttf = new URL(
+			'/wp-content/plugins/content-pdf/modules/Export/assets/fonts/NotoSans-Bold.ttf',
+			post.link
+		).href;
+		const family = await requestUtils.rest( {
+			path: '/wp/v2/font-families',
+			method: 'POST',
+			params: {
+				font_family_settings: JSON.stringify( {
+					name: 'E2E Library Font',
+					slug: 'e2e-library-font',
+					fontFamily: '"E2E Library Font", sans-serif',
+				} ),
+			},
+		} );
+		const { cpdf_settings: original } = await requestUtils.rest( {
+			path: '/wp/v2/settings',
+		} );
+
+		try {
+			await requestUtils.rest( {
+				path: `/wp/v2/font-families/${ family.id }/font-faces`,
+				method: 'POST',
+				params: {
+					font_face_settings: JSON.stringify( {
+						fontFamily: '"E2E Library Font", sans-serif',
+						fontWeight: '400',
+						fontStyle: 'normal',
+						src: ttf,
+					} ),
+				},
+			} );
+
+			// The settings page offers the family.
+			await admin.visitAdminPage(
+				'options-general.php',
+				'page=content-pdf'
+			);
+			await browserPage
+				.getByRole( 'combobox', { name: /PDF font/ } )
+				.selectOption( 'e2e-library-font' );
+			await browserPage
+				.getByRole( 'button', { name: 'Save Changes' } )
+				.click();
+			await expect(
+				browserPage.getByText( 'Settings saved.' ).first()
+			).toBeVisible();
+
+			// The print page embeds its TTF as the body font.
+			await browserPage.route(
+				'**/modules/Export/build/index.js*',
+				( route ) => route.abort()
+			);
+			await browserPage.goto( printUrl( post.link ) );
+			const config = await browserPage.evaluate(
+				() => window.cpdfConfig
+			);
+			expect(
+				config.fonts.filter( ( font ) => font.family === 'cpdf-body' )
+			).toEqual( [
+				{
+					family: 'cpdf-body',
+					url: ttf,
+					weight: 400,
+					style: 'normal',
+				},
+			] );
+			await browserPage.unroute( '**/modules/Export/build/index.js*' );
+
+			const downloadPromise = browserPage.waitForEvent( 'download' );
+			await browserPage.goto( printUrl( post.link ) );
+			await expectPdfDownload(
+				await downloadPromise,
+				'Blocks-Export.pdf'
+			);
+		} finally {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: { cpdf_settings: original },
+			} );
+			await requestUtils.rest( {
+				path: `/wp/v2/font-families/${ family.id }`,
+				method: 'DELETE',
+				params: { force: true },
+			} );
+		}
+	} );
+
 	test( 'password-protected posts need the password first', async ( {
 		page: browserPage,
 		requestUtils,

@@ -100,4 +100,96 @@ class FontsTest extends TestCase {
 
 		$this->assertSame( 'https://cdn.example.com/noto.ttf', $fonts[ Fonts::DEFAULT ]['files'][0]['url'] );
 	}
+
+	public function test_library_families_keep_only_ttf_faces(): void {
+		$fonts = Fonts::from_library(
+			[
+				[
+					'name'  => 'Lora',
+					'slug'  => 'lora',
+					'faces' => [
+						[
+							'src'        => 'https://example.com/fonts/lora-regular.ttf',
+							'fontWeight' => '400',
+							'fontStyle'  => 'normal',
+						],
+						[
+							'src'        => [ 'https://example.com/fonts/lora-bold.woff2', 'https://example.com/fonts/lora-bold.TTF?ver=2' ],
+							'fontWeight' => 'bold',
+						],
+						[
+							'src'        => 'https://example.com/fonts/lora-italic.woff2',
+							'fontWeight' => '400',
+							'fontStyle'  => 'italic',
+						],
+						[
+							'src'        => 'https://example.com/fonts/lora-light-italic.ttf',
+							'fontWeight' => '300',
+							'fontStyle'  => 'italic',
+						],
+					],
+				],
+				[
+					'name'  => 'Inter',
+					'slug'  => 'inter',
+					'faces' => [
+						[
+							'src'        => 'https://example.com/fonts/inter-variable.ttf',
+							'fontWeight' => '100 900',
+						],
+					],
+				],
+				[
+					'name'  => 'Only Woff',
+					'slug'  => 'only-woff',
+					'faces' => [ [ 'src' => 'https://example.com/fonts/only.woff2' ] ],
+				],
+			]
+		);
+
+		$this->assertSame( [ 'lora', 'inter' ], array_keys( $fonts ) );
+		$this->assertSame(
+			[
+				'label' => 'Lora',
+				'files' => [
+					[
+						'url'    => 'https://example.com/fonts/lora-regular.ttf',
+						'weight' => 400,
+						'style'  => 'normal',
+					],
+					[
+						'url'    => 'https://example.com/fonts/lora-bold.TTF?ver=2',
+						'weight' => 700,
+						'style'  => 'normal',
+					],
+					[
+						'url'    => 'https://example.com/fonts/lora-light-italic.ttf',
+						'weight' => 300,
+						'style'  => 'italic',
+					],
+				],
+			],
+			$fonts['lora']
+		);
+		$this->assertSame( 400, $fonts['inter']['files'][0]['weight'] );
+	}
+
+	public function test_library_weight_range_without_400_uses_its_lowest_weight(): void {
+		$fonts = Fonts::from_library(
+			[
+				[
+					'name'  => 'Display',
+					'slug'  => 'display',
+					'faces' => [
+						[
+							'src'        => 'https://example.com/display.ttf',
+							'fontWeight' => '600 900',
+						],
+					],
+				],
+			]
+		);
+
+		$this->assertSame( 600, $fonts['display']['files'][0]['weight'] );
+	}
 }

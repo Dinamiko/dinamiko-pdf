@@ -80,7 +80,7 @@ export const fields = [
 		id: 'font_body',
 		label: __( 'PDF font', 'content-pdf' ),
 		description: __(
-			'Used for all text. Developers can add fonts with the cpdf_fonts filter.',
+			'Used for all text. Fonts uploaded to the Font Library (Appearance → Editor → Styles → Typography) are listed here when they include TTF files; WOFF and WOFF2 files are not supported.',
 			'content-pdf'
 		),
 		type: 'text',
