@@ -27,10 +27,12 @@ class SettingsPage {
 	 * Constructor.
 	 *
 	 * @param Settings   $settings   Settings.
+	 * @param Fonts      $fonts      Font registry.
 	 * @param Properties $properties Plugin properties.
 	 */
 	public function __construct(
 		private Settings $settings,
+		private Fonts $fonts,
 		private Properties $properties
 	) {
 	}
@@ -183,6 +185,14 @@ class SettingsPage {
 					'label' => 'US Letter',
 				],
 			],
+			'fonts'     => array_map(
+				static fn( string $slug, array $font ): array => [
+					'value' => $slug,
+					'label' => $font['label'],
+				],
+				array_keys( $this->fonts->all() ),
+				$this->fonts->all()
+			),
 			'limits'    => [
 				'marginMax'        => Settings::MARGIN_MAX,
 				'logoHeightMin'    => Settings::LOGO_HEIGHT_MIN,

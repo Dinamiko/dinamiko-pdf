@@ -91,6 +91,7 @@ Variables: `$post`, `$settings` (plugin settings), `$region` (`header` or `foote
 | `cpdf_print_template` | filter | `string $template, WP_Post $post` | Absolute path of the print template, after the theme lookup. |
 | `cpdf_region_template` | filter | `string $template, string $region, WP_Post $post` | Absolute path of the header or footer template. |
 | `cpdf_placeholder_values` | filter | `array $values, WP_Post $post` | Values of `{title}`, `{site}`, `{date}` and `{url}`. |
+| `cpdf_fonts` | filter | `array $fonts` | Fonts offered in the PDF font and Heading font settings, keyed by slug. See [Fonts](#fonts). |
 | `cpdf_export_config` | filter | `array $config, WP_Post $post` | Config passed to the exporter: paper, margins, regions, `filename`, `title`, `author`, `mode`, `fonts`, `i18n`. |
 | `cpdf_engine` | filter | `Engine $engine` | Replace the PDF engine (a `Dinamiko\ContentPdf\Export\Engine\Engine`). |
 | `cpdf_dequeue_scripts` | filter | `string[] $handles` | Script handles removed from the print page. Default: scripts loaded from the theme directories. |
@@ -124,6 +125,32 @@ add_filter( 'cpdf_placeholder_values', function ( array $values, WP_Post $post )
 ```
 
 Only `{title}`, `{site}`, `{date}` and `{url}` are replaced. For other data (author, custom fields), use a custom header/footer template, which receives `$post`.
+
+## Fonts
+
+The PDF engine embeds only the TrueType files it is given, so the print page forces every text node to the selected fonts: the body font (`cpdf-body` in CSS) everywhere, and the heading font (`cpdf-heading`) on the post title and `h1`–`h6`. Noto Sans is bundled. Register more families with `cpdf_fonts`, then pick them under **Settings → Content PDF**:
+
+```php
+add_filter( 'cpdf_fonts', function ( array $fonts ): array {
+	$dir = get_stylesheet_directory_uri() . '/fonts/';
+
+	$fonts['merriweather'] = [
+		'label' => 'Merriweather',
+		'files' => [
+			[ 'url' => $dir . 'Merriweather-Regular.ttf', 'weight' => 400 ],
+			[ 'url' => $dir . 'Merriweather-Bold.ttf', 'weight' => 700 ],
+			[ 'url' => $dir . 'Merriweather-Italic.ttf', 'weight' => 400, 'style' => 'italic' ],
+		],
+	];
+	return $fonts;
+} );
+```
+
+- Files must be TrueType (`.ttf`). WOFF/WOFF2 files don't work.
+- The browser fetches the files, so the URL must be same-origin or send CORS headers.
+- `weight` is 100–900 (default 400) and `style` is `normal` (default) or `italic`. Register at least 400, and 700 for bold text. Without an italic file, italic text is slanted synthetically.
+- Only the selected fonts are downloaded during the export. If a selected font is no longer registered, the PDF falls back to Noto Sans.
+- The font's character coverage limits what the PDF can show (see [Known limitations](limitations.md)).
 
 ## JavaScript hooks
 

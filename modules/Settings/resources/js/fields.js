@@ -77,6 +77,32 @@ export const fields = [
 		Edit: 'toggle',
 	},
 	{
+		id: 'font_body',
+		label: __( 'PDF font', 'content-pdf' ),
+		description: __(
+			'Used for all text. Developers can add fonts with the cpdf_fonts filter.',
+			'content-pdf'
+		),
+		type: 'text',
+		Edit: 'select',
+		elements: config.fonts || [],
+		isValid: { required: true, elements: true },
+	},
+	{
+		id: 'font_heading',
+		label: __( 'Heading font', 'content-pdf' ),
+		description: __(
+			'Used for the post title and headings.',
+			'content-pdf'
+		),
+		type: 'text',
+		Edit: 'select',
+		elements: [
+			{ value: '', label: __( 'Same as the PDF font', 'content-pdf' ) },
+			...( config.fonts || [] ),
+		],
+	},
+	{
 		id: 'header_logo_id',
 		label: __( 'Header logo', 'content-pdf' ),
 		description: __(

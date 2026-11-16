@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Dinamiko\ContentPdf\Export;
 
 use Dinamiko\ContentPdf\Export\Engine\Engine;
+use Dinamiko\ContentPdf\Settings\Fonts;
 use Dinamiko\ContentPdf\Settings\Settings;
 use Inpsyde\Modularity\Properties\Properties;
 use WP_Post;
@@ -23,6 +24,12 @@ class PrintEndpoint {
 	public const QUERY_VAR = 'cpdf_print';
 
 	/**
+	 * CSS families of the body and heading fonts on the print page.
+	 */
+	public const FONT_BODY    = 'cpdf-body';
+	public const FONT_HEADING = 'cpdf-heading';
+
+	/**
 	 * True while the print page is being rendered.
 	 *
 	 * @var bool
@@ -33,11 +40,13 @@ class PrintEndpoint {
 	 * Constructor.
 	 *
 	 * @param Settings   $settings   Settings.
+	 * @param Fonts      $fonts      Font registry.
 	 * @param Engine     $engine     Default PDF engine.
 	 * @param Properties $properties Plugin properties.
 	 */
 	public function __construct(
 		private Settings $settings,
+		private Fonts $fonts,
 		private Engine $engine,
 		private Properties $properties
 	) {
@@ -323,6 +332,59 @@ class PrintEndpoint {
 	}
 
 	/**
+	 * Font files of the body and heading families, keyed by CSS family.
+	 *
+	 * Without a heading font the heading family reuses the body files: dompdf.js gets the same
+	 * bytes twice, which keeps the CSS identical in both cases.
+	 *
+	 * @param array<string, mixed> $settings Settings.
+	 * @return array<string, list<array{url: string, weight: int, style: string}>>
+	 */
+	private function print_fonts( array $settings ): array {
+		$body    = (string) $settings['font_body'];
+		$heading = (string) $settings['font_heading'];
+
+		return [
+			self::FONT_BODY    => $this->fonts->resolve( $body )['files'],
+			self::FONT_HEADING => $this->fonts->resolve( '' !== $heading ? $heading : $body )['files'],
+		];
+	}
+
+	/**
+	 * `@font-face` rules for the print fonts, and the rules that apply them to the article.
+	 *
+	 * The engine (dompdf.js) embeds only the fonts it is given, so every text node must use a
+	 * registered family.
+	 *
+	 * @param array<string, list<array{url: string, weight: int, style: string}>> $fonts See print_fonts().
+	 * @return string
+	 */
+	private function font_css( array $fonts ): string {
+		$css = '';
+		foreach ( $fonts as $family => $files ) {
+			foreach ( $files as $file ) {
+				$css .= sprintf(
+					'@font-face{font-family:"%1$s";src:url("%2$s") format("truetype");font-weight:%3$d;font-style:%4$s;font-display:block}',
+					$family,
+					esc_url_raw( $file['url'] ),
+					$file['weight'],
+					'italic' === $file['style'] ? 'italic' : 'normal'
+				);
+			}
+		}
+
+		$headings = ':is(h1,h2,h3,h4,h5,h6)';
+
+		return $css . sprintf(
+			'.cpdf-article,.cpdf-article *{font-family:"%1$s",sans-serif!important}'
+			. '.cpdf-article %3$s,.cpdf-article %3$s *{font-family:"%2$s","%1$s",sans-serif!important}',
+			self::FONT_BODY,
+			self::FONT_HEADING,
+			$headings
+		);
+	}
+
+	/**
 	 * Enqueue print styles and the engine assets.
 	 */
 	public function enqueue(): void {
@@ -372,6 +434,9 @@ class PrintEndpoint {
 			wp_add_inline_style( 'cpdf-print', implode( ',', $hidden ) . '{display:none!important}' );
 		}
 
+		$fonts = $this->print_fonts( $settings );
+		wp_add_inline_style( 'cpdf-print', $this->font_css( $fonts ) );
+
 		wp_add_inline_style(
 			'cpdf-print',
 			sprintf(
@@ -402,7 +467,7 @@ class PrintEndpoint {
 					'footer' => (int) $settings['footer_font_size'],
 				],
 				'color'         => (string) $settings['hf_color'],
-				'fontFamily'    => 'CPDF Sans',
+				'fontFamily'    => self::FONT_BODY,
 				'skipFirstPage' => (bool) $settings['hf_skip_first_page'],
 				// Extra header height (mm → pt).
 				'headerExtraPt' => round( (int) $settings['header_spacing_mm'] * 72 / 25.4, 2 ),
@@ -412,18 +477,16 @@ class PrintEndpoint {
 			'author'         => get_the_author_meta( 'display_name', (int) $post->post_author ),
 			// pdf: download; view: show the PDF in this tab; print: browser print dialog.
 			'mode'           => in_array( $mode, [ 'print', 'view' ], true ) ? $mode : 'pdf',
-			'fonts'          => [
-				[
-					'family' => 'CPDF Sans',
-					'weight' => 400,
-					'url'    => $base_url . 'modules/Export/assets/fonts/NotoSans-Regular.ttf',
-				],
-				[
-					'family' => 'CPDF Sans',
-					'weight' => 700,
-					'url'    => $base_url . 'modules/Export/assets/fonts/NotoSans-Bold.ttf',
-				],
-			],
+			'fonts'          => array_merge(
+				...array_map(
+					static fn( string $family, array $files ): array => array_map(
+						static fn( array $file ): array => [ 'family' => $family ] + $file,
+						$files
+					),
+					array_keys( $fonts ),
+					$fonts
+				)
+			),
 			'i18n'           => [
 				'preparing' => __( 'Preparing PDF…', 'content-pdf' ),
 				/* translators: 1: current page, 2: total pages */

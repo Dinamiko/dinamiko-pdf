@@ -18,7 +18,15 @@ export const form = {
 			id: 'content',
 			label: __( 'Content', 'content-pdf' ),
 			layout: { type: 'card', isCollapsible: false },
-			children: [ 'show_title', 'show_featured_image' ],
+			children: [
+				'show_title',
+				'show_featured_image',
+				{
+					id: 'fonts',
+					layout: row,
+					children: [ 'font_body', 'font_heading' ],
+				},
+			],
 		},
 		{
 			id: 'regions',

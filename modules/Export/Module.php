@@ -11,6 +11,7 @@ namespace Dinamiko\ContentPdf\Export;
 
 use Dinamiko\ContentPdf\Export\Engine\BrowserEngine;
 use Dinamiko\ContentPdf\Export\Engine\Engine;
+use Dinamiko\ContentPdf\Settings\Fonts;
 use Dinamiko\ContentPdf\Settings\Settings;
 use Inpsyde\Modularity\Module\ExecutableModule;
 use Inpsyde\Modularity\Module\ModuleClassNameIdTrait;
@@ -39,6 +40,7 @@ class Module implements ServiceModule, ExecutableModule {
 			),
 			PrintEndpoint::class => static fn( ContainerInterface $container ): PrintEndpoint => new PrintEndpoint(
 				$container->get( Settings::class ),
+				$container->get( Fonts::class ),
 				$container->get( Engine::class ),
 				$container->get( Package::PROPERTIES )
 			),

@@ -64,6 +64,9 @@ class Settings {
 			'margin_mm'           => 15,
 			'show_title'          => true,
 			'show_featured_image' => false,
+			// Slugs from the Fonts registry; an empty heading font means "same as the body font".
+			'font_body'           => Fonts::DEFAULT,
+			'font_heading'        => '',
 			'header_logo_id'      => 0,
 			'header_logo_height'  => 48,
 			'header_left'         => '',
@@ -112,6 +115,9 @@ class Settings {
 			'margin_mm'           => $integer( 0, self::MARGIN_MAX ),
 			'show_title'          => [ 'type' => 'boolean' ],
 			'show_featured_image' => [ 'type' => 'boolean' ],
+			// No enum: the `cpdf_fonts` filter decides which slugs exist.
+			'font_body'           => [ 'type' => 'string' ],
+			'font_heading'        => [ 'type' => 'string' ],
 			'header_logo_id'      => [
 				'type'    => 'integer',
 				'minimum' => 0,
@@ -203,6 +209,7 @@ class Settings {
 		$logo_height = isset( $input['header_logo_height'] ) ? absint( $input['header_logo_height'] ) : $defaults['header_logo_height'];
 		$spacing     = isset( $input['header_spacing_mm'] ) ? absint( $input['header_spacing_mm'] ) : $defaults['header_spacing_mm'];
 		$color       = isset( $input['hf_color'] ) ? sanitize_hex_color( (string) $input['hf_color'] ) : '';
+		$font_body   = isset( $input['font_body'] ) ? sanitize_key( (string) $input['font_body'] ) : '';
 
 		$output = [
 			'post_types'          => array_values( array_intersect( $post_types, $public ) ),
@@ -212,6 +219,9 @@ class Settings {
 			// A missing key keeps the title: only an explicit false hides it.
 			'show_title'          => isset( $input['show_title'] ) ? (bool) $input['show_title'] : $defaults['show_title'],
 			'show_featured_image' => ! empty( $input['show_featured_image'] ),
+			// Unknown slugs fall back to the default font when the PDF is built (Fonts::resolve()).
+			'font_body'           => '' !== $font_body ? $font_body : $defaults['font_body'],
+			'font_heading'        => isset( $input['font_heading'] ) ? sanitize_key( (string) $input['font_heading'] ) : $defaults['font_heading'],
 			'header_logo_id'      => $logo_id,
 			'header_logo_height'  => max( self::LOGO_HEIGHT_MIN, min( self::LOGO_HEIGHT_MAX, $logo_height ) ),
 			'header_spacing_mm'   => min( self::HEADER_SPACING_MAX, $spacing ),

@@ -4,11 +4,12 @@ The PDF is created in the browser by [dompdf.js](https://github.com/lmn1919/domp
 
 ## Fonts
 
-All text uses the bundled **Noto Sans** (Regular and Bold), because dompdf.js only embeds the fonts it is given. Font sizes, weights, colors and spacing come from the theme. The typeface itself doesn't.
+All text uses the fonts selected in the settings, because dompdf.js only embeds the fonts it is given: one for body text and, optionally, one for headings. The bundled default is **Noto Sans** (Regular and Bold). Developers can register other TrueType fonts with the `cpdf_fonts` filter (see the [developer guide](developer-guide.md#fonts)). Font sizes, weights, colors and spacing come from the theme. The theme's own typefaces don't, unless you register their TTF files.
 
-- Covered scripts: Latin, Greek and Cyrillic.
-- Not covered: CJK, Arabic, Hebrew, Devanagari, Thai and emoji. Those characters may be missing.
-- Italic text is slanted synthetically (there is no italic font file).
+- Noto Sans covers Latin, Greek and Cyrillic.
+- Noto Sans doesn't cover CJK, Arabic, Hebrew, Devanagari, Thai or emoji, so those characters may be missing. Register a font that covers them.
+- Italic text is slanted synthetically unless the font has an italic file registered. Noto Sans doesn't.
+- WOFF and WOFF2 files aren't supported, only TTF.
 
 ## Images
 

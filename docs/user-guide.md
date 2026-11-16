@@ -28,6 +28,8 @@ Requirements: WordPress 6.8 or later, PHP 8.1 or later.
 | Page margins (mm) | 15 | 0 to 50 | Margin on all four sides. The content width is the paper width minus the margins. |
 | Show the post title | On | On/Off | Prints the post title above the content. |
 | Show the featured image | Off | On/Off | Prints the featured image below the title, at the full content width. |
+| PDF font | Noto Sans | Registered fonts | Typeface for all text, including the header and footer. Developers can register more fonts with the `cpdf_fonts` filter. |
+| Heading font | Same as the PDF font | Registered fonts | Typeface for the post title and the headings (h1–h6), for themes that use a different font for headings. |
 
 ### Header and footer
 
@@ -103,7 +105,7 @@ These URLs work on any singular post, page or custom post type, even when it isn
 - Optionally, the title and the featured image.
 - Not included: the site header, navigation, sidebars, footer, comments, share buttons and related posts.
 - Videos, audio, iframes and embeds become a link to the original.
-- Text is real, selectable text in the bundled Noto Sans font. See [Known limitations](limitations.md).
+- Text is real, selectable text in the selected fonts (Noto Sans by default). See [Known limitations](limitations.md).
 
 If the browser can't create the PDF (very old browsers, a strict Content Security Policy, or an error), the print dialog opens instead, so the visitor can still "Save as PDF".
 

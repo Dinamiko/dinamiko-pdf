@@ -3,21 +3,7 @@
  * The browser lays out the article at the PDF content width; dompdf.js then reads that layout.
  */
 
-@font-face {
-	font-family: "CPDF Sans";
-	src: url("../fonts/NotoSans-Regular.ttf") format("truetype");
-	font-weight: 400;
-	font-style: normal;
-	font-display: block;
-}
-
-@font-face {
-	font-family: "CPDF Sans";
-	src: url("../fonts/NotoSans-Bold.ttf") format("truetype");
-	font-weight: 700;
-	font-style: normal;
-	font-display: block;
-}
+/* Fonts: @font-face rules and the font-family rules come from PrintEndpoint::font_css(). */
 
 html,
 body.cpdf-print {
@@ -91,12 +77,6 @@ body.cpdf-print .wp-site-blocks {
 .cpdf-article *::before,
 .cpdf-article *::after {
 	transition: none !important;
-}
-
-/* dompdf.js embeds only fonts it is given, so every text node must use the registered family. */
-.cpdf-article,
-.cpdf-article * {
-	font-family: "CPDF Sans", sans-serif !important;
 }
 
 .cpdf-article > .alignwide,

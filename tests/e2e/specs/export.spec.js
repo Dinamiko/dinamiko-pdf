@@ -386,6 +386,78 @@ test.describe( 'PDF export', () => {
 		await expectPdfDownload( await downloadPromise, 'Shortcode-Page.pdf' );
 	} );
 
+	test( 'fonts from cpdf_fonts apply to headings and body text', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		// The child theme registers "cpdf-test-font" (the Noto Sans Bold file) through cpdf_fonts.
+		await requestUtils.activateTheme( 'cpdf-test-child' );
+		const { cpdf_settings: original } = await requestUtils.rest( {
+			path: '/wp/v2/settings',
+		} );
+		await requestUtils.rest( {
+			path: '/wp/v2/settings',
+			method: 'POST',
+			data: {
+				cpdf_settings: { ...original, font_heading: 'cpdf-test-font' },
+			},
+		} );
+
+		try {
+			await browserPage.route(
+				'**/modules/Export/build/index.js*',
+				( route ) => route.abort()
+			);
+			await browserPage.goto( printUrl( post.link ) );
+
+			const config = await browserPage.evaluate(
+				() => window.cpdfConfig
+			);
+			const heading = config.fonts.filter(
+				( font ) => font.family === 'cpdf-heading'
+			);
+			expect( heading ).toHaveLength( 1 );
+			expect( heading[ 0 ].url ).toContain( 'NotoSans-Bold.ttf' );
+			expect( heading[ 0 ].weight ).toBe( 400 );
+			expect(
+				config.fonts.filter( ( font ) => font.family === 'cpdf-body' )
+			).toHaveLength( 2 );
+			expect( config.regions.fontFamily ).toBe( 'cpdf-body' );
+
+			const fontFamily = ( locator ) =>
+				locator.evaluate(
+					( el ) =>
+						el.ownerDocument.defaultView.getComputedStyle( el )
+							.fontFamily
+				);
+			const article = browserPage.locator( '.cpdf-article' );
+			expect(
+				await fontFamily( article.locator( 'h2' ).first() )
+			).toMatch( /^"?cpdf-heading"?/ );
+			expect(
+				await fontFamily( article.locator( '.wp-block-post-title' ) )
+			).toMatch( /^"?cpdf-heading"?/ );
+			expect(
+				await fontFamily( article.locator( 'p' ).first() )
+			).toMatch( /^"?cpdf-body"?/ );
+			await browserPage.unroute( '**/modules/Export/build/index.js*' );
+
+			const downloadPromise = browserPage.waitForEvent( 'download' );
+			await browserPage.goto( printUrl( post.link ) );
+			await expectPdfDownload(
+				await downloadPromise,
+				'Blocks-Export.pdf'
+			);
+		} finally {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: { cpdf_settings: original },
+			} );
+			await requestUtils.activateTheme( 'twentytwentyfive' );
+		}
+	} );
+
 	test( 'password-protected posts need the password first', async ( {
 		page: browserPage,
 		requestUtils,

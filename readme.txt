@@ -88,7 +88,7 @@ Yes. Add the `cpdf-page-break` CSS class to a block (Block → Advanced → Addi
 
 = Which fonts does the PDF use? =
 
-The PDF uses the bundled Noto Sans font, which covers Latin, Greek and Cyrillic. Sizes, colors and spacing come from your theme.
+By default the PDF uses the bundled Noto Sans font, which covers Latin, Greek and Cyrillic. Under **Settings → Content PDF** you can pick the PDF font and a separate heading font. Developers can add more TrueType fonts with the `cpdf_fonts` filter. Sizes, colors and spacing come from your theme.
 
 = What about videos and embeds? =
 

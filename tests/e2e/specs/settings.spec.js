@@ -45,6 +45,12 @@ test.describe( 'Settings page', () => {
 		await page
 			.getByRole( 'checkbox', { name: 'Show the featured image' } )
 			.check();
+		await expect(
+			page.getByRole( 'combobox', { name: /PDF font/ } )
+		).toHaveValue( 'noto-sans' );
+		await page
+			.getByRole( 'combobox', { name: /Heading font/ } )
+			.selectOption( 'noto-sans' );
 
 		await expect( save ).toBeEnabled();
 		await save.click();
@@ -72,6 +78,9 @@ test.describe( 'Settings page', () => {
 		await expect(
 			page.getByRole( 'checkbox', { name: 'Show the featured image' } )
 		).toBeChecked();
+		await expect(
+			page.getByRole( 'combobox', { name: /Heading font/ } )
+		).toHaveValue( 'noto-sans' );
 	} );
 
 	test( 'rejects out-of-range values over REST', async ( {

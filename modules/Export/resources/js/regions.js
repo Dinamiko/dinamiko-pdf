@@ -40,7 +40,7 @@ function slotStyle( el, defaults, region, maxFontSize ) {
 		// Only the regular and bold faces are registered.
 		fontWeight: weight >= 600 ? 700 : 400,
 		italic: cs.fontStyle === 'italic' || cs.fontStyle.startsWith( 'oblique' ),
-		fontFamily: defaults.fontFamily || 'CPDF Sans',
+		fontFamily: defaults.fontFamily || 'cpdf-body',
 	};
 }
 

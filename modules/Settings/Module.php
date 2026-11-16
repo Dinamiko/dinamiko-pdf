@@ -29,8 +29,12 @@ class Module implements ServiceModule, ExecutableModule {
 	public function services(): array {
 		return [
 			Settings::class     => static fn(): Settings => new Settings(),
+			Fonts::class        => static fn( ContainerInterface $container ): Fonts => new Fonts(
+				(string) $container->get( Package::PROPERTIES )->baseUrl()
+			),
 			SettingsPage::class => static fn( ContainerInterface $container ): SettingsPage => new SettingsPage(
 				$container->get( Settings::class ),
+				$container->get( Fonts::class ),
 				$container->get( Package::PROPERTIES )
 			),
 		];
