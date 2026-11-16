@@ -7,7 +7,7 @@
  *
  * --screenshots needs wp-env running and `pdftoppm` (poppler) on the host. It reseeds the block theme demo first.
  */
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -82,7 +82,13 @@ async function screenshots() {
 	await buttonScene();
 
 	// 2. A block theme page (cover, dark sections and photos from a custom template) and its PDF.
-	await webToPdf( 'Event landing (custom template)', 'yoursite.com/events/landing/', 'screenshot-2.png' );
+	// The page has no title on screen, so the PDF leaves it out too.
+	const showTitle = setting( 'show_title', false );
+	try {
+		await webToPdf( 'Event landing (custom template)', 'yoursite.com/events/landing/', 'screenshot-2.png' );
+	} finally {
+		setting( 'show_title', showTitle );
+	}
 
 	// 3-5. Settings cards.
 	const admin = await browser.newContext( { viewport: { width: 1280, height: 1000 }, deviceScaleFactor: 2 } );
@@ -214,8 +220,26 @@ function pdfPages( pdf, count ) {
 }
 
 /**
+ * Sets one key of the cpdf_settings option on the dev site and returns its previous value.
+ *
+ * @param {string} key   Setting key.
+ * @param {*}      value New value (JSON-encodable).
+ * @return {*} Previous value.
+ */
+function setting( key, value ) {
+	const wp = ( ...args ) =>
+		execFileSync( 'npx', [ 'wp-env', 'run', 'cli', 'wp', 'option', ...args, '--format=json' ], {
+			cwd: root,
+			stdio: [ 'ignore', 'pipe', 'ignore' ],
+		} ).toString();
+	const previous = JSON.parse( wp( 'pluck', 'cpdf_settings', key ).trim().split( '\n' ).pop() );
+	wp( 'patch', 'update', 'cpdf_settings', key, JSON.stringify( value ) );
+	return previous;
+}
+
+/**
  * Screenshot 2: a demo item in a browser frame next to its generated PDF
- * (bin/wporg-assets/web-to-pdf.html), with the real PDF filename and page count.
+ * (bin/wporg-assets/web-to-pdf.html).
  *
  * @param {string} title Demo item title (front page link text).
  * @param {string} url   Address shown in the browser frame.
@@ -229,19 +253,15 @@ async function webToPdf( title, url, file ) {
 	const pdf = await downloadPdf( page, page.locator( '.cpdf-button' ).first() );
 	await context.close();
 
-	const counts = [ ...fs.readFileSync( pdf, 'latin1' ).matchAll( /\/Count (\d+)/g ) ].map( ( match ) => Number( match[ 1 ] ) );
-	const pages = Math.max( 1, ...counts );
 	const tokens = {
 		WEB: `data:image/png;base64,${ web }`,
 		URL: url,
 		PDF: pdfPages( pdf, 1 )[ 0 ],
-		FILENAME: path.basename( pdf ),
-		PAGES: `${ pages } ${ 1 === pages ? 'page' : 'pages' }`,
 	};
 	const html = fs
 		.readFileSync( path.join( root, 'bin/wporg-assets/web-to-pdf.html' ), 'utf8' )
 		.replace( /\{\{(\w+)\}\}/g, ( match, key ) => String( tokens[ key ] ?? match ) );
-	const shot = await browser.newPage( { viewport: { width: 1370, height: 950 } } );
+	const shot = await browser.newPage( { viewport: { width: 1370, height: 902 } } );
 	await shot.setContent( html );
 	await save( shot, file );
 	await shot.close();
