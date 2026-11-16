@@ -100,9 +100,12 @@ Yes. Drafts and private posts can only be downloaded by people who are allowed t
 
 == Screenshots ==
 
-1. The "Download PDF" button on a blog post.
-2. The PDF keeps your theme's look: columns, images, tables and quotes.
-3. Settings: content types, paper, margins, header and footer.
+1. The "Download PDF" button at the end of a blog post.
+2. The PDF keeps your theme's look: images, captions, floats and layout.
+3. General settings: where the button shows, download or open in a new tab, paper size and margins.
+4. Content settings: post title, featured image, and the PDF and heading fonts.
+5. Header and footer: logo, text slots with placeholders such as page numbers, spacing and color.
+6. The same post exported from a classic theme (Twenty Twenty-One).
 
 == Changelog ==
 
