@@ -1,6 +1,6 @@
 === Content PDF ===
 Contributors: dinamiko
-Tags: pdf, wordpress pdf generator, pdf generator, woocommerce pdf, post to pdf
+Tags: pdf, wordpress pdf generator, pdf generator, post to pdf, content to pdf
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -88,7 +88,7 @@ Yes. Add the `cpdf-page-break` CSS class to a block (Block → Advanced → Addi
 
 = Which fonts does the PDF use? =
 
-By default the PDF uses the bundled Noto Sans font, which covers Latin, Greek and Cyrillic. Under **Settings → Content PDF** you can pick the PDF font and a separate heading font. Fonts you upload as TTF files to the WordPress Font Library (Appearance → Editor → Styles → Typography) appear there too, and developers can add fonts with the `cpdf_fonts` filter. Sizes, colors and spacing come from your theme.
+By default the PDF uses the bundled Noto Sans font, which covers Latin, Greek and Cyrillic. Under **Settings → Content PDF** you can pick the PDF font and a separate heading font. With a block theme, fonts you upload as TTF files to the WordPress Font Library (Appearance → Editor → Styles → Typography) appear there too. With a classic theme, upload the TTF files to your site and register them with a few lines of code using the `cpdf_fonts` filter. The documentation has a step-by-step example. Sizes, colors and spacing come from your theme.
 
 = What about videos and embeds? =
 

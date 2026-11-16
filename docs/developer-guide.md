@@ -134,7 +134,7 @@ The PDF engine embeds only the TrueType files it is given, so the print page for
 2. Font Library families (`wp_font_family` / `wp_font_face` posts) that have at least one `.ttf` face. They're keyed by the family slug. WOFF/WOFF2 sources are skipped, and a weight range such as `100 900` is registered as 400 (`Fonts::from_library()`).
 3. Families added with the `cpdf_fonts` filter, which receives the list from 1 and 2. This also means the filter can remove or change Font Library entries.
 
-Pick the fonts under **Settings → Content PDF**. Registering a family in code:
+Pick the fonts under **Settings → Content PDF**. Classic themes have no Font Library UI, so they use the filter; the [user guide](user-guide.md#classic-themes-a-small-plugin-file) has a step-by-step version with a must-use plugin. Registering a family in code:
 
 ```php
 add_filter( 'cpdf_fonts', function ( array $fonts ): array {

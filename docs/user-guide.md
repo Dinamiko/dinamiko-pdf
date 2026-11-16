@@ -33,13 +33,65 @@ Requirements: WordPress 6.8 or later, PHP 8.1 or later.
 
 ### Adding fonts
 
-The font selects list the bundled Noto Sans and the fonts in the WordPress **Font Library**:
+The font selects list the bundled Noto Sans, the fonts in the WordPress **Font Library**, and fonts registered in code. Whichever way you add a font:
 
-1. Go to **Appearance → Editor → Styles → Typography** and open **Manage fonts** (the Font Library). In WordPress 6.8 it is part of the Site Editor, so it is available with block themes.
-2. Under **Upload**, add the font's `.ttf` files: Regular, and preferably Bold. Italic files are optional.
+- Only TrueType (`.ttf`) files can be embedded in the PDF. WOFF/WOFF2 files don't work.
+- Add at least the Regular file, and preferably Bold. Without a Bold file, bold text is drawn with the Regular file. Italic files are optional; without one, italic text is slanted synthetically.
+- A variable font is used at its default weight, so bold text isn't really bold. Use static Regular and Bold files instead.
+- Check the font's license allows embedding in PDF documents. Most open-source fonts (SIL Open Font License) do.
+
+#### Block themes: the Font Library
+
+1. Go to **Appearance → Editor → Styles → Typography** and open **Manage fonts** (the Font Library).
+2. Under **Upload**, add the font's `.ttf` files.
 3. Go back to **Settings → Content PDF** and choose the family as the PDF font or the heading font.
 
-Only TrueType (`.ttf`) files can be embedded in the PDF. Families that only have WOFF/WOFF2 files aren't listed. A variable font is used at its default weight, so bold text isn't really bold. Upload static Regular and Bold files instead. Developers can also register fonts in code with the `cpdf_fonts` filter (see the [developer guide](developer-guide.md#fonts)).
+Families that only have WOFF/WOFF2 files aren't listed.
+
+#### Classic themes: a small plugin file
+
+In WordPress 6.8 the Font Library is part of the Site Editor, which classic themes don't have. Register the font with a few lines of code instead. A must-use plugin is the safest place, because it keeps working after theme updates or a theme switch.
+
+1. Upload the `.ttf` files to `wp-content/fonts/` (create the folder if it doesn't exist) with SFTP or your host's file manager. The Media Library rejects `.ttf` files by default, so it can't be used for this.
+2. Create `wp-content/mu-plugins/content-pdf-fonts.php` (create the `mu-plugins` folder if needed) with:
+
+   ```php
+   <?php
+   /**
+    * Plugin Name: Content PDF fonts
+    */
+
+   add_filter( 'cpdf_fonts', function ( array $fonts ): array {
+   	$dir = content_url( 'fonts/' );
+
+   	// The key is the font's ID: lowercase letters, numbers and dashes.
+   	$fonts['merriweather'] = [
+   		'label' => 'Merriweather', // Name shown in the settings.
+   		'files' => [
+   			[ 'url' => $dir . 'Merriweather-Regular.ttf', 'weight' => 400 ],
+   			[ 'url' => $dir . 'Merriweather-Bold.ttf', 'weight' => 700 ],
+   			// Optional italic files.
+   			[ 'url' => $dir . 'Merriweather-Italic.ttf', 'weight' => 400, 'style' => 'italic' ],
+   			[ 'url' => $dir . 'Merriweather-BoldItalic.ttf', 'weight' => 700, 'style' => 'italic' ],
+   		],
+   	];
+
+   	return $fonts;
+   } );
+   ```
+
+   Change the family name and file names to match your font. To add a second family, copy the `$fonts['...'] = [ ... ];` block with another key.
+3. Go to **Settings → Content PDF**. The font is now listed in **PDF font** and **Heading font**.
+
+Notes:
+
+- Must-use plugins load automatically; there's nothing to activate. They're listed under **Plugins → Must-Use**.
+- If you use a child theme, the same `add_filter()` code also works in its `functions.php`, with the files in the child theme (for example, `get_stylesheet_directory_uri() . '/fonts/'` as `$dir`). The font disappears if you switch themes, and the PDF then falls back to Noto Sans.
+- The font files must load from your own site. If they come from a CDN or another domain, it has to send CORS headers (`Access-Control-Allow-Origin`).
+- Fonts uploaded to the Font Library while a block theme was active stay available after switching to a classic theme, because the Font Library isn't tied to the theme.
+- If a font doesn't appear in the list, check that the file URLs end in `.ttf` and open in the browser.
+
+See the [developer guide](developer-guide.md#fonts) for every option of the `cpdf_fonts` filter.
 
 ### Header and footer
 
