@@ -1,0 +1,89 @@
+<!doctype html>
+<!--
+	Screenshot 2, rendered at 1370x950 by bin/wporg-assets.mjs: the page in a browser frame on the left,
+	the generated PDF (first page on a stack of sheets) on the right.
+	Tokens: {{WEB}} (page capture, shown at 600x732), {{URL}}, {{PDF}} (first PDF page), {{FILENAME}}, {{PAGES}}.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+	html, body { margin: 0; }
+	body {
+		width: 1370px; height: 950px; overflow: hidden; position: relative;
+		background: linear-gradient(120deg, #1d35b4 0%, #3858e9 55%, #6f86ff 100%);
+		font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+	}
+
+	/* Labels above each side. */
+	.label {
+		position: absolute; top: 34px; height: 40px; display: flex; align-items: center; gap: 10px;
+		padding: 0 18px 0 12px; border-radius: 999px; font-size: 18px; font-weight: 700;
+	}
+	.label.web { left: 48px; background: rgba(255, 255, 255, .16); color: #fff; }
+	.label.pdf { left: 744px; background: #fff; color: #1e1e1e; box-shadow: 0 10px 24px rgba(0, 0, 0, .2); }
+	.label .meta { font-weight: 500; color: #5b6275; }
+	.doc {
+		width: 22px; height: 27px; background: #e8453c; border-radius: 3px;
+		clip-path: polygon(0 0, 15px 0, 100% 7px, 100% 100%, 0 100%);
+	}
+
+	/* The page. */
+	.browser {
+		position: absolute; left: 48px; top: 96px; width: 600px; border-radius: 14px; overflow: hidden;
+		background: #fff; box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
+	}
+	.bar { height: 44px; background: #eef0f6; display: flex; align-items: center; gap: 8px; padding: 0 16px; }
+	.bar i { width: 12px; height: 12px; border-radius: 50%; }
+	.bar i:nth-child(1) { background: #ff5f57; }
+	.bar i:nth-child(2) { background: #febc2e; }
+	.bar i:nth-child(3) { background: #28c840; }
+	.url {
+		margin-left: 14px; flex: 1; height: 26px; border-radius: 13px; background: #fff;
+		color: #5b6275; font-size: 13px; line-height: 26px; padding: 0 12px; white-space: nowrap; overflow: hidden;
+	}
+	.browser img { display: block; width: 600px; height: 732px; object-fit: cover; object-position: top; }
+
+	/* Arrow between the two. */
+	.arrow {
+		position: absolute; left: 662px; top: 448px; width: 68px; height: 68px; border-radius: 50%;
+		background: #fff; box-shadow: 0 12px 28px rgba(0, 0, 0, .25);
+		display: flex; align-items: center; justify-content: center;
+	}
+
+	/* The PDF: first page on a stack of sheets. */
+	.sheet {
+		position: absolute; left: 744px; top: 96px; width: 549px; height: 776px; background: #fff; border-radius: 4px;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
+	}
+	.sheet.s3 { transform: translate(28px, 28px); opacity: .55; }
+	.sheet.s2 { transform: translate(14px, 14px); opacity: .8; }
+	.sheet img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+	.badge {
+		position: absolute; left: 1225px; top: 800px; background: #e8453c; color: #fff; font-weight: 800;
+		font-size: 24px; padding: 9px 16px; border-radius: 10px; box-shadow: 0 12px 26px rgba(0, 0, 0, .25);
+	}
+</style>
+</head>
+<body>
+	<div class="label web">
+		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M2.5 9h19"/></svg>
+		Your page
+	</div>
+	<div class="label pdf"><span class="doc"></span>Generated PDF <span class="meta">· {{FILENAME}} · {{PAGES}}</span></div>
+
+	<div class="browser">
+		<div class="bar"><i></i><i></i><i></i><div class="url">{{URL}}</div></div>
+		<img src="{{WEB}}">
+	</div>
+
+	<div class="sheet s3"></div>
+	<div class="sheet s2"></div>
+	<div class="sheet"><img src="{{PDF}}"></div>
+	<div class="badge">PDF</div>
+
+	<div class="arrow">
+		<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3858e9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+	</div>
+</body>
+</html>

@@ -2,11 +2,10 @@
  * Generates the wordpress.org plugin page assets into .wordpress-org/ (SVN `assets/`).
  *
  *   node bin/wporg-assets.mjs --brand        # icon PNGs from icon.svg, banners from bin/wporg-assets/banner.html
- *   node bin/wporg-assets.mjs --screenshots  # screenshot-1..6.png from the wp-env dev site
+ *   node bin/wporg-assets.mjs --screenshots  # screenshot-1..5.png from the wp-env dev site
  *   node bin/wporg-assets.mjs --screenshot-1 # only screenshot-1.png, without reseeding (block demo must be seeded)
  *
- * --screenshots needs wp-env running and `pdftoppm` (poppler) on the host. It reseeds the demo
- * (block theme, then classic for screenshot 6) and leaves the block demo seeded at the end.
+ * --screenshots needs wp-env running and `pdftoppm` (poppler) on the host. It reseeds the block theme demo first.
  */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -18,8 +17,6 @@ import { chromium } from 'playwright';
 const root = path.resolve( path.dirname( fileURLToPath( import.meta.url ) ), '..' );
 const out = path.join( root, '.wordpress-org' );
 const base = process.env.WP_BASE_URL || 'http://localhost:8888';
-const width = 1600;
-const height = 1000;
 
 const args = process.argv.slice( 2 );
 if ( ! [ '--brand', '--screenshots', '--screenshot-1' ].some( ( arg ) => args.includes( arg ) ) ) {
@@ -74,7 +71,7 @@ async function brand() {
 }
 
 /**
- * Screenshots 1-6, matching `== Screenshots ==` in readme.txt.
+ * Screenshots 1-5, matching `== Screenshots ==` in readme.txt.
  */
 async function screenshots() {
 	execSync( 'which pdftoppm', { stdio: 'ignore' } );
@@ -84,17 +81,11 @@ async function screenshots() {
 	// 1. The button at the end of a post, staged in a browser frame.
 	await buttonScene();
 
-	const visitor = await browser.newContext( { viewport: { width, height } } );
-	const page = await visitor.newPage();
-
-	// 2. The PDF of a media-heavy post.
-	await page.goto( await demoLink( page, 'Media and layout blocks' ) );
-	const button = page.locator( '.cpdf-button' ).first();
-	await spread( page, await downloadPdf( page, button ), 'screenshot-2.png' );
-	await visitor.close();
+	// 2. A block theme page (cover, dark sections and photos from a custom template) and its PDF.
+	await webToPdf( 'Event landing (custom template)', 'yoursite.com/events/landing/', 'screenshot-2.png' );
 
 	// 3-5. Settings cards.
-	const admin = await browser.newContext( { viewport: { width, height: 1200 } } );
+	const admin = await browser.newContext( { viewport: { width: 1280, height: 1000 }, deviceScaleFactor: 2 } );
 	const adminPage = await admin.newPage();
 	await adminPage.goto( `${ base }/wp-login.php` );
 	await adminPage.fill( '#user_login', 'admin' );
@@ -108,23 +99,9 @@ async function screenshots() {
 		[ 'Header logo', 'screenshot-5.png' ],
 	];
 	for ( const [ text, file ] of cards ) {
-		const card = adminPage.locator( '.dataforms-layouts-card__field' ).filter( { hasText: text } ).last();
-		await card.waitFor();
-		await card.screenshot( { path: path.join( out, file ) } );
-		console.log( `Wrote .wordpress-org/${ file }` );
+		await settingsCard( adminPage, text, file );
 	}
 	await admin.close();
-
-	// 6. The same post exported from a classic theme.
-	seed( 'demo:seed:classic' );
-	const classic = await browser.newContext( { viewport: { width, height } } );
-	const classicPage = await classic.newPage();
-	await classicPage.goto( await demoLink( classicPage, 'Media and layout blocks' ) );
-	const pdf = await downloadPdf( classicPage, classicPage.locator( '.cpdf-button' ).first() );
-	await spread( classicPage, pdf, 'screenshot-6.png' );
-	await classic.close();
-
-	seed( 'demo:seed' );
 }
 
 /**
@@ -141,6 +118,8 @@ async function buttonScene() {
 	await button.evaluate( ( el ) => {
 		// Keep only the "Tables" section and the button: the post then reads as a table followed by the button.
 		const wrap = el.closest( '.cpdf-button-wrap' );
+		// The scene shows the button after the content, whatever the "button_position" setting is.
+		wrap.parentElement.append( wrap );
 		let section = false;
 		for ( const child of wrap.parentElement.children ) {
 			const text = child.textContent.trim();
@@ -172,7 +151,7 @@ async function buttonScene() {
 	const html = fs
 		.readFileSync( path.join( root, 'bin/wporg-assets/screenshot-1.html' ), 'utf8' )
 		.replace( /\{\{(\w+)\}\}/g, ( match, key ) => String( tokens[ key ] ?? match ) );
-	const scene = await browser.newPage( { viewport: { width, height } } );
+	const scene = await browser.newPage( { viewport: { width: 1376, height: 855 } } );
 	await scene.setContent( html );
 	await save( scene, 'screenshot-1.png' );
 	await scene.close();
@@ -218,30 +197,137 @@ async function downloadPdf( page, button ) {
 }
 
 /**
- * Renders the first two PDF pages side by side and saves the screenshot.
+ * The first pages of a PDF as PNG data URLs.
  *
- * @param {import('playwright').Page} page Page.
- * @param {string}                    pdf  PDF path.
- * @param {string}                    file Output name.
+ * @param {string} pdf   PDF path.
+ * @param {number} count Number of pages.
+ * @return {string[]} Data URLs.
  */
-async function spread( page, pdf, file ) {
-	const prefix = path.join( path.dirname( pdf ), 'page' );
-	execSync( `pdftoppm -png -r 110 -f 1 -l 2 "${ pdf }" "${ prefix }"` );
-	const images = fs
-		.readdirSync( path.dirname( pdf ) )
+function pdfPages( pdf, count ) {
+	const dir = path.dirname( pdf );
+	execSync( `pdftoppm -png -r 150 -f 1 -l ${ count } "${ pdf }" "${ path.join( dir, 'page' ) }"` );
+	return fs
+		.readdirSync( dir )
 		.filter( ( name ) => name.startsWith( 'page' ) && name.endsWith( '.png' ) )
 		.sort()
-		.map( ( name ) => fs.readFileSync( path.join( path.dirname( pdf ), name ) ).toString( 'base64' ) );
-	await page.setViewportSize( { width, height } );
+		.map( ( name ) => `data:image/png;base64,${ fs.readFileSync( path.join( dir, name ) ).toString( 'base64' ) }` );
+}
+
+/**
+ * Screenshot 2: a demo item in a browser frame next to its generated PDF
+ * (bin/wporg-assets/web-to-pdf.html), with the real PDF filename and page count.
+ *
+ * @param {string} title Demo item title (front page link text).
+ * @param {string} url   Address shown in the browser frame.
+ * @param {string} file  Output name.
+ */
+async function webToPdf( title, url, file ) {
+	const context = await browser.newContext( { viewport: { width: 820, height: 1000 }, deviceScaleFactor: 2 } );
+	const page = await context.newPage();
+	await page.goto( await demoLink( page, title ) );
+	const web = ( await page.screenshot() ).toString( 'base64' );
+	const pdf = await downloadPdf( page, page.locator( '.cpdf-button' ).first() );
+	await context.close();
+
+	const counts = [ ...fs.readFileSync( pdf, 'latin1' ).matchAll( /\/Count (\d+)/g ) ].map( ( match ) => Number( match[ 1 ] ) );
+	const pages = Math.max( 1, ...counts );
+	const tokens = {
+		WEB: `data:image/png;base64,${ web }`,
+		URL: url,
+		PDF: pdfPages( pdf, 1 )[ 0 ],
+		FILENAME: path.basename( pdf ),
+		PAGES: `${ pages } ${ 1 === pages ? 'page' : 'pages' }`,
+	};
+	const html = fs
+		.readFileSync( path.join( root, 'bin/wporg-assets/web-to-pdf.html' ), 'utf8' )
+		.replace( /\{\{(\w+)\}\}/g, ( match, key ) => String( tokens[ key ] ?? match ) );
+	const shot = await browser.newPage( { viewport: { width: 1370, height: 950 } } );
+	await shot.setContent( html );
+	await save( shot, file );
+	await shot.close();
+}
+
+/**
+ * Screenshots 3-5: one settings card, with some of the admin page around it, in a browser frame.
+ *
+ * @param {import('playwright').Page} page Settings page (2x device scale).
+ * @param {string}                    text Text that identifies the card.
+ * @param {string}                    file Output name.
+ */
+async function settingsCard( page, text, file ) {
+	const card = page.locator( '.dataforms-layouts-card__field' ).filter( { hasText: text } ).last();
+	await card.waitFor( { state: 'attached' } );
+	await page.addStyleTag( {
+		content: '#wpadminbar, #adminmenumain { display: none !important; } html.wp-toolbar { padding-top: 0; } #wpcontent { margin-left: 0; }',
+	} );
+	// Only this card shows: the other cards and the Save button are hidden (they keep their space).
+	await card.evaluate( ( el ) => {
+		for ( const other of document.querySelectorAll( '.dataforms-layouts-card__field' ) ) {
+			other.style.visibility = el.contains( other ) || other.contains( el ) ? '' : 'hidden';
+		}
+		for ( const button of document.querySelectorAll( '.wrap button, .wrap .notice' ) ) {
+			if ( ! button.closest( '.dataforms-layouts-card__field' ) ) {
+				button.style.visibility = 'hidden';
+			}
+		}
+		window.scrollTo( 0, el.getBoundingClientRect().top + window.scrollY - 24 );
+	} );
+	const box = await card.boundingBox();
+	const margin = 24;
+	const clip = {
+		x: Math.max( 0, box.x - margin ),
+		y: Math.max( 0, box.y - margin ),
+		width: box.width + margin * 2,
+		height: box.height + margin * 2,
+	};
+	const image = ( await page.screenshot( { clip } ) ).toString( 'base64' );
+	const shot = await browser.newPage();
+	await scene(
+		shot,
+		`<div class="browser">
+			<div class="bar"><i></i><i></i><i></i><div class="url">yoursite.com/wp-admin/options-general.php?page=content-pdf</div></div>
+			<img src="data:image/png;base64,${ image }" width="${ clip.width }" height="${ clip.height }">
+		</div>`,
+		file
+	);
+	await shot.close();
+}
+
+/**
+ * Saves `content` on the blue background shared by all screenshots (see bin/wporg-assets/screenshot-1.html):
+ * a 48px border, with `.browser` (frame with a title bar) and `.pdf-page` (PDF page image) styles available.
+ *
+ * @param {import('playwright').Page} page    Page.
+ * @param {string}                    content HTML.
+ * @param {string}                    file    Output name.
+ */
+async function scene( page, content, file ) {
+	await page.setViewportSize( { width: 2400, height: 1400 } );
 	await page.setContent( `
 		<style>
-			html,body{margin:0;height:100%}
-			body{background:#e5e7eb;display:flex;gap:48px;justify-content:center;align-items:center}
-			img{height:${ height - 96 }px;box-shadow:0 10px 30px rgba(0,0,0,.18);background:#fff}
+			html, body { margin: 0; }
+			body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+			.scene {
+				display: inline-flex; gap: 48px; align-items: center; padding: 48px;
+				background: linear-gradient(120deg, #1d35b4 0%, #3858e9 55%, #6f86ff 100%);
+			}
+			.browser { border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 20px 40px rgba(0, 0, 0, .25); }
+			.browser img { display: block; }
+			.bar { height: 44px; background: #eef0f6; display: flex; align-items: center; gap: 8px; padding: 0 18px; }
+			.bar i { width: 12px; height: 12px; border-radius: 50%; }
+			.bar i:nth-child(1) { background: #ff5f57; }
+			.bar i:nth-child(2) { background: #febc2e; }
+			.bar i:nth-child(3) { background: #28c840; }
+			.url {
+				margin-left: 18px; flex: 1; max-width: 620px; height: 26px; border-radius: 13px; background: #fff;
+				color: #5b6275; font-size: 14px; line-height: 26px; padding: 0 14px;
+			}
+			.pdf-page { display: block; height: 860px; background: #fff; border-radius: 4px; box-shadow: 0 20px 40px rgba(0, 0, 0, .25); }
 		</style>
-		${ images.map( ( src ) => `<img src="data:image/png;base64,${ src }">` ).join( '' ) }
+		<div class="scene">${ content }</div>
 	` );
-	await save( page, file );
+	await page.locator( '.scene' ).screenshot( { path: path.join( out, file ) } );
+	console.log( `Wrote .wordpress-org/${ file }` );
 }
 
 /**
