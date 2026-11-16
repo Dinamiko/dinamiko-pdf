@@ -74,7 +74,27 @@ class SettingsPage {
 	 * @return mixed
 	 */
 	public function rest_value( mixed $value, string $name ): mixed {
-		return Settings::OPTION === $name ? $this->settings->get() : $value;
+		if ( Settings::OPTION !== $name ) {
+			return $value;
+		}
+
+		// Drop post types the form does not offer (e.g. from a deactivated plugin): the form
+		// validates the field against its choices, and a stale one would block every save.
+		$settings               = $this->settings->get();
+		$settings['post_types'] = array_values(
+			array_intersect( (array) $settings['post_types'], $this->selectable_post_types() )
+		);
+
+		return $settings;
+	}
+
+	/**
+	 * Post types the settings form offers: public ones, without attachments.
+	 *
+	 * @return string[]
+	 */
+	private function selectable_post_types(): array {
+		return array_values( array_diff( get_post_types( [ 'public' => true ] ), [ 'attachment' ] ) );
 	}
 
 	/**
