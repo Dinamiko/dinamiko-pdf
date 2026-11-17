@@ -1,6 +1,6 @@
 === Content PDF ===
 Contributors: dinamiko
-Tags: pdf, wordpress pdf generator, pdf generator, post to pdf, content to pdf
+Tags: pdf, pdf generator, post to pdf, pdf button
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -12,7 +12,7 @@ Give your readers a beautiful "Download PDF" button. Posts and pages become clea
 
 == Description ==
 
-Your content deserves to live beyond the browser tab. Content PDF adds a "Download PDF" button to your posts and pages so readers can save, print, share or read your work offline, with one click.
+Content PDF adds a "Download PDF" button to your posts and pages so readers can save, print, share or read your work offline, with one click.
 
 The PDF looks like your website, not a plain text dump. Your theme's font sizes, colors, columns, galleries, tables and quotes carry over, so the document feels like part of your brand. The clutter stays behind: menus, sidebars, footers, share buttons and comment forms are removed, leaving only what matters.
 
