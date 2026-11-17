@@ -149,8 +149,13 @@ class Button {
 		wp_enqueue_script( self::HANDLE );
 		wp_enqueue_style( self::HANDLE );
 
+		$settings = $this->settings->get();
 		if ( ! in_array( $action, Settings::BUTTON_ACTIONS, true ) ) {
-			$action = (string) $this->settings->get()['button_action'];
+			$action = (string) $settings['button_action'];
+		}
+		// A label from the shortcode or block wins, then the "Button text" setting.
+		if ( '' === $label ) {
+			$label = trim( (string) $settings['button_label'] );
 		}
 		if ( '' === $label ) {
 			$label = 'view' === $action ? __( 'View PDF', 'content-pdf' ) : __( 'Download PDF', 'content-pdf' );

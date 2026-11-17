@@ -47,6 +47,15 @@ export const fields = [
 		isValid: { required: true, elements: true },
 	},
 	{
+		id: 'button_label',
+		label: __( 'Button text', 'content-pdf' ),
+		description: __(
+			'Used by every button, including the PDF Button block and the shortcode when they have no text of their own. Leave empty to use "Download PDF", or "View PDF" when the button opens the PDF in a new tab.',
+			'content-pdf'
+		),
+		type: 'text',
+	},
+	{
 		id: 'button_position',
 		label: __( 'Button position', 'content-pdf' ),
 		description: __(

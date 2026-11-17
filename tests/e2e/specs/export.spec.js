@@ -148,6 +148,34 @@ test.describe( 'PDF export', () => {
 		}
 	} );
 
+	test( 'the button text setting changes the automatic label', async ( {
+		page: browserPage,
+		requestUtils,
+	} ) => {
+		const { cpdf_settings: original } = await requestUtils.rest( {
+			path: '/wp/v2/settings',
+		} );
+		await requestUtils.rest( {
+			path: '/wp/v2/settings',
+			method: 'POST',
+			data: {
+				cpdf_settings: { ...original, button_label: 'Save as PDF' },
+			},
+		} );
+		try {
+			await browserPage.goto( post.link );
+			await expect(
+				browserPage.getByRole( 'button', { name: 'Save as PDF' } )
+			).toBeVisible();
+		} finally {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: { cpdf_settings: original },
+			} );
+		}
+	} );
+
 	test( 'renders the shortcode button on a page', async ( {
 		page: browserPage,
 	} ) => {
@@ -310,7 +338,9 @@ test.describe( 'PDF export', () => {
 		await browserPage.goto( viewPage.link );
 
 		const popupPromise = browserPage.waitForEvent( 'popup' );
-		await browserPage.getByRole( 'button', { name: 'View PDF' } ).click();
+		await browserPage
+			.locator( 'button.cpdf-button[data-cpdf-action="view"]' )
+			.click();
 		const popup = await popupPromise;
 		expect( popup.url() ).toContain( 'cpdf_mode=view' );
 		await expect( popup.locator( 'iframe.cpdf-viewer' ) ).toHaveAttribute(

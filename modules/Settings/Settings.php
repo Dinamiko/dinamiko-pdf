@@ -65,6 +65,9 @@ class Settings {
 		return [
 			'post_types'          => [ 'post' ],
 			'button_action'       => 'download',
+			// Used by every button without its own label. Empty falls back to "Download PDF", or
+			// "View PDF" for the view action. `__()` is missing in the unit tests, which don't load WordPress.
+			'button_label'        => function_exists( '__' ) ? __( 'Download PDF', 'content-pdf' ) : 'Download PDF',
 			'button_position'     => 'after',
 			'paper'               => 'a4',
 			'margin_mm'           => 15,
@@ -114,6 +117,7 @@ class Settings {
 				'type' => 'string',
 				'enum' => self::BUTTON_ACTIONS,
 			],
+			'button_label'        => [ 'type' => 'string' ],
 			'button_position'     => [
 				'type' => 'string',
 				'enum' => self::BUTTON_POSITIONS,
@@ -224,6 +228,7 @@ class Settings {
 		$output = [
 			'post_types'          => array_values( array_intersect( $post_types, $public ) ),
 			'button_action'       => isset( $input['button_action'] ) && in_array( $input['button_action'], self::BUTTON_ACTIONS, true ) ? $input['button_action'] : $defaults['button_action'],
+			'button_label'        => isset( $input['button_label'] ) ? sanitize_text_field( (string) $input['button_label'] ) : $defaults['button_label'],
 			'button_position'     => isset( $input['button_position'] ) && in_array( $input['button_position'], self::BUTTON_POSITIONS, true ) ? $input['button_position'] : $defaults['button_position'],
 			'paper'               => isset( Geometry::PAPER_SIZES[ $paper ] ) ? $paper : $defaults['paper'],
 			'margin_mm'           => min( self::MARGIN_MAX, $margin ),

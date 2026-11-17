@@ -50,10 +50,16 @@ class ButtonBlock {
 		if ( ! $block_type instanceof WP_Block_Type ) {
 			return;
 		}
+		$settings = $this->settings->get();
 		foreach ( $block_type->editor_script_handles as $handle ) {
 			wp_add_inline_script(
 				$handle,
-				'window.cpdfBlock = ' . wp_json_encode( [ 'action' => $this->settings->get()['button_action'] ] ) . ';',
+				'window.cpdfBlock = ' . wp_json_encode(
+					[
+						'action' => $settings['button_action'],
+						'label'  => $settings['button_label'],
+					]
+				) . ';',
 				'before'
 			);
 			wp_set_script_translations( $handle, 'content-pdf' );

@@ -15,8 +15,12 @@ import { __ } from '@wordpress/i18n';
 import metadata from '../../block.json';
 
 const settingAction = window.cpdfBlock?.action || 'download';
+const settingLabel = ( window.cpdfBlock?.label || '' ).trim();
 
 function defaultLabel( action ) {
+	if ( settingLabel ) {
+		return settingLabel;
+	}
 	return 'view' === ( action || settingAction )
 		? __( 'View PDF', 'content-pdf' )
 		: __( 'Download PDF', 'content-pdf' );
@@ -30,6 +34,20 @@ function Edit( { attributes, setAttributes } ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'content-pdf' ) }>
+					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Button text', 'content-pdf' ) }
+						help={ __(
+							'Leave empty to use the text from Settings → Content PDF.',
+							'content-pdf'
+						) }
+						placeholder={ defaultLabel( action ) }
+						value={ label }
+						onChange={ ( value ) =>
+							setAttributes( { label: value } )
+						}
+					/>
 					<SelectControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom

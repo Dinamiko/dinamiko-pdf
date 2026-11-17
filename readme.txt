@@ -64,7 +64,7 @@ Yes. Content PDF uses your theme's styles, so headings, colors, columns, images 
 
 = Can I add the button somewhere else? =
 
-Yes. Under **Settings → Content PDF**, **Button position** puts the automatic button before or after the content. For any other spot, add the **PDF Button** block, or use the `[content_pdf_button]` shortcode in any post, page or widget. Change the text by typing on the block's button, or with `[content_pdf_button label="Save as PDF"]`.
+Yes. Under **Settings → Content PDF**, **Button position** puts the automatic button before or after the content. For any other spot, add the **PDF Button** block, or use the `[content_pdf_button]` shortcode in any post, page or widget. Change the text of every button with **Button text** in the settings ("Download PDF" by default). To change a single button, type on the block's button or in its **Button text** field, or use `[content_pdf_button label="Save as PDF"]`.
 
 = Can visitors view the PDF in the browser instead of downloading it? =
 

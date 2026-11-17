@@ -15,6 +15,7 @@ export const form = {
 			children: [
 				'post_types',
 				'button_action',
+				'button_label',
 				'button_position',
 				'paper',
 				'margin_mm',
