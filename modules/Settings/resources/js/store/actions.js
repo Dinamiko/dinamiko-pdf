@@ -32,17 +32,17 @@ export const save =
 			} );
 			dispatch( receiveSettings( response[ OPTION ] ) );
 			notices.createSuccessNotice(
-				__( 'Settings saved.', 'content-pdf' ),
+				__( 'Settings saved.', 'dinamiko-pdf' ),
 				{
-					id: 'cpdf-settings-save',
+					id: 'dinamiko-pdf-settings-save',
 					type: 'snackbar',
 				}
 			);
 		} catch ( error ) {
 			notices.createErrorNotice(
 				error?.message ||
-					__( 'The settings could not be saved.', 'content-pdf' ),
-				{ id: 'cpdf-settings-save', type: 'snackbar' }
+					__( 'The settings could not be saved.', 'dinamiko-pdf' ),
+				{ id: 'dinamiko-pdf-settings-save', type: 'snackbar' }
 			);
 		} finally {
 			dispatch( { type: 'SAVE_FINISH' } );

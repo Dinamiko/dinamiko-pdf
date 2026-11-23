@@ -2,17 +2,17 @@
 /**
  * Export module.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Export;
+namespace Dinamiko\DinamikoPdf\Export;
 
-use Dinamiko\ContentPdf\Export\Engine\BrowserEngine;
-use Dinamiko\ContentPdf\Export\Engine\Engine;
-use Dinamiko\ContentPdf\Settings\Fonts;
-use Dinamiko\ContentPdf\Settings\Settings;
+use Dinamiko\DinamikoPdf\Export\Engine\BrowserEngine;
+use Dinamiko\DinamikoPdf\Export\Engine\Engine;
+use Dinamiko\DinamikoPdf\Settings\Fonts;
+use Dinamiko\DinamikoPdf\Settings\Settings;
 use Inpsyde\Modularity\Module\ExecutableModule;
 use Inpsyde\Modularity\Module\ModuleClassNameIdTrait;
 use Inpsyde\Modularity\Module\ServiceModule;
@@ -20,7 +20,7 @@ use Inpsyde\Modularity\Package;
 use Psr\Container\ContainerInterface;
 
 /**
- * Provides the print page (?cpdf_print=1) and the PDF engine.
+ * Provides the print page (?dinamiko_pdf_print=1) and the PDF engine.
  *
  * Other modules use `$container->get( PrintEndpoint::class )->is_active()` to know whether
  * the current request renders the print page.

@@ -98,7 +98,7 @@ async function screenshots() {
 	await adminPage.fill( '#user_pass', 'password' );
 	await adminPage.click( '#wp-submit' );
 	await adminPage.waitForURL( /wp-admin/ );
-	await adminPage.goto( `${ base }/wp-admin/options-general.php?page=content-pdf` );
+	await adminPage.goto( `${ base }/wp-admin/options-general.php?page=dinamiko-pdf` );
 	const cards = [
 		[ 'Show button on', 'screenshot-3.png' ],
 		[ 'PDF font', 'screenshot-4.png' ],
@@ -120,10 +120,10 @@ async function buttonScene() {
 	const context = await browser.newContext( { viewport: { width: 1056, height: 590 }, deviceScaleFactor: 2.5 } );
 	const page = await context.newPage();
 	await page.goto( await demoLink( page, 'Core text blocks' ) );
-	const button = page.locator( '.cpdf-button' ).first();
+	const button = page.locator( '.dinamiko-pdf-button' ).first();
 	await button.evaluate( ( el ) => {
 		// Keep only the "Tables" section and the button: the post then reads as a table followed by the button.
-		const wrap = el.closest( '.cpdf-button-wrap' );
+		const wrap = el.closest( '.dinamiko-pdf-button-wrap' );
 		// The scene shows the button after the content, whatever the "button_position" setting is.
 		wrap.parentElement.append( wrap );
 		let section = false;
@@ -197,7 +197,7 @@ async function downloadPdf( page, button ) {
 		page.waitForEvent( 'download', { timeout: 120000 } ),
 		button.click(),
 	] );
-	const file = path.join( fs.mkdtempSync( path.join( os.tmpdir(), 'cpdf-' ) ), download.suggestedFilename() );
+	const file = path.join( fs.mkdtempSync( path.join( os.tmpdir(), 'dinamiko-pdf-' ) ), download.suggestedFilename() );
 	await download.saveAs( file );
 	return file;
 }
@@ -220,7 +220,7 @@ function pdfPages( pdf, count ) {
 }
 
 /**
- * Sets one key of the cpdf_settings option on the dev site and returns its previous value.
+ * Sets one key of the dinamiko_pdf_settings option on the dev site and returns its previous value.
  *
  * @param {string} key   Setting key.
  * @param {*}      value New value (JSON-encodable).
@@ -232,8 +232,8 @@ function setting( key, value ) {
 			cwd: root,
 			stdio: [ 'ignore', 'pipe', 'ignore' ],
 		} ).toString();
-	const previous = JSON.parse( wp( 'pluck', 'cpdf_settings', key ).trim().split( '\n' ).pop() );
-	wp( 'patch', 'update', 'cpdf_settings', key, JSON.stringify( value ) );
+	const previous = JSON.parse( wp( 'pluck', 'dinamiko_pdf_settings', key ).trim().split( '\n' ).pop() );
+	wp( 'patch', 'update', 'dinamiko_pdf_settings', key, JSON.stringify( value ) );
 	return previous;
 }
 
@@ -250,7 +250,7 @@ async function webToPdf( title, url, file ) {
 	const page = await context.newPage();
 	await page.goto( await demoLink( page, title ) );
 	const web = ( await page.screenshot() ).toString( 'base64' );
-	const pdf = await downloadPdf( page, page.locator( '.cpdf-button' ).first() );
+	const pdf = await downloadPdf( page, page.locator( '.dinamiko-pdf-button' ).first() );
 	await context.close();
 
 	const tokens = {
@@ -305,7 +305,7 @@ async function settingsCard( page, text, file ) {
 	await scene(
 		shot,
 		`<div class="browser">
-			<div class="bar"><i></i><i></i><i></i><div class="url">yoursite.com/wp-admin/options-general.php?page=content-pdf</div></div>
+			<div class="bar"><i></i><i></i><i></i><div class="url">yoursite.com/wp-admin/options-general.php?page=dinamiko-pdf</div></div>
 			<img src="data:image/png;base64,${ image }" width="${ clip.width }" height="${ clip.height }">
 		</div>`,
 		file

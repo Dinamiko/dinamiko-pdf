@@ -3,7 +3,7 @@
 ## 1. Prepare
 
 - [ ] Every check in the [testing guide](testing.md) passes.
-- [ ] `Version:` in `content-pdf.php` matches `Stable tag:` in `readme.txt` (`npm run dist` fails otherwise).
+- [ ] `Version:` in `dinamiko-pdf.php` matches `Stable tag:` in `readme.txt` (`npm run dist` fails otherwise).
 - [ ] `Tested up to:` in `readme.txt` is the current WordPress version.
 - [ ] `readme.txt` has a changelog entry for the version.
 - [ ] `readme.txt` passes the [readme validator](https://wordpress.org/plugins/developers/readme-validator/).
@@ -14,27 +14,27 @@
 npm run dist
 ```
 
-This builds the JS and creates `dist/content-pdf.zip` with a single `content-pdf/` folder. The zip contains only the main plugin file, `readme.txt`, `composer.json`, `modules/` (including the readable JS sources in `resources/`, which wordpress.org requires next to the minified builds), `bin/demo-content/` (the Live Preview seeds from it) and the production `vendor/`. `docs/`, tests and dev tooling are left out.
+This builds the JS and creates `dist/dinamiko-pdf.zip` with a single `dinamiko-pdf/` folder. The zip contains only the main plugin file, `readme.txt`, `composer.json`, `modules/` (including the readable JS sources in `resources/`, which wordpress.org requires next to the minified builds), `bin/demo-content/` (the Live Preview seeds from it) and the production `vendor/`. `docs/`, tests and dev tooling are left out.
 
 ## 3. Plugin Check
 
 Run [Plugin Check](https://wordpress.org/plugins/plugin-check/) on the release build, not on the working copy (which has dev files):
 
 ```bash
-mkdir -p dist/check && unzip -qo dist/content-pdf.zip -d dist/check
-npm run wp-env run cli -- wp plugin check /var/www/html/wp-content/plugins/content-pdf/dist/check/content-pdf
+mkdir -p dist/check && unzip -qo dist/dinamiko-pdf.zip -d dist/check
+npm run wp-env run cli -- wp plugin check /var/www/html/wp-content/plugins/dinamiko-pdf/dist/check/dinamiko-pdf
 ```
 
 The expected result is "Checks complete. No errors found."
 
 ## 4. Submit (first release only)
 
-Upload `dist/content-pdf.zip` at [wordpress.org/plugins/developers/add](https://wordpress.org/plugins/developers/add/). The review team replies by email. Once the plugin is approved, you get SVN access.
+Upload `dist/dinamiko-pdf.zip` at [wordpress.org/plugins/developers/add](https://wordpress.org/plugins/developers/add/). The review team replies by email. Once the plugin is approved, you get SVN access.
 
 ## 5. Publish in SVN
 
 ```text
-trunk/                     ← contents of the zip's content-pdf/ folder
+trunk/                     ← contents of the zip's dinamiko-pdf/ folder
 tags/0.1.0/                ← copy of trunk
 assets/
     banner-772x250.png
@@ -53,7 +53,7 @@ The screenshots have to match the captions in `readme.txt` (`== Screenshots ==`)
 
 <!-- SCREENSHOT: assets/screenshot-2.png. Caption: "The PDF keeps your theme's look: columns, images, tables and quotes." Where: the PDF of demo post "Media and layout blocks", opened in the browser's PDF viewer. Setup: block demo, logo and default header/footer. Show: one or two pages with columns, a gallery and the header/footer. -->
 
-<!-- SCREENSHOT: assets/screenshot-3.png. Caption: "Settings: content types, paper, margins, header and footer." Where: wp-admin → Settings → Content PDF. Setup: default settings plus a logo. Show: the whole settings page. -->
+<!-- SCREENSHOT: assets/screenshot-3.png. Caption: "Settings: content types, paper, margins, header and footer." Where: wp-admin → Settings → Dinamiko PDF. Setup: default settings plus a logo. Show: the whole settings page. -->
 
 <!-- SCREENSHOT: assets/banner-772x250.png, banner-1544x500.png, icon-128x128.png, icon-256x256.png. Plugin directory banner and icon (design assets, not screen captures). -->
 
@@ -65,6 +65,6 @@ After uploading the blueprint, enable the preview for everyone in the plugin's *
 
 ## Later releases
 
-1. Bump `Version:` in `content-pdf.php` and `Stable tag:` in `readme.txt`, and add a changelog entry.
+1. Bump `Version:` in `dinamiko-pdf.php` and `Stable tag:` in `readme.txt`, and add a changelog entry.
 2. Repeat steps 1 to 3.
 3. Update `trunk/` in SVN, copy it to `tags/<version>/`, and commit.

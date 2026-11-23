@@ -24,7 +24,7 @@ export function embedPlaceholder( url, title, posterUrl ) {
 		href = 'https://www.youtube.com/watch?v=' + id;
 	}
 	const box = document.createElement( 'a' );
-	box.className = 'cpdf-embed-placeholder';
+	box.className = 'dinamiko-pdf-embed-placeholder';
 	box.setAttribute( 'divisionDisable', '' );
 	box.href = href ? new URL( href, window.location.href ).href : '#';
 	if ( posterUrl ) {

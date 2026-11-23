@@ -14,7 +14,7 @@
 			"step": "installPlugin",
 			"pluginData": {
 				"resource": "wordpress.org/plugins",
-				"slug": "content-pdf"
+				"slug": "dinamiko-pdf"
 			},
 			"options": {
 				"activate": true
@@ -32,7 +32,7 @@
 		},
 		{
 			"step": "wp-cli",
-			"command": "wp eval-file wp-content/plugins/content-pdf/bin/demo-content/demo.php seed"
+			"command": "wp eval-file wp-content/plugins/dinamiko-pdf/bin/demo-content/demo.php seed"
 		}
 	]
 }

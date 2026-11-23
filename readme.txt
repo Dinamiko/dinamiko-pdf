@@ -1,4 +1,4 @@
-=== Content PDF ===
+=== Dinamiko PDF ===
 Contributors: dinamiko
 Tags: pdf, pdf generator, post to pdf, pdf button
 Requires at least: 6.8
@@ -12,7 +12,7 @@ Give your readers a beautiful "Download PDF" button. Posts and pages become clea
 
 == Description ==
 
-Content PDF adds a "Download PDF" button to your posts and pages so readers can save, print, share or read your work offline, with one click.
+Dinamiko PDF adds a "Download PDF" button to your posts and pages so readers can save, print, share or read your work offline, with one click.
 
 The PDF looks like your website, not a plain text dump. Your theme's font sizes, colors, columns, galleries, tables and quotes carry over, so the document feels like part of your brand. The clutter stays behind: menus, sidebars, footers, share buttons and comment forms are removed, leaving only what matters.
 
@@ -25,7 +25,7 @@ The PDF looks like your website, not a plain text dump. Your theme's font sizes,
 * **Event programs, menus, price lists and product sheets.**
 * **Articles and long reads** to enjoy offline or on an e-reader.
 
-= Why Content PDF =
+= Why Dinamiko PDF =
 
 * **One click for your readers.** The button appears on the content types you choose. No sign-up, no waiting, no pop-ups.
 * **Looks like your site.** Works with block themes and classic themes, and keeps the look of WordPress blocks.
@@ -35,19 +35,19 @@ The PDF looks like your website, not a plain text dump. Your theme's font sizes,
 * **Simple settings.** Choose A4 or Letter paper, set the margins, and show or hide the post title and featured image.
 * **Branded header and footer.** Add your logo, the post title, site name, date, link and page numbers to every page.
 * **Download or view.** The button can download the PDF or open it in a new tab.
-* **Place the button anywhere.** Add it automatically before or after the content, or place it yourself with the **PDF Button** block or the `[content_pdf_button]` shortcode, with your own label.
-* **You decide where pages break.** Add the `cpdf-page-break` class to any block to start it on a new page.
+* **Place the button anywhere.** Add it automatically before or after the content, or place it yourself with the **PDF Button** block or the `[dinamiko_pdf_button]` shortcode, with your own label.
+* **You decide where pages break.** Add the `dinamiko-pdf-page-break` class to any block to start it on a new page.
 * **Always works.** If an older browser can't create the PDF, the print dialog opens instead, so nobody is left without a copy.
 * **Respects private content.** Drafts, private and password-protected posts stay visible only to people allowed to read them, and PDF pages are hidden from search engines.
 
 = Made for designers and developers too =
 
-Need a branded layout, a cover image or extra details such as prices or authors? Your theme can provide its own PDF, header and footer templates, for all content or for a single post type or post. Filters and actions let plugins change what goes into the PDF. Documentation: https://github.com/Dinamiko/content-pdf/tree/main/docs
+Need a branded layout, a cover image or extra details such as prices or authors? Your theme can provide its own PDF, header and footer templates, for all content or for a single post type or post. Filters and actions let plugins change what goes into the PDF. Documentation: https://github.com/Dinamiko/dinamiko-pdf/tree/main/docs
 
 == Installation ==
 
-1. In your dashboard, go to **Plugins → Add New**, search for "Content PDF" and click **Install Now**, then **Activate**.
-2. Go to **Settings → Content PDF**.
+1. In your dashboard, go to **Plugins → Add New**, search for "Dinamiko PDF" and click **Install Now**, then **Activate**.
+2. Go to **Settings → Dinamiko PDF**.
 3. Choose where the button should appear (posts, pages or other content types), pick the paper size and margins, and save.
 
 That's it. Visit any post and you'll see the "Download PDF" button.
@@ -60,19 +60,19 @@ No. Everything happens on your site and in your reader's browser. There's nothin
 
 = Will the PDF match my theme? =
 
-Yes. Content PDF uses your theme's styles, so headings, colors, columns, images and tables look the way they do on your site. Menus, sidebars and footers are left out.
+Yes. Dinamiko PDF uses your theme's styles, so headings, colors, columns, images and tables look the way they do on your site. Menus, sidebars and footers are left out.
 
 = Can I add the button somewhere else? =
 
-Yes. Under **Settings → Content PDF**, **Button position** puts the automatic button before or after the content. For any other spot, add the **PDF Button** block, or use the `[content_pdf_button]` shortcode in any post, page or widget. Change the text of every button with **Button text** in the settings ("Download PDF" by default). To change a single button, type on the block's button or in its **Button text** field, or use `[content_pdf_button label="Save as PDF"]`.
+Yes. Under **Settings → Dinamiko PDF**, **Button position** puts the automatic button before or after the content. For any other spot, add the **PDF Button** block, or use the `[dinamiko_pdf_button]` shortcode in any post, page or widget. Change the text of every button with **Button text** in the settings ("Download PDF" by default). To change a single button, type on the block's button or in its **Button text** field, or use `[dinamiko_pdf_button label="Save as PDF"]`.
 
 = Can visitors view the PDF in the browser instead of downloading it? =
 
-Yes. Under **Settings → Content PDF**, set **Button action** to "Open the PDF in a new tab". The PDF then opens in the browser's PDF viewer. A single button can override the setting: in the **PDF Button** block settings, or with `[content_pdf_button action="view"]` or `action="download"`.
+Yes. Under **Settings → Dinamiko PDF**, set **Button action** to "Open the PDF in a new tab". The PDF then opens in the browser's PDF viewer. A single button can override the setting: in the **PDF Button** block settings, or with `[dinamiko_pdf_button action="view"]` or `action="download"`.
 
 = Can I add page numbers, a logo or the post title to every page? =
 
-Yes. Under **Settings → Content PDF**, the header and footer each have a left, center and right slot. They accept `{title}`, `{site}`, `{date}`, `{url}`, `${currentPage}` and `${totalPages}`. By default the header shows the post title and the footer shows the site name and "Page 1 / 3". You can also add a logo to the header, change the font sizes and color, and hide both on the first page.
+Yes. Under **Settings → Dinamiko PDF**, the header and footer each have a left, center and right slot. They accept `{title}`, `{site}`, `{date}`, `{url}`, `${currentPage}` and `${totalPages}`. By default the header shows the post title and the footer shows the site name and "Page 1 / 3". You can also add a logo to the header, change the font sizes and color, and hide both on the first page.
 
 = Does it work with pages and custom post types? =
 
@@ -84,11 +84,11 @@ Yes. The text is real text, not an image, so it can be selected, searched and co
 
 = Can I choose where pages break? =
 
-Yes. Add the `cpdf-page-break` CSS class to a block (Block → Advanced → Additional CSS class(es)) to start it on a new page.
+Yes. Add the `dinamiko-pdf-page-break` CSS class to a block (Block → Advanced → Additional CSS class(es)) to start it on a new page.
 
 = Which fonts does the PDF use? =
 
-By default the PDF uses the bundled Noto Sans font, which covers Latin, Greek and Cyrillic. Under **Settings → Content PDF** you can pick the PDF font and a separate heading font. With a block theme, fonts you upload as TTF files to the WordPress Font Library (Appearance → Editor → Styles → Typography) appear there too. With a classic theme, upload the TTF files to your site and register them with a few lines of code using the `cpdf_fonts` filter. The documentation has a step-by-step example. Sizes, colors and spacing come from your theme.
+By default the PDF uses the bundled Noto Sans font, which covers Latin, Greek and Cyrillic. Under **Settings → Dinamiko PDF** you can pick the PDF font and a separate heading font. With a block theme, fonts you upload as TTF files to the WordPress Font Library (Appearance → Editor → Styles → Typography) appear there too. With a classic theme, upload the TTF files to your site and register them with a few lines of code using the `dinamiko_pdf_fonts` filter. The documentation has a step-by-step example. Sizes, colors and spacing come from your theme.
 
 = What about videos and embeds? =
 

@@ -1,7 +1,7 @@
 /**
- * Content PDF — "PDF Button" block (editor).
+ * Dinamiko PDF — "PDF Button" block (editor).
  *
- * A dynamic block: PHP renders the same markup as the [content_pdf_button] shortcode.
+ * A dynamic block: PHP renders the same markup as the [dinamiko_pdf_button] shortcode.
  * The editor shows a button with the theme's button styles and an editable label.
  */
 import { registerBlockType } from '@wordpress/blocks';
@@ -14,16 +14,16 @@ import { PanelBody, SelectControl, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import metadata from '../../block.json';
 
-const settingAction = window.cpdfBlock?.action || 'download';
-const settingLabel = ( window.cpdfBlock?.label || '' ).trim();
+const settingAction = window.dinamikoPdfBlock?.action || 'download';
+const settingLabel = ( window.dinamikoPdfBlock?.label || '' ).trim();
 
 function defaultLabel( action ) {
 	if ( settingLabel ) {
 		return settingLabel;
 	}
 	return 'view' === ( action || settingAction )
-		? __( 'View PDF', 'content-pdf' )
-		: __( 'Download PDF', 'content-pdf' );
+		? __( 'View PDF', 'dinamiko-pdf' )
+		: __( 'Download PDF', 'dinamiko-pdf' );
 }
 
 function Edit( { attributes, setAttributes } ) {
@@ -33,14 +33,14 @@ function Edit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'content-pdf' ) }>
+				<PanelBody title={ __( 'Settings', 'dinamiko-pdf' ) }>
 					<TextControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
-						label={ __( 'Button text', 'content-pdf' ) }
+						label={ __( 'Button text', 'dinamiko-pdf' ) }
 						help={ __(
-							'Leave empty to use the text from Settings → Content PDF.',
-							'content-pdf'
+							'Leave empty to use the text from Settings → Dinamiko PDF.',
+							'dinamiko-pdf'
 						) }
 						placeholder={ defaultLabel( action ) }
 						value={ label }
@@ -51,24 +51,24 @@ function Edit( { attributes, setAttributes } ) {
 					<SelectControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
-						label={ __( 'Button action', 'content-pdf' ) }
+						label={ __( 'Button action', 'dinamiko-pdf' ) }
 						value={ action }
 						options={ [
 							{
 								label: __(
 									'Use the plugin setting',
-									'content-pdf'
+									'dinamiko-pdf'
 								),
 								value: '',
 							},
 							{
-								label: __( 'Download the PDF', 'content-pdf' ),
+								label: __( 'Download the PDF', 'dinamiko-pdf' ),
 								value: 'download',
 							},
 							{
 								label: __(
 									'Open the PDF in a new tab',
-									'content-pdf'
+									'dinamiko-pdf'
 								),
 								value: 'view',
 							},
@@ -82,10 +82,10 @@ function Edit( { attributes, setAttributes } ) {
 						__nextHasNoMarginBottom
 						type="number"
 						min={ 0 }
-						label={ __( 'Post ID', 'content-pdf' ) }
+						label={ __( 'Post ID', 'dinamiko-pdf' ) }
 						help={ __(
 							'Leave empty to export the current post.',
-							'content-pdf'
+							'dinamiko-pdf'
 						) }
 						value={ postId ? String( postId ) : '' }
 						onChange={ ( value ) =>
@@ -101,7 +101,7 @@ function Edit( { attributes, setAttributes } ) {
 					<RichText
 						tagName="span"
 						className="wp-block-button__link wp-element-button"
-						aria-label={ __( 'Button text', 'content-pdf' ) }
+						aria-label={ __( 'Button text', 'dinamiko-pdf' ) }
 						placeholder={ defaultLabel( action ) }
 						value={ label }
 						onChange={ ( value ) =>

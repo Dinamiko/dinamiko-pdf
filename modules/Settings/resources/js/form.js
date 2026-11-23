@@ -10,7 +10,7 @@ export const form = {
 	fields: [
 		{
 			id: 'general',
-			label: __( 'General', 'content-pdf' ),
+			label: __( 'General', 'dinamiko-pdf' ),
 			layout: { type: 'card', isCollapsible: false },
 			children: [
 				'post_types',
@@ -23,7 +23,7 @@ export const form = {
 		},
 		{
 			id: 'content',
-			label: __( 'Content', 'content-pdf' ),
+			label: __( 'Content', 'dinamiko-pdf' ),
 			layout: { type: 'card', isCollapsible: false },
 			children: [
 				'show_title',
@@ -37,14 +37,14 @@ export const form = {
 		},
 		{
 			id: 'regions',
-			label: __( 'Header & footer', 'content-pdf' ),
+			label: __( 'Header & footer', 'dinamiko-pdf' ),
 			description:
 				__(
-					'Shown on every PDF page, inside the top and bottom margins. Leave every slot of a region empty (and no logo, for the header) to turn it off. Themes can override the markup with content-pdf/header.php and content-pdf/footer.php.',
-					'content-pdf'
+					'Shown on every PDF page, inside the top and bottom margins. Leave every slot of a region empty (and no logo, for the header) to turn it off. Themes can override the markup with dinamiko-pdf/header.php and dinamiko-pdf/footer.php.',
+					'dinamiko-pdf'
 				) +
 				' ' +
-				__( 'Placeholders:', 'content-pdf' ) +
+				__( 'Placeholders:', 'dinamiko-pdf' ) +
 				' {title} {site} {date} {url} ${currentPage} ${totalPages}',
 			layout: { type: 'card', isCollapsible: false },
 			children: [

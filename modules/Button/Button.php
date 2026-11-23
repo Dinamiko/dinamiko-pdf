@@ -2,27 +2,27 @@
 /**
  * "Download PDF" button: automatic placement and shortcode.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Button;
+namespace Dinamiko\DinamikoPdf\Button;
 
-use Dinamiko\ContentPdf\Export\PrintEndpoint;
-use Dinamiko\ContentPdf\Settings\Settings;
+use Dinamiko\DinamikoPdf\Export\PrintEndpoint;
+use Dinamiko\DinamikoPdf\Settings\Settings;
 use Inpsyde\Modularity\Properties\Properties;
 use WP_Post;
 
 /**
- * Adds the button before or after the content of enabled post types and provides [content_pdf_button].
+ * Adds the button before or after the content of enabled post types and provides [dinamiko_pdf_button].
  * The "PDF Button" block (ButtonBlock module) renders through render() too.
  */
 class Button {
 
-	public const SHORTCODE = 'content_pdf_button';
-	public const BLOCK     = 'content-pdf/button';
-	public const HANDLE    = 'cpdf-button';
+	public const SHORTCODE = 'dinamiko_pdf_button';
+	public const BLOCK     = 'dinamiko-pdf/button';
+	public const HANDLE    = 'dinamiko-pdf-button';
 
 	private const BUILD_DIR = 'modules/Button/build/';
 
@@ -59,11 +59,11 @@ class Button {
 		);
 		wp_add_inline_script(
 			self::HANDLE,
-			'window.cpdfButton = ' . wp_json_encode(
+			'window.dinamikoPdfButton = ' . wp_json_encode(
 				[
-					'working' => __( 'Preparing PDF…', 'content-pdf' ),
-					'done'    => __( 'PDF downloaded', 'content-pdf' ),
-					'failed'  => __( 'Opening print dialog…', 'content-pdf' ),
+					'working' => __( 'Preparing PDF…', 'dinamiko-pdf' ),
+					'done'    => __( 'PDF downloaded', 'dinamiko-pdf' ),
+					'failed'  => __( 'Opening print dialog…', 'dinamiko-pdf' ),
 				]
 			) . ';',
 			'before'
@@ -72,7 +72,7 @@ class Button {
 		wp_register_style( self::HANDLE, false, [], $this->properties->version() );
 		wp_add_inline_style(
 			self::HANDLE,
-			'.cpdf-button-wrap{margin-block:1.5em}.cpdf-button{cursor:pointer}.cpdf-button[aria-busy="true"]{cursor:progress;opacity:.75}'
+			'.dinamiko-pdf-button-wrap{margin-block:1.5em}.dinamiko-pdf-button{cursor:pointer}.dinamiko-pdf-button[aria-busy="true"]{cursor:progress;opacity:.75}'
 		);
 	}
 
@@ -158,11 +158,11 @@ class Button {
 			$label = trim( (string) $settings['button_label'] );
 		}
 		if ( '' === $label ) {
-			$label = 'view' === $action ? __( 'View PDF', 'content-pdf' ) : __( 'Download PDF', 'content-pdf' );
+			$label = 'view' === $action ? __( 'View PDF', 'dinamiko-pdf' ) : __( 'Download PDF', 'dinamiko-pdf' );
 		}
 
 		return sprintf(
-			'<div class="cpdf-button-wrap wp-block-buttons"><div class="wp-block-button"><button type="button" class="cpdf-button wp-block-button__link wp-element-button" data-cpdf-url="%1$s" data-cpdf-action="%2$s">%3$s</button></div></div>',
+			'<div class="dinamiko-pdf-button-wrap wp-block-buttons"><div class="wp-block-button"><button type="button" class="dinamiko-pdf-button wp-block-button__link wp-element-button" data-dinamiko-pdf-url="%1$s" data-dinamiko-pdf-action="%2$s">%3$s</button></div></div>',
 			esc_url( $this->print_endpoint->url( $post ) ),
 			esc_attr( $action ),
 			esc_html( $label )

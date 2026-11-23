@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Tests\Unit;
+namespace Dinamiko\DinamikoPdf\Tests\Unit;
 
-use Dinamiko\ContentPdf\Export\Placeholders;
+use Dinamiko\DinamikoPdf\Export\Placeholders;
 use PHPUnit\Framework\TestCase;
 
 class PlaceholdersTest extends TestCase {

@@ -37,7 +37,7 @@ Run it in a real browser (Chrome, Firefox and Safari if possible) on both demos.
 - [ ] Every "download PDF" link downloads a PDF named after the post.
 - [ ] The PDFs contain only the content: no site header, navigation or footer, including "Business home" (Page No Title template) and "Event landing" (custom template).
 - [ ] Columns, galleries, cover blocks, tables, quotes and pattern sections look like the page.
-- [ ] "A long-form article with page breaks": each `cpdf-page-break` block starts a new page, with no blank pages.
+- [ ] "A long-form article with page breaks": each `dinamiko-pdf-page-break` block starts a new page, with no blank pages.
 - [ ] "Embeds, video and audio": every embed is a link box to the original.
 - [ ] "Typography and languages": Latin, Greek and Cyrillic text renders. Other scripts are expected to be missing (see [limitations](limitations.md)).
 - [ ] "Synced patterns": the contact card and disclaimer are in the PDF.
@@ -47,14 +47,14 @@ Run it in a real browser (Chrome, Firefox and Safari if possible) on both demos.
 
 - [ ] Twenty Twenty-One is active, and the front page lists only the items that work with any theme.
 - [ ] Every PDF downloads. The content uses Twenty Twenty-One's styles (title, links, tables), and the masthead, menu and footer are absent.
-- [ ] "Classic editor content (no blocks)": paragraphs, lists, the captioned image and the table render, and the `cpdf-page-break` heading starts a new page.
+- [ ] "Classic editor content (no blocks)": paragraphs, lists, the captioned image and the table render, and the `dinamiko-pdf-page-break` heading starts a new page.
 
 ### Button, shortcode and block
 
 - [ ] The "Download PDF" button appears at the end of posts and pages (both are enabled by the demo) and shows progress while it works.
 - [ ] "Shortcode buttons" page: the custom label works, and `id="…"` downloads the other post.
 - [ ] **Button action → Open the PDF in a new tab**: the button opens a tab that shows the PDF, and its download link saves it with the right name. Allow pop-ups if the browser asks.
-- [ ] `[content_pdf_button action="view"]` and `action="download"` override the setting.
+- [ ] `[dinamiko_pdf_button action="view"]` and `action="download"` override the setting.
 - [ ] With a post type unchecked in **Show button on**, its posts have no automatic button.
 - [ ] "Shortcode buttons" page, **PDF Button block** section: the block's custom label works, and the view block opens the media post in a new tab.
 - [ ] In the editor, the **PDF Button** block shows the default label as a placeholder, and the label, **Button action** and **Post ID** settings are saved. A post with the block has no automatic button.
@@ -72,17 +72,17 @@ Run it in a real browser (Chrome, Firefox and Safari if possible) on both demos.
 
 ### Direct URLs and fallback
 
-- [ ] `?cpdf_print=1` downloads, `&cpdf_mode=view` shows the PDF in the tab, and `&cpdf_mode=print` opens the print dialog.
+- [ ] `?dinamiko_pdf_print=1` downloads, `&dinamiko_pdf_mode=view` shows the PDF in the tab, and `&dinamiko_pdf_mode=print` opens the print dialog.
 - [ ] Block `modules/Export/assets/vendor/dompdf/` in DevTools (Network → Block request URL) and click the button: the print dialog opens instead.
 
 ### Privacy
 
-- [ ] Logged out, `?cpdf_print=1` on a draft or private post returns a 404.
+- [ ] Logged out, `?dinamiko_pdf_print=1` on a draft or private post returns a 404.
 - [ ] A password-protected post shows no button and its print URL shows the password form. After entering the password, the button appears and the PDF downloads.
-- [ ] `curl -sI 'http://localhost:8888/?p=ID&cpdf_print=1' -L` shows `X-Robots-Tag: noindex, nofollow` and `Cache-Control: private, no-store`.
+- [ ] `curl -sI 'http://localhost:8888/?p=ID&dinamiko_pdf_print=1' -L` shows `X-Robots-Tag: noindex, nofollow` and `Cache-Control: private, no-store`.
 
 ### Clean-up and logs
 
 - [ ] `npm run demo:clean` removes the demo and restores the front page and settings.
-- [ ] `npm run wp-env run cli cat wp-content/debug.log` has no notices, warnings or deprecations from `content-pdf`.
+- [ ] `npm run wp-env run cli cat wp-content/debug.log` has no notices, warnings or deprecations from `dinamiko-pdf`.
 - [ ] No errors in the browser console on posts and on the print page.

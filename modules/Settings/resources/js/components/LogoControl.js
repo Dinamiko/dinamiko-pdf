@@ -22,8 +22,8 @@ export default function LogoControl( { data, field, onChange } ) {
 	const open = () => {
 		if ( ! frame.current ) {
 			frame.current = window.wp.media( {
-				title: __( 'Select header logo', 'content-pdf' ),
-				button: { text: __( 'Use as logo', 'content-pdf' ) },
+				title: __( 'Select header logo', 'dinamiko-pdf' ),
+				button: { text: __( 'Use as logo', 'dinamiko-pdf' ) },
 				library: { type: [ 'image/png', 'image/jpeg' ] },
 				multiple: false,
 			} );
@@ -48,27 +48,27 @@ export default function LogoControl( { data, field, onChange } ) {
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom
-			id="cpdf-header-logo"
+			id="dinamiko-pdf-header-logo"
 			label={ field.label }
 			help={ field.description }
-			className="cpdf-logo-control"
+			className="dinamiko-pdf-logo-control"
 		>
 			{ id > 0 && urls[ id ] && (
 				<img
-					className="cpdf-logo-control__preview"
+					className="dinamiko-pdf-logo-control__preview"
 					src={ urls[ id ] }
 					alt=""
 				/>
 			) }
-			<div className="cpdf-logo-control__actions">
+			<div className="dinamiko-pdf-logo-control__actions">
 				<Button
 					variant="secondary"
 					__next40pxDefaultSize
 					onClick={ open }
 				>
 					{ id > 0
-						? __( 'Replace image', 'content-pdf' )
-						: __( 'Select image', 'content-pdf' ) }
+						? __( 'Replace image', 'dinamiko-pdf' )
+						: __( 'Select image', 'dinamiko-pdf' ) }
 				</Button>
 				{ id > 0 && (
 					<Button
@@ -77,7 +77,7 @@ export default function LogoControl( { data, field, onChange } ) {
 						__next40pxDefaultSize
 						onClick={ () => setId( 0 ) }
 					>
-						{ __( 'Remove', 'content-pdf' ) }
+						{ __( 'Remove', 'dinamiko-pdf' ) }
 					</Button>
 				) }
 			</div>

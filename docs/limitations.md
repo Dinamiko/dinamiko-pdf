@@ -4,7 +4,7 @@ The PDF is created in the browser by [dompdf.js](https://github.com/lmn1919/domp
 
 ## Fonts
 
-All text uses the fonts selected in the settings, because dompdf.js only embeds the fonts it is given: one for body text and, optionally, one for headings. The bundled default is **Noto Sans** (Regular and Bold). With a block theme, fonts uploaded to the WordPress Font Library with TTF files can be selected too. Classic themes have no Font Library screen, so their fonts are registered with the `cpdf_fonts` filter, for example in a small must-use plugin. See [Adding fonts](user-guide.md#adding-fonts) for both, and the [developer guide](developer-guide.md#fonts) for the filter. Font sizes, weights, colors and spacing come from the theme. The theme's own typefaces don't, unless you register their TTF files.
+All text uses the fonts selected in the settings, because dompdf.js only embeds the fonts it is given: one for body text and, optionally, one for headings. The bundled default is **Noto Sans** (Regular and Bold). With a block theme, fonts uploaded to the WordPress Font Library with TTF files can be selected too. Classic themes have no Font Library screen, so their fonts are registered with the `dinamiko_pdf_fonts` filter, for example in a small must-use plugin. See [Adding fonts](user-guide.md#adding-fonts) for both, and the [developer guide](developer-guide.md#fonts) for the filter. Font sizes, weights, colors and spacing come from the theme. The theme's own typefaces don't, unless you register their TTF files.
 
 - Noto Sans covers Latin, Greek and Cyrillic.
 - Noto Sans doesn't cover CJK, Arabic, Hebrew, Devanagari, Thai or emoji, so those characters may be missing. Register a font that covers them.
@@ -35,7 +35,7 @@ The export script works around these dompdf.js 2.0.6 bugs. The results can diffe
 - Drop caps (`::first-letter`) are recreated as a real element with the same styles.
 - Headings are kept with the paragraph that follows them, and small boxes with a background or border are kept on one page.
 - List markers are always discs.
-- `cpdf-page-break` on an element that also can't be split (a heading or figure) makes the page break win. Otherwise dompdf.js adds blank pages.
+- `dinamiko-pdf-page-break` on an element that also can't be split (a heading or figure) makes the page break win. Otherwise dompdf.js adds blank pages.
 
 ## Fallback to the print dialog
 
@@ -49,4 +49,4 @@ The visitor can still choose "Save as PDF" in the dialog.
 
 ## Page builders
 
-Content that a page builder renders with its own front-end JavaScript may not appear as it does on screen. Page-builder support belongs in add-on modules (see `cpdf_modules` in the [developer guide](developer-guide.md)).
+Content that a page builder renders with its own front-end JavaScript may not appear as it does on screen. Page-builder support belongs in add-on modules (see `dinamiko_pdf_modules` in the [developer guide](developer-guide.md)).

@@ -12,15 +12,15 @@
  * leaves out everything that needs a block theme: theme and full-page patterns, synced
  * patterns and the custom template.
  *
- * Every object it creates is tagged with the `_cpdf_demo` meta, so `clean` never touches
+ * Every object it creates is tagged with the `_dinamiko_pdf_demo` meta, so `clean` never touches
  * other content. Options it changes are backed up and restored by `clean`.
  *
  * Block markup lives in `content/*.html`. Placeholders resolved at seed time:
- * `{{img:key:id}}`, `{{img:key:url}}`, `{{block:key}}`, `{{post:key:id}}`, `{{post:key:url}}`.
+ * `{{img:key:id}}`, `{{img:key:url}}`, `{{media:key:url}}`, `{{block:key}}`, `{{post:key:id}}`, `{{post:key:url}}`.
  * Post URLs are `?p=ID` / `?page_id=ID` links (see link()), so they keep working when the
  * permalink structure changes after seeding.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -32,16 +32,16 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 /**
  * Creates and removes the demo content.
  */
-final class Cpdf_Demo_Content {
+final class Dinamiko_Pdf_Demo_Content {
 
-	private const META       = '_cpdf_demo';
-	private const BACKUP     = 'cpdf_demo_backup';
+	private const META       = '_dinamiko_pdf_demo';
+	private const BACKUP     = 'dinamiko_pdf_demo_backup';
 	private const THEMES     = [
 		'block'   => 'twentytwentyfive',
 		'classic' => 'twentytwentyone',
 	];
-	private const CATEGORY   = 'Content PDF demo';
-	private const TEMPLATE   = 'cpdf-demo-landing';
+	private const CATEGORY   = 'Dinamiko PDF demo';
+	private const TEMPLATE   = 'dinamiko-pdf-demo-landing';
 	private const FONT       = '/modules/Export/assets/fonts/NotoSans-Bold.ttf';
 	private const POST_TYPES = [ 'post', 'page', 'attachment', 'wp_block', 'wp_template' ];
 
@@ -108,10 +108,11 @@ final class Cpdf_Demo_Content {
 	/**
 	 * Created objects, for placeholder replacement.
 	 *
-	 * @var array{img: array<string, int>, block: array<string, int>, post: array<string, int>}
+	 * @var array{img: array<string, int>, media: array<string, int>, block: array<string, int>, post: array<string, int>}
 	 */
 	private array $ids = [
 		'img'   => [],
+		'media' => [],
 		'block' => [],
 		'post'  => [],
 	];
@@ -237,12 +238,15 @@ final class Cpdf_Demo_Content {
 		}
 		$classic = 'classic' === $this->mode;
 
-		$this->backup_options( [ 'cpdf_settings', 'show_on_front', 'page_on_front' ] );
+		$this->backup_options( [ 'dinamiko_pdf_settings', 'show_on_front', 'page_on_front' ] );
 
 		foreach ( self::IMAGES as $key => $image ) {
 			$this->ids['img'][ $key ] = $this->create_image( $key, ...$image );
 		}
 		WP_CLI::log( sprintf( 'Created %d images.', count( self::IMAGES ) ) );
+
+		// Local audio for the media blocks, so the demo loads nothing from third-party services.
+		$this->ids['media']['tone'] = $this->create_audio( 'tone', 'Demo tone', 3 );
 
 		foreach ( $classic ? [] : self::BLOCKS as $key => [ $title, $file ] ) {
 			$this->ids['block'][ $key ] = $this->insert(
@@ -288,15 +292,15 @@ final class Cpdf_Demo_Content {
 		$index = $this->insert(
 			[
 				'post_type'    => 'page',
-				'post_title'   => 'Content PDF demo',
+				'post_title'   => 'Dinamiko PDF demo',
 				'post_content' => $this->index_content(),
 			]
 		);
 
-		$settings               = get_option( 'cpdf_settings', [] );
+		$settings               = get_option( 'dinamiko_pdf_settings', [] );
 		$settings               = is_array( $settings ) ? $settings : [];
 		$settings['post_types'] = [ 'post', 'page' ];
-		update_option( 'cpdf_settings', $settings );
+		update_option( 'dinamiko_pdf_settings', $settings );
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_on_front', $index );
 
@@ -344,7 +348,7 @@ final class Cpdf_Demo_Content {
 				'post_type'    => 'wp_template',
 				'post_name'    => self::TEMPLATE,
 				'post_title'   => 'Landing (no header or footer)',
-				'post_excerpt' => 'Content PDF demo: a custom template that shows only the page content.',
+				'post_excerpt' => 'Dinamiko PDF demo: a custom template that shows only the page content.',
 				'post_content' => $this->content( 'template-landing.html' ),
 			]
 		);
@@ -371,7 +375,7 @@ final class Cpdf_Demo_Content {
 		}
 
 		return (string) preg_replace_callback(
-			'/\{\{(img|block|post):([a-z0-9_-]+)(?::(id|url))?\}\}/',
+			'/\{\{(img|media|block|post):([a-z0-9_-]+)(?::(id|url))?\}\}/',
 			function ( array $m ): string {
 				[ , $kind, $key ] = $m;
 				$field            = $m[3] ?? 'id';
@@ -382,7 +386,7 @@ final class Cpdf_Demo_Content {
 				if ( 'id' === $field ) {
 					return (string) $id;
 				}
-				return 'img' === $kind ? (string) wp_get_attachment_url( $id ) : $this->link( $id );
+				return in_array( $kind, [ 'img', 'media' ], true ) ? (string) wp_get_attachment_url( $id ) : $this->link( $id );
 			},
 			$markup
 		);
@@ -393,7 +397,7 @@ final class Cpdf_Demo_Content {
 	 *
 	 * The seeded markup stores URLs, so they must not depend on the permalink structure at seed
 	 * time. WordPress resolves `?p=` / `?page_id=` with any structure, and redirect_canonical()
-	 * forwards them (keeping extra query args such as `cpdf_print`) to the current pretty URL.
+	 * forwards them (keeping extra query args such as `dinamiko_pdf_print`) to the current pretty URL.
 	 *
 	 * @param int $id Post ID.
 	 * @return string URL.
@@ -419,8 +423,8 @@ final class Cpdf_Demo_Content {
 			}
 			$id    = $this->ids['post'][ $key ];
 			$url   = $this->link( $id );
-			$pdf   = add_query_arg( 'cpdf_print', '1', $url );
-			$print = add_query_arg( 'cpdf_mode', 'print', $pdf );
+			$pdf   = add_query_arg( 'dinamiko_pdf_print', '1', $url );
+			$print = add_query_arg( 'dinamiko_pdf_mode', 'print', $pdf );
 			$list  = empty( $extra['block_only'] ) ? 'items_any' : 'items_block';
 
 			$li = '<li><a href="%s">%s</a> (%s): <a href="%s">download PDF</a> · <a href="%s">print dialog</a></li>';
@@ -494,15 +498,56 @@ final class Cpdf_Demo_Content {
 		$data = (string) ob_get_clean();
 		imagedestroy( $img );
 
-		$upload = wp_upload_bits( "cpdf-demo-{$key}.jpg", null, $data );
+		$id = $this->attach( "dinamiko-pdf-demo-{$key}.jpg", $data, $label, 'image/jpeg' );
+		update_post_meta( $id, '_wp_attachment_image_alt', $label );
+
+		return $id;
+	}
+
+	/**
+	 * Generate a short WAV tone (16-bit mono PCM) and add it to the media library.
+	 *
+	 * @param string $key     Audio key (file name).
+	 * @param string $label   Attachment title.
+	 * @param int    $seconds Duration in seconds.
+	 * @return int Attachment ID.
+	 */
+	private function create_audio( string $key, string $label, int $seconds ): int {
+		$rate    = 8000;
+		$samples = $rate * $seconds;
+		$pcm     = '';
+		for ( $i = 0; $i < $samples; $i++ ) {
+			// A 440 Hz tone at a third of full volume, faded out over the duration.
+			$fade = 1 - $i / $samples;
+			$pcm .= pack( 'v', (int) ( sin( 2 * M_PI * 440 * $i / $rate ) * 10000 * $fade ) & 0xFFFF );
+		}
+		$size = strlen( $pcm );
+		$data = 'RIFF' . pack( 'V', 36 + $size ) . 'WAVE'
+			. 'fmt ' . pack( 'VvvVVvv', 16, 1, 1, $rate, $rate * 2, 2, 16 )
+			. 'data' . pack( 'V', $size ) . $pcm;
+
+		return $this->attach( "dinamiko-pdf-demo-{$key}.wav", $data, $label, 'audio/wav' );
+	}
+
+	/**
+	 * Upload a generated file and add it to the media library, tagged as demo content.
+	 *
+	 * @param string $name  File name.
+	 * @param string $data  File contents.
+	 * @param string $title Attachment title.
+	 * @param string $mime  MIME type.
+	 * @return int Attachment ID.
+	 */
+	private function attach( string $name, string $data, string $title, string $mime ): int {
+		$upload = wp_upload_bits( $name, null, $data );
 		if ( ! empty( $upload['error'] ) ) {
 			WP_CLI::error( $upload['error'] );
 		}
 
 		$id = wp_insert_attachment(
 			[
-				'post_title'     => $label,
-				'post_mime_type' => 'image/jpeg',
+				'post_title'     => $title,
+				'post_mime_type' => $mime,
 				'post_status'    => 'inherit',
 			],
 			$upload['file'],
@@ -512,14 +557,14 @@ final class Cpdf_Demo_Content {
 		if ( is_wp_error( $id ) ) {
 			WP_CLI::error( $id );
 		}
-		update_post_meta( $id, '_wp_attachment_image_alt', $label );
 		update_post_meta( $id, self::META, 1 );
 
 		require_once ABSPATH . 'wp-admin/includes/image.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
 		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
 
 		return $id;
 	}
 }
 
-( new Cpdf_Demo_Content() )->run( (string) ( $args[0] ?? 'seed' ), (string) ( $args[1] ?? 'block' ) );
+( new Dinamiko_Pdf_Demo_Content() )->run( (string) ( $args[0] ?? 'seed' ), (string) ( $args[1] ?? 'block' ) );

@@ -40,7 +40,7 @@ function slotStyle( el, defaults, region, maxFontSize ) {
 		// Only the regular and bold faces are registered.
 		fontWeight: weight >= 600 ? 700 : 400,
 		italic: cs.fontStyle === 'italic' || cs.fontStyle.startsWith( 'oblique' ),
-		fontFamily: defaults.fontFamily || 'cpdf-body',
+		fontFamily: defaults.fontFamily || 'dinamiko-pdf-body',
 	};
 }
 
@@ -73,7 +73,7 @@ function logoSize( img, maxHeight, maxWidth ) {
  * Build the dompdf.js options for the header and footer.
  *
  * @param {Document} doc    Print document.
- * @param {Object}   config window.cpdfConfig.
+ * @param {Object}   config window.dinamikoPdfConfig.
  * @return {{options: Object, extraHeightPx: number}} dompdf.js options to merge (marginPt,
  *         pageWidthPt, pageHeightPt, pageConfig, watermark) and how much taller than the page
  *         margins the regions are, in px (the content area per page is shorter by that much).
@@ -105,7 +105,7 @@ export function buildRegions( doc, config ) {
 		// Region height: the page margin, plus the extra header spacing.
 		const marginPt = regions[ name ] + ( name === 'header' ? extraPt : 0 );
 		const el = doc.querySelector(
-			`.cpdf-regions [data-cpdf-region="${ name }"]`
+			`.dinamiko-pdf-regions [data-dinamiko-pdf-region="${ name }"]`
 		);
 		const heightPx = marginPt / PT_PER_PX;
 		// A region needs room for at least a small line of text.
@@ -115,7 +115,7 @@ export function buildRegions( doc, config ) {
 
 		let logo = null;
 		if ( name === 'header' ) {
-			const img = el.querySelector( 'img.cpdf-region-logo' );
+			const img = el.querySelector( 'img.dinamiko-pdf-region-logo' );
 			const size = logoSize(
 				img,
 				heightPx * FILL,
@@ -127,9 +127,9 @@ export function buildRegions( doc, config ) {
 		}
 
 		const slots = [];
-		el.querySelectorAll( '[data-cpdf-slot]' ).forEach( ( slotEl ) => {
+		el.querySelectorAll( '[data-dinamiko-pdf-slot]' ).forEach( ( slotEl ) => {
 			const content = slotText( slotEl );
-			const which = slotEl.getAttribute( 'data-cpdf-slot' );
+			const which = slotEl.getAttribute( 'data-dinamiko-pdf-slot' );
 			if ( ! content || ! POSITIONS[ which ] ) {
 				return;
 			}

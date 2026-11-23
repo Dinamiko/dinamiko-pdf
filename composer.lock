@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f022f774a3845466546bf5c6951e04f2",
+    "content-hash": "3f61076e0c0cced9bea9a3e2c4cc9d7a",
     "packages": [
         {
             "name": "inpsyde/modularity",

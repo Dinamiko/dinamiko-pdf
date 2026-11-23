@@ -1,14 +1,14 @@
 /**
- * Content PDF — "Download PDF" button.
+ * Dinamiko PDF — "Download PDF" button.
  *
  * Loads the print page in an off-screen iframe (it needs real layout, so not display:none),
  * listens for progress via postMessage and downloads the Blob the print page sends back.
  * If the export fails, the print page is opened in a new tab with the print dialog.
  *
- * With data-cpdf-action="view" the print page opens in a new tab instead (?cpdf_mode=view)
+ * With data-dinamiko-pdf-action="view" the print page opens in a new tab instead (?dinamiko_pdf_mode=view)
  * and shows the PDF there. It must open synchronously in the click, or popup blockers stop it.
  */
-const strings = window.cpdfButton || {};
+const strings = window.dinamikoPdfButton || {};
 const TIMEOUT_MS = 120000;
 let busy = false;
 
@@ -25,7 +25,7 @@ function download( blob, filename ) {
 
 function modeUrl( url, mode ) {
 	const u = new URL( url, window.location.href );
-	u.searchParams.set( 'cpdf_mode', mode );
+	u.searchParams.set( 'dinamiko_pdf_mode', mode );
 	return u.href;
 }
 
@@ -39,7 +39,7 @@ function start( button ) {
 	}
 	busy = true;
 
-	const url = button.getAttribute( 'data-cpdf-url' );
+	const url = button.getAttribute( 'data-dinamiko-pdf-url' );
 	const label = button.textContent;
 	const iframe = document.createElement( 'iframe' );
 	let timer;
@@ -72,7 +72,7 @@ function start( button ) {
 			return;
 		}
 		const data = event.data || {};
-		if ( data.type !== 'cpdf' ) {
+		if ( data.type !== 'dinamiko-pdf' ) {
 			return;
 		}
 		if ( data.status === 'progress' ) {
@@ -102,7 +102,7 @@ function start( button ) {
 	// A 404 (e.g. logged out on a draft) or a broken page never posts back.
 	iframe.addEventListener( 'load', () => {
 		try {
-			if ( ! iframe.contentWindow.cpdfConfig ) {
+			if ( ! iframe.contentWindow.dinamikoPdfConfig ) {
 				fail();
 			}
 		} catch ( e ) {
@@ -114,14 +114,14 @@ function start( button ) {
 }
 
 document.addEventListener( 'click', ( event ) => {
-	const button = event.target.closest && event.target.closest( '.cpdf-button' );
+	const button = event.target.closest && event.target.closest( '.dinamiko-pdf-button' );
 	if ( ! button ) {
 		return;
 	}
 	event.preventDefault();
-	if ( button.getAttribute( 'data-cpdf-action' ) === 'view' ) {
+	if ( button.getAttribute( 'data-dinamiko-pdf-action' ) === 'view' ) {
 		const win = window.open(
-			modeUrl( button.getAttribute( 'data-cpdf-url' ), 'view' ),
+			modeUrl( button.getAttribute( 'data-dinamiko-pdf-url' ), 'view' ),
 			'_blank'
 		);
 		if ( win ) {

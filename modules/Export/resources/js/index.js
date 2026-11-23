@@ -1,5 +1,5 @@
 /**
- * Content PDF — runs on the print page (?cpdf_print=1).
+ * Dinamiko PDF — runs on the print page (?dinamiko_pdf_print=1).
  *
  * Top-level visit: exports and downloads the PDF directly.
  * Inside the button's hidden iframe: posts progress and the finished Blob to the parent.
@@ -12,11 +12,11 @@ import { loadFonts } from './fonts';
 import { runHooks } from './hooks';
 import { buildRegions } from './regions';
 
-const config = window.cpdfConfig || {};
+const config = window.dinamikoPdfConfig || {};
 const i18n = config.i18n || {};
-const article = document.querySelector( '.cpdf-article' );
-const regionsEl = document.querySelector( '.cpdf-regions' );
-const statusEl = document.querySelector( '.cpdf-status' );
+const article = document.querySelector( '.dinamiko-pdf-article' );
+const regionsEl = document.querySelector( '.dinamiko-pdf-regions' );
+const statusEl = document.querySelector( '.dinamiko-pdf-status' );
 const embedded = window.parent !== window;
 
 /**
@@ -39,7 +39,7 @@ function format( str, ...args ) {
 }
 
 function send( message ) {
-	message.type = 'cpdf';
+	message.type = 'dinamiko-pdf';
 	if ( statusEl && message.text ) {
 		statusEl.textContent = message.text;
 	}
@@ -72,7 +72,7 @@ function showPdf( blob, filename ) {
 	const url = URL.createObjectURL( blob );
 
 	const toolbar = document.createElement( 'div' );
-	toolbar.className = 'cpdf-viewer-toolbar';
+	toolbar.className = 'dinamiko-pdf-viewer-toolbar';
 	const link = document.createElement( 'a' );
 	link.href = url;
 	link.download = filename;
@@ -80,18 +80,18 @@ function showPdf( blob, filename ) {
 	toolbar.appendChild( link );
 
 	const frame = document.createElement( 'iframe' );
-	frame.className = 'cpdf-viewer';
+	frame.className = 'dinamiko-pdf-viewer';
 	frame.title = config.title || document.title;
 	frame.src = url;
 
-	document.body.classList.add( 'cpdf-viewing' );
+	document.body.classList.add( 'dinamiko-pdf-viewing' );
 	document.body.append( toolbar, frame );
 }
 
 function fallback( error ) {
 	if ( error ) {
 		// eslint-disable-next-line no-console
-		console.error( '[Content PDF]', error );
+		console.error( '[Dinamiko PDF]', error );
 	}
 	send( {
 		status: 'error',
@@ -154,7 +154,7 @@ async function run() {
 			useCORS: true,
 			// The article is transparent; the page background comes from here (white paper by default).
 			backgroundColor: document.body.classList.contains(
-				'cpdf-theme-background'
+				'dinamiko-pdf-theme-background'
 			)
 				? window.getComputedStyle( document.body ).backgroundColor
 				: '#ffffff',

@@ -1,13 +1,13 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "content-pdf/button",
+	"name": "dinamiko-pdf/button",
 	"title": "PDF Button",
 	"category": "widgets",
 	"icon": "pdf",
 	"description": "A button that downloads the post as a PDF, or opens it in a new tab.",
 	"keywords": [ "pdf", "download", "print", "export" ],
-	"textdomain": "content-pdf",
+	"textdomain": "dinamiko-pdf",
 	"attributes": {
 		"label": {
 			"type": "string",

@@ -2,12 +2,12 @@
 /**
  * Static access to the plugin's PSR-11 container.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf;
+namespace Dinamiko\DinamikoPdf;
 
 use LogicException;
 use Psr\Container\ContainerInterface;

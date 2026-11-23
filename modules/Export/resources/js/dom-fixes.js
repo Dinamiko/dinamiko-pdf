@@ -75,7 +75,7 @@ export function fixHiddenContent( root ) {
 				ps.content !== 'none' &&
 				ps.content !== 'normal'
 			) {
-				el.classList.add( 'cpdf-no-' + which );
+				el.classList.add( 'dinamiko-pdf-no-' + which );
 			}
 		} );
 	} );
@@ -140,7 +140,7 @@ export function fixDropCaps( root ) {
 		letterNode.splitText( letter.length );
 
 		const span = document.createElement( 'span' );
-		span.className = 'cpdf-drop-cap';
+		span.className = 'dinamiko-pdf-drop-cap';
 		span.textContent = letter;
 		styles.forEach( ( [ prop, value ] ) =>
 			span.style.setProperty( prop, value )
@@ -225,7 +225,7 @@ export function prepareDom( root, pageHeightPx = 0 ) {
 
 	// dompdf.js 2.0.x adds about 20 blank pages when an element is both a page break and
 	// unsplittable (e.g. a heading or figure with the class), so the page break wins.
-	root.querySelectorAll( '.cpdf-page-break' ).forEach( ( el ) => {
+	root.querySelectorAll( '.dinamiko-pdf-page-break' ).forEach( ( el ) => {
 		el.setAttribute( 'pageBreak', '' );
 		el.removeAttribute( 'divisionDisable' );
 	} );

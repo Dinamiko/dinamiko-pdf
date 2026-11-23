@@ -1,6 +1,6 @@
 @import "@wordpress/dataviews/build-style/style.css";
 
-.cpdf-settings {
+.dinamiko-pdf-settings {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
@@ -8,41 +8,41 @@
 	margin-top: 16px;
 }
 
-.cpdf-settings__hint {
+.dinamiko-pdf-settings__hint {
 	margin: 0;
 }
 
-.cpdf-checkbox-list {
+.dinamiko-pdf-checkbox-list {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
 
-.cpdf-logo-control__preview {
+.dinamiko-pdf-logo-control__preview {
 	display: block;
 	max-height: 60px;
 	width: auto;
 	margin-bottom: 8px;
 }
 
-.cpdf-logo-control__actions {
+.dinamiko-pdf-logo-control__actions {
 	display: flex;
 	gap: 8px;
 }
 
-.cpdf-settings__notices {
+.dinamiko-pdf-settings__notices {
 	position: fixed;
 	bottom: 24px;
 	left: calc(160px + 24px);
 	z-index: 100000;
 }
 
-.folded .cpdf-settings__notices {
+.folded .dinamiko-pdf-settings__notices {
 	left: calc(36px + 24px);
 }
 
 @media (max-width: 782px) {
-	.cpdf-settings__notices {
+	.dinamiko-pdf-settings__notices {
 		left: 16px;
 	}
 }

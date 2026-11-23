@@ -1,21 +1,21 @@
 <?php
 /**
- * Plugin Name: Content PDF
+ * Plugin Name: Dinamiko PDF
  * Description: WordPress PDF Generator
  * Version:     0.1.0
  * Author:      Dinamiko
  * License:     MIT
  * License URI: https://opensource.org/licenses/MIT
- * Text Domain: content-pdf
+ * Text Domain: dinamiko-pdf
  * Requires at least: 6.8
  * Requires PHP: 8.1
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf;
+namespace Dinamiko\DinamikoPdf;
 
 use Inpsyde\Modularity\Package;
 use Inpsyde\Modularity\Properties\PluginProperties;
@@ -43,7 +43,7 @@ function plugin(): Package {
 		 *
 		 * @param \Inpsyde\Modularity\Module\Module[] $modules Modules.
 		 */
-		$modules = apply_filters( 'cpdf_modules', [] );
+		$modules = apply_filters( 'dinamiko_pdf_modules', [] );
 		foreach ( $modules as $module ) {
 			$package->addModule( $module );
 		}

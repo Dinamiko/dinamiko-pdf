@@ -1,11 +1,11 @@
 # User guide
 
-Content PDF adds a "Download PDF" button to your posts, pages and custom post types. The PDF is created in the visitor's browser, uses your theme's styles and leaves out menus, sidebars and footers.
+Dinamiko PDF adds a "Download PDF" button to your posts, pages and custom post types. The PDF is created in the visitor's browser, uses your theme's styles and leaves out menus, sidebars and footers.
 
 ## Installation
 
-1. Go to **Plugins → Add New**, search for "Content PDF", then click **Install Now** and **Activate**.
-2. Go to **Settings → Content PDF**, choose where the button appears and save.
+1. Go to **Plugins → Add New**, search for "Dinamiko PDF", then click **Install Now** and **Activate**.
+2. Go to **Settings → Dinamiko PDF**, choose where the button appears and save.
 3. Open a post. The "Download PDF" button sits at the end of the content.
 
 Requirements: WordPress 6.8 or later, PHP 8.1 or later.
@@ -14,9 +14,9 @@ Requirements: WordPress 6.8 or later, PHP 8.1 or later.
 
 ## Settings
 
-**Settings → Content PDF**. Only administrators (`manage_options`) can change them. The values are stored in the `cpdf_settings` option.
+**Settings → Dinamiko PDF**. Only administrators (`manage_options`) can change them. The values are stored in the `dinamiko_pdf_settings` option.
 
-<!-- SCREENSHOT: docs/images/settings-page.png. Where: wp-admin → Settings → Content PDF. Setup: default settings. Show: the whole page, from "Show button on" to "Hide the header and footer on the first page". -->
+<!-- SCREENSHOT: docs/images/settings-page.png. Where: wp-admin → Settings → Dinamiko PDF. Setup: default settings. Show: the whole page, from "Show button on" to "Hide the header and footer on the first page". -->
 
 ### Button and page
 
@@ -28,7 +28,7 @@ Requirements: WordPress 6.8 or later, PHP 8.1 or later.
 | Page margins (mm) | 15 | 0 to 50 | Margin on all four sides. The content width is the paper width minus the margins. |
 | Show the post title | On | On/Off | Prints the post title above the content. |
 | Show the featured image | Off | On/Off | Prints the featured image below the title, at the full content width. |
-| PDF font | Noto Sans | Noto Sans, Font Library fonts with TTF files, fonts from `cpdf_fonts` | Typeface for all text, including the header and footer. See [Adding fonts](#adding-fonts). |
+| PDF font | Noto Sans | Noto Sans, Font Library fonts with TTF files, fonts from `dinamiko_pdf_fonts` | Typeface for all text, including the header and footer. See [Adding fonts](#adding-fonts). |
 | Heading font | Same as the PDF font | Same list as PDF font | Typeface for the post title and the headings (h1–h6), for themes that use a different font for headings. |
 
 ### Adding fonts
@@ -44,7 +44,7 @@ The font selects list the bundled Noto Sans, the fonts in the WordPress **Font L
 
 1. Go to **Appearance → Editor → Styles → Typography** and open **Manage fonts** (the Font Library).
 2. Under **Upload**, add the font's `.ttf` files.
-3. Go back to **Settings → Content PDF** and choose the family as the PDF font or the heading font.
+3. Go back to **Settings → Dinamiko PDF** and choose the family as the PDF font or the heading font.
 
 Families that only have WOFF/WOFF2 files aren't listed.
 
@@ -53,15 +53,15 @@ Families that only have WOFF/WOFF2 files aren't listed.
 In WordPress 6.8 the Font Library is part of the Site Editor, which classic themes don't have. Register the font with a few lines of code instead. A must-use plugin is the safest place, because it keeps working after theme updates or a theme switch.
 
 1. Upload the `.ttf` files to `wp-content/fonts/` (create the folder if it doesn't exist) with SFTP or your host's file manager. The Media Library rejects `.ttf` files by default, so it can't be used for this.
-2. Create `wp-content/mu-plugins/content-pdf-fonts.php` (create the `mu-plugins` folder if needed) with:
+2. Create `wp-content/mu-plugins/dinamiko-pdf-fonts.php` (create the `mu-plugins` folder if needed) with:
 
    ```php
    <?php
    /**
-    * Plugin Name: Content PDF fonts
+    * Plugin Name: Dinamiko PDF fonts
     */
 
-   add_filter( 'cpdf_fonts', function ( array $fonts ): array {
+   add_filter( 'dinamiko_pdf_fonts', function ( array $fonts ): array {
    	$dir = content_url( 'fonts/' );
 
    	// The key is the font's ID: lowercase letters, numbers and dashes.
@@ -81,7 +81,7 @@ In WordPress 6.8 the Font Library is part of the Site Editor, which classic them
    ```
 
    Change the family name and file names to match your font. To add a second family, copy the `$fonts['...'] = [ ... ];` block with another key.
-3. Go to **Settings → Content PDF**. The font is now listed in **PDF font** and **Heading font**.
+3. Go to **Settings → Dinamiko PDF**. The font is now listed in **PDF font** and **Heading font**.
 
 Notes:
 
@@ -91,7 +91,7 @@ Notes:
 - Fonts uploaded to the Font Library while a block theme was active stay available after switching to a classic theme, because the Font Library isn't tied to the theme.
 - If a font doesn't appear in the list, check that the file URLs end in `.ttf` and open in the browser.
 
-See the [developer guide](developer-guide.md#fonts) for every option of the `cpdf_fonts` filter.
+See the [developer guide](developer-guide.md#fonts) for every option of the `dinamiko_pdf_fonts` filter.
 
 ### Header and footer
 
@@ -126,7 +126,7 @@ Example: `{site} · {date}` on the left, `Page ${currentPage} of ${totalPages}` 
 
 ## The shortcode
 
-`[content_pdf_button]` adds a button wherever you place it: in a post, a page, a widget or a template part. When a post contains the shortcode, the automatic button is not added, so the button doesn't appear twice.
+`[dinamiko_pdf_button]` adds a button wherever you place it: in a post, a page, a widget or a template part. When a post contains the shortcode, the automatic button is not added, so the button doesn't appear twice.
 
 | Attribute | Default | Description |
 | --- | --- | --- |
@@ -135,10 +135,10 @@ Example: `{site} · {date}` on the left, `Page ${currentPage} of ${totalPages}` 
 | `action` | The **Button action** setting | `download` or `view`. |
 
 ```text
-[content_pdf_button]
-[content_pdf_button label="Save this recipe as PDF"]
-[content_pdf_button id="42" label="Download the price list"]
-[content_pdf_button action="view"]
+[dinamiko_pdf_button]
+[dinamiko_pdf_button label="Save this recipe as PDF"]
+[dinamiko_pdf_button id="42" label="Download the price list"]
+[dinamiko_pdf_button action="view"]
 ```
 
 The button uses the core button classes (`wp-block-button__link wp-element-button`), so it looks like the theme's buttons.
@@ -156,9 +156,9 @@ When a post contains the block, the automatic button is not added, so the button
 
 ## Page breaks
 
-Add the CSS class `cpdf-page-break` to any block (**Block → Advanced → Additional CSS class(es)**) to start that block on a new page. In the classic editor, add `class="cpdf-page-break"` to the element in the text tab.
+Add the CSS class `dinamiko-pdf-page-break` to any block (**Block → Advanced → Additional CSS class(es)**) to start that block on a new page. In the classic editor, add `class="dinamiko-pdf-page-break"` to the element in the text tab.
 
-Content PDF also avoids common bad breaks on its own. Headings stay with the paragraph that follows them, and small boxes with a background or border aren't split across pages.
+Dinamiko PDF also avoids common bad breaks on its own. Headings stay with the paragraph that follows them, and small boxes with a background or border aren't split across pages.
 
 ## Direct URLs
 
@@ -166,9 +166,9 @@ Every exportable post has a print URL, which you can use in links or menus:
 
 | URL | Result |
 | --- | --- |
-| `https://example.com/my-post/?cpdf_print=1` | Downloads the PDF. |
-| `https://example.com/my-post/?cpdf_print=1&cpdf_mode=view` | Shows the PDF in the tab, with a download link. |
-| `https://example.com/my-post/?cpdf_print=1&cpdf_mode=print` | Opens the browser's print dialog on the content-only page. |
+| `https://example.com/my-post/?dinamiko_pdf_print=1` | Downloads the PDF. |
+| `https://example.com/my-post/?dinamiko_pdf_print=1&dinamiko_pdf_mode=view` | Shows the PDF in the tab, with a download link. |
+| `https://example.com/my-post/?dinamiko_pdf_print=1&dinamiko_pdf_mode=print` | Opens the browser's print dialog on the content-only page. |
 
 These URLs work on any singular post, page or custom post type, even when it isn't in **Show button on**.
 

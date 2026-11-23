@@ -2,12 +2,12 @@
 /**
  * Settings module.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Settings;
+namespace Dinamiko\DinamikoPdf\Settings;
 
 use Inpsyde\Modularity\Module\ExecutableModule;
 use Inpsyde\Modularity\Module\ModuleClassNameIdTrait;

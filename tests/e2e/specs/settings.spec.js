@@ -1,6 +1,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const OPTION = 'cpdf_settings';
+const OPTION = 'dinamiko_pdf_settings';
 
 test.describe( 'Settings page', () => {
 	let original;
@@ -22,7 +22,7 @@ test.describe( 'Settings page', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.visitAdminPage( 'options-general.php', 'page=content-pdf' );
+		await admin.visitAdminPage( 'options-general.php', 'page=dinamiko-pdf' );
 
 		const save = page.getByRole( 'button', { name: 'Save Changes' } );
 		await expect( save ).toBeDisabled();

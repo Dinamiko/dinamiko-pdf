@@ -17,7 +17,7 @@ export default function CheckboxListControl( { data, field, onChange } ) {
 	};
 
 	return (
-		<fieldset className="cpdf-checkbox-list">
+		<fieldset className="dinamiko-pdf-checkbox-list">
 			<BaseControl.VisualLabel as="legend">
 				{ field.label }
 			</BaseControl.VisualLabel>

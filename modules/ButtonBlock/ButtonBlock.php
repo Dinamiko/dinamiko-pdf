@@ -1,24 +1,24 @@
 <?php
 /**
- * "PDF Button" block: the [content_pdf_button] shortcode as a block.
+ * "PDF Button" block: the [dinamiko_pdf_button] shortcode as a block.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\ButtonBlock;
+namespace Dinamiko\DinamikoPdf\ButtonBlock;
 
-use Dinamiko\ContentPdf\Button\Button;
-use Dinamiko\ContentPdf\Export\PrintEndpoint;
-use Dinamiko\ContentPdf\Settings\Settings;
+use Dinamiko\DinamikoPdf\Button\Button;
+use Dinamiko\DinamikoPdf\Export\PrintEndpoint;
+use Dinamiko\DinamikoPdf\Settings\Settings;
 use Inpsyde\Modularity\Properties\Properties;
 use WP_Block;
 use WP_Block_Type;
 use WP_Post;
 
 /**
- * Registers the dynamic `content-pdf/button` block and renders it with Button::render().
+ * Registers the dynamic `dinamiko-pdf/button` block and renders it with Button::render().
  */
 class ButtonBlock {
 
@@ -54,7 +54,7 @@ class ButtonBlock {
 		foreach ( $block_type->editor_script_handles as $handle ) {
 			wp_add_inline_script(
 				$handle,
-				'window.cpdfBlock = ' . wp_json_encode(
+				'window.dinamikoPdfBlock = ' . wp_json_encode(
 					[
 						'action' => $settings['button_action'],
 						'label'  => $settings['button_label'],
@@ -62,7 +62,7 @@ class ButtonBlock {
 				) . ';',
 				'before'
 			);
-			wp_set_script_translations( $handle, 'content-pdf' );
+			wp_set_script_translations( $handle, 'dinamiko-pdf' );
 		}
 	}
 

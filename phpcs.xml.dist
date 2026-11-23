@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Content PDF" xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
-	<description>Coding standards for the Content PDF plugin.</description>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Dinamiko PDF" xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+	<description>Coding standards for the Dinamiko PDF plugin.</description>
 
-	<file>content-pdf.php</file>
+	<file>dinamiko-pdf.php</file>
 	<file>modules</file>
 	<file>tests/unit</file>
 	<file>bin</file>
@@ -46,7 +46,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="content-pdf"/>
+				<element value="dinamiko-pdf"/>
 			</property>
 		</properties>
 	</rule>
@@ -54,8 +54,8 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="cpdf"/>
-				<element value="Dinamiko\ContentPdf"/>
+				<element value="dinamiko_pdf"/>
+				<element value="Dinamiko\DinamikoPdf"/>
 			</property>
 		</properties>
 	</rule>

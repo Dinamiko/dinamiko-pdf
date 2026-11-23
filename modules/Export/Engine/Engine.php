@@ -2,16 +2,16 @@
 /**
  * PDF engine contract.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Export\Engine;
+namespace Dinamiko\DinamikoPdf\Export\Engine;
 
 /**
  * An engine turns the print page into a PDF. The plugin ships a browser engine (dompdf.js);
- * other engines (e.g. server-side) can implement the same contract and be swapped in with `cpdf_engine`.
+ * other engines (e.g. server-side) can implement the same contract and be swapped in with `dinamiko_pdf_engine`.
  */
 interface Engine {
 

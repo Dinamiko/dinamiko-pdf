@@ -1,4 +1,4 @@
-// Builds the wordpress.org release zip: dist/content-pdf.zip.
+// Builds the wordpress.org release zip: dist/dinamiko-pdf.zip.
 // Only tracked files from the allowlist below are copied, so tests, tooling and
 // untracked junk never ship. Composer runs with --no-dev in the staging folder,
 // which leaves the repo's dev vendor/ untouched. Run through `npm run dist`,
@@ -8,7 +8,7 @@ import { copyFileSync, mkdirSync, readFileSync, rmSync, statSync } from 'node:fs
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const SLUG = 'content-pdf';
+const SLUG = 'dinamiko-pdf';
 const root = join( dirname( fileURLToPath( import.meta.url ) ), '..' );
 const distDir = join( root, 'dist' );
 const stage = join( distDir, SLUG );

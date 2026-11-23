@@ -2,16 +2,16 @@
 /**
  * Registry of the fonts a PDF can use.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Settings;
+namespace Dinamiko\DinamikoPdf\Settings;
 
 /**
  * Bundled Noto Sans, the Font Library families that have TrueType files, and any families
- * registered through the `cpdf_fonts` filter.
+ * registered through the `dinamiko_pdf_fonts` filter.
  *
  * The PDF engine (dompdf.js) embeds only the TrueType files it is given, so every family lists
  * its TTF files with their weight and style.
@@ -63,7 +63,7 @@ class Fonts {
 		 *
 		 * @param array<string, array<string, mixed>> $fonts Fonts keyed by slug.
 		 */
-		$filtered = apply_filters( 'cpdf_fonts', $fonts );
+		$filtered = apply_filters( 'dinamiko_pdf_fonts', $fonts );
 
 		$this->fonts = self::normalize( is_array( $filtered ) ? $filtered : $fonts, self::bundled( $this->base_url ) );
 

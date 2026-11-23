@@ -2,12 +2,12 @@
 /**
  * E2E fixture: print template for pages.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) $geometry['content_px'], (int) $geometry['gutter_px'] );
+$dinamiko_pdf_width = sprintf( '--dinamiko-pdf-content-width: %dpx; --dinamiko-pdf-gutter: %dpx', (int) $geometry['content_px'], (int) $geometry['gutter_px'] );
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -17,9 +17,9 @@ $cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) 
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class( $body_classes ); ?>>
-	<p class="cpdf-status" role="status" aria-live="polite"></p>
-	<article class="entry-content cpdf-article" style="<?php echo esc_attr( $cpdf_width ); ?>">
-		<p class="cpdf-test-template">print-page.php</p>
+	<p class="dinamiko-pdf-status" role="status" aria-live="polite"></p>
+	<article class="entry-content dinamiko-pdf-article" style="<?php echo esc_attr( $dinamiko_pdf_width ); ?>">
+		<p class="dinamiko-pdf-test-template">print-page.php</p>
 		<h1><?php echo wp_kses_post( $title ); ?></h1>
 		<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</article>

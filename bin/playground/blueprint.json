@@ -12,7 +12,7 @@
 	"steps": [
 		{
 			"step": "activatePlugin",
-			"pluginPath": "content-pdf/content-pdf.php"
+			"pluginPath": "dinamiko-pdf/dinamiko-pdf.php"
 		},
 		{
 			"step": "installTheme",
@@ -26,7 +26,7 @@
 		},
 		{
 			"step": "wp-cli",
-			"command": "wp eval-file wp-content/plugins/content-pdf/bin/demo-content/demo.php seed"
+			"command": "wp eval-file wp-content/plugins/dinamiko-pdf/bin/demo-content/demo.php seed"
 		}
 	]
 }

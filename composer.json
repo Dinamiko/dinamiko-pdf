@@ -1,5 +1,5 @@
 {
-    "name": "dinamiko/content-pdf",
+    "name": "dinamiko/dinamiko-pdf",
     "description": "WordPress PDF Generator",
     "type": "wordpress-plugin",
     "require": {
@@ -14,12 +14,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Dinamiko\\ContentPdf\\": "modules/"
+            "Dinamiko\\DinamikoPdf\\": "modules/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dinamiko\\ContentPdf\\Tests\\Unit\\": "tests/unit/"
+            "Dinamiko\\DinamikoPdf\\Tests\\Unit\\": "tests/unit/"
         }
     },
     "config": {

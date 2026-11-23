@@ -2,12 +2,12 @@
 /**
  * Page geometry shared by PHP (CSS width) and JS (dompdf.js options).
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Settings;
+namespace Dinamiko\DinamikoPdf\Settings;
 
 /**
  * Converts paper size and margins into the numbers the print page and the exporter need.

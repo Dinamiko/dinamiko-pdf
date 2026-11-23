@@ -2,16 +2,16 @@
 /**
  * Button block module.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\ButtonBlock;
+namespace Dinamiko\DinamikoPdf\ButtonBlock;
 
-use Dinamiko\ContentPdf\Button\Button;
-use Dinamiko\ContentPdf\Export\PrintEndpoint;
-use Dinamiko\ContentPdf\Settings\Settings;
+use Dinamiko\DinamikoPdf\Button\Button;
+use Dinamiko\DinamikoPdf\Export\PrintEndpoint;
+use Dinamiko\DinamikoPdf\Settings\Settings;
 use Inpsyde\Modularity\Module\ExecutableModule;
 use Inpsyde\Modularity\Module\ModuleClassNameIdTrait;
 use Inpsyde\Modularity\Module\ServiceModule;

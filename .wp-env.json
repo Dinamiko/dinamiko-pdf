@@ -6,7 +6,7 @@
 	],
 	"themes": [
 		"https://downloads.wordpress.org/theme/twentytwentyone.zip",
-		"./tests/e2e/fixtures/themes/cpdf-test-child"
+		"./tests/e2e/fixtures/themes/dinamiko-pdf-test-child"
 	],
 	"config": {
 		"WP_DEBUG": true,

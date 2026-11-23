@@ -1,8 +1,8 @@
 /**
- * Hooks registered by compatibility scripts (added through the `cpdf_print_enqueue` action):
+ * Hooks registered by compatibility scripts (added through the `dinamiko_pdf_print_enqueue` action):
  *
- *     window.cpdfHooks = window.cpdfHooks || {};
- *     ( window.cpdfHooks.beforeExport = window.cpdfHooks.beforeExport || [] ).push(
+ *     window.dinamikoPdfHooks = window.dinamikoPdfHooks || {};
+ *     ( window.dinamikoPdfHooks.beforeExport = window.dinamikoPdfHooks.beforeExport || [] ).push(
  *         ( article, helpers ) => { … }
  *     );
  *
@@ -14,7 +14,7 @@
  * @param {Object}  helpers Helpers passed to each hook.
  */
 export async function runHooks( name, root, helpers ) {
-	const hooks = ( window.cpdfHooks && window.cpdfHooks[ name ] ) || [];
+	const hooks = ( window.dinamikoPdfHooks && window.dinamikoPdfHooks[ name ] ) || [];
 	for ( const hook of hooks ) {
 		try {
 			await Promise.race( [
@@ -25,7 +25,7 @@ export async function runHooks( name, root, helpers ) {
 			] );
 		} catch ( e ) {
 			// eslint-disable-next-line no-console
-			console.warn( '[Content PDF] ' + name + ' hook failed', e );
+			console.warn( '[Dinamiko PDF] ' + name + ' hook failed', e );
 		}
 	}
 }

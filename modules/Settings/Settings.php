@@ -2,19 +2,19 @@
 /**
  * Plugin settings stored in a single option.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Settings;
+namespace Dinamiko\DinamikoPdf\Settings;
 
 /**
- * Reads, defaults and sanitizes the `cpdf_settings` option.
+ * Reads, defaults and sanitizes the `dinamiko_pdf_settings` option.
  */
 class Settings {
 
-	public const OPTION = 'cpdf_settings';
+	public const OPTION = 'dinamiko_pdf_settings';
 
 	/**
 	 * What the button does: download the PDF or open it in a new tab.
@@ -67,7 +67,7 @@ class Settings {
 			'button_action'       => 'download',
 			// Used by every button without its own label. Empty falls back to "Download PDF", or
 			// "View PDF" for the view action. `__()` is missing in the unit tests, which don't load WordPress.
-			'button_label'        => function_exists( '__' ) ? __( 'Download PDF', 'content-pdf' ) : 'Download PDF',
+			'button_label'        => function_exists( '__' ) ? __( 'Download PDF', 'dinamiko-pdf' ) : 'Download PDF',
 			'button_position'     => 'after',
 			'paper'               => 'a4',
 			'margin_mm'           => 15,
@@ -129,7 +129,7 @@ class Settings {
 			'margin_mm'           => $integer( 0, self::MARGIN_MAX ),
 			'show_title'          => [ 'type' => 'boolean' ],
 			'show_featured_image' => [ 'type' => 'boolean' ],
-			// No enum: the `cpdf_fonts` filter decides which slugs exist.
+			// No enum: the `dinamiko_pdf_fonts` filter decides which slugs exist.
 			'font_body'           => [ 'type' => 'string' ],
 			'font_heading'        => [ 'type' => 'string' ],
 			'header_logo_id'      => [

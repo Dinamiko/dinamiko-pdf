@@ -4,12 +4,12 @@
  *
  * Themes can override this file. The first match wins (child theme, then parent theme):
  *
- *   content-pdf/print-{post_type}-{slug}.php
- *   content-pdf/print-{post_type}-{id}.php
- *   content-pdf/print-{post_type}.php
- *   content-pdf/print.php
+ *   dinamiko-pdf/print-{post_type}-{slug}.php
+ *   dinamiko-pdf/print-{post_type}-{id}.php
+ *   dinamiko-pdf/print-{post_type}.php
+ *   dinamiko-pdf/print.php
  *
- * Keep the `.cpdf-article` element: it is what gets exported and what receives the PDF
+ * Keep the `.dinamiko-pdf-article` element: it is what gets exported and what receives the PDF
  * content width. Keep wp_head() and wp_footer(): they load the exporter.
  *
  * Variables from PrintEndpoint::render():
@@ -23,12 +23,12 @@
  * @var bool     $show_title     Whether to print the post title.
  * @var string   $featured_image Featured image markup, or empty when it is turned off or missing.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) $geometry['content_px'], (int) $geometry['gutter_px'] );
+$dinamiko_pdf_width = sprintf( '--dinamiko-pdf-content-width: %dpx; --dinamiko-pdf-gutter: %dpx', (int) $geometry['content_px'], (int) $geometry['gutter_px'] );
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -40,16 +40,16 @@ $cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) 
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class( $body_classes ); ?>>
-	<p class="cpdf-status" role="status" aria-live="polite"></p>
+	<p class="dinamiko-pdf-status" role="status" aria-live="polite"></p>
 	<?php if ( $is_block_theme ) : ?>
 		<?php // Block themes style block classes via theme.json global styles. ?>
 		<main class="wp-site-blocks">
-			<article class="entry-content is-layout-constrained cpdf-article" style="<?php echo esc_attr( $cpdf_width ); ?>">
+			<article class="entry-content is-layout-constrained dinamiko-pdf-article" style="<?php echo esc_attr( $dinamiko_pdf_width ); ?>">
 				<?php if ( $show_title ) : ?>
 					<h1 class="wp-block-post-title"><?php echo wp_kses_post( $title ); ?></h1>
 				<?php endif; ?>
 				<?php if ( $featured_image ) : ?>
-					<figure class="wp-block-post-featured-image cpdf-featured-image">
+					<figure class="wp-block-post-featured-image dinamiko-pdf-featured-image">
 						<?php echo $featured_image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_the_post_thumbnail() output. ?>
 					</figure>
 				<?php endif; ?>
@@ -58,7 +58,7 @@ $cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) 
 		</main>
 	<?php else : ?>
 		<?php // Classic themes style their own wrappers; mirror the common (Underscores / core default) structure. ?>
-		<div class="cpdf-article" style="<?php echo esc_attr( $cpdf_width ); ?>">
+		<div class="dinamiko-pdf-article" style="<?php echo esc_attr( $dinamiko_pdf_width ); ?>">
 			<div id="page" class="site">
 				<div id="content" class="site-content">
 					<div id="primary" class="content-area">
@@ -70,7 +70,7 @@ $cpdf_width = sprintf( '--cpdf-content-width: %dpx; --cpdf-gutter: %dpx', (int) 
 											<h1 class="entry-title"><?php echo wp_kses_post( $title ); ?></h1>
 										<?php endif; ?>
 										<?php if ( $featured_image ) : ?>
-											<div class="post-thumbnail cpdf-featured-image">
+											<div class="post-thumbnail dinamiko-pdf-featured-image">
 												<?php echo $featured_image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_the_post_thumbnail() output. ?>
 											</div>
 										<?php endif; ?>

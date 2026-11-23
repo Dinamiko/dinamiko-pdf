@@ -2,12 +2,12 @@
 /**
  * Print template lookup order.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Export;
+namespace Dinamiko\DinamikoPdf\Export;
 
 /**
  * Builds the list of theme template names for the print page (and its header/footer),
@@ -15,7 +15,7 @@ namespace Dinamiko\ContentPdf\Export;
  */
 final class TemplateHierarchy {
 
-	public const DIRECTORY = 'content-pdf';
+	public const DIRECTORY = 'dinamiko-pdf';
 
 	/**
 	 * Template names that have their own hierarchy.

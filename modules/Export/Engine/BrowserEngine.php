@@ -2,12 +2,12 @@
 /**
  * Browser engine: dompdf.js running in the visitor's browser.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Export\Engine;
+namespace Dinamiko\DinamikoPdf\Export\Engine;
 
 use Inpsyde\Modularity\Properties\Properties;
 
@@ -48,13 +48,13 @@ class BrowserEngine implements Engine {
 		if ( is_readable( $base_path . self::VENDOR_DIR . 'dompdf.min.js' ) ) {
 			$version = trim( (string) file_get_contents( $base_path . self::VENDOR_DIR . 'VERSION' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local file.
 			wp_enqueue_script(
-				'cpdf-dompdf',
+				'dinamiko-pdf-dompdf',
 				$base_url . self::VENDOR_DIR . 'dompdf.min.js',
 				[],
 				'' !== $version ? $version : $this->properties->version(),
 				true
 			);
-			$deps[] = 'cpdf-dompdf';
+			$deps[] = 'dinamiko-pdf-dompdf';
 		}
 
 		$asset_file = $base_path . self::BUILD_DIR . 'index.asset.php';
@@ -64,12 +64,12 @@ class BrowserEngine implements Engine {
 		];
 
 		wp_enqueue_script(
-			'cpdf-export',
+			'dinamiko-pdf-export',
 			$base_url . self::BUILD_DIR . 'index.js',
 			array_merge( $asset['dependencies'], $deps ),
 			$asset['version'],
 			true
 		);
-		wp_add_inline_script( 'cpdf-export', 'window.cpdfConfig = ' . wp_json_encode( $config ) . ';', 'before' );
+		wp_add_inline_script( 'dinamiko-pdf-export', 'window.dinamikoPdfConfig = ' . wp_json_encode( $config ) . ';', 'before' );
 	}
 }

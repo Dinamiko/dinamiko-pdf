@@ -2,15 +2,15 @@
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Tests\Unit;
+namespace Dinamiko\DinamikoPdf\Tests\Unit;
 
-use Dinamiko\ContentPdf\Settings\Fonts;
+use Dinamiko\DinamikoPdf\Settings\Fonts;
 use PHPUnit\Framework\TestCase;
 
 class FontsTest extends TestCase {
 
 	private function default(): array {
-		return Fonts::bundled( 'https://example.com/wp-content/plugins/content-pdf/' );
+		return Fonts::bundled( 'https://example.com/wp-content/plugins/dinamiko-pdf/' );
 	}
 
 	public function test_default_is_kept_when_the_filter_removes_it(): void {

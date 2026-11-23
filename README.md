@@ -1,11 +1,11 @@
-# Content PDF
+# Dinamiko PDF
 
 A WordPress plugin that lets visitors download any post, page or custom post type as a PDF that looks like the site. The PDF is generated in the visitor's browser by the bundled [dompdf.js](https://github.com/lmn1919/dompdf.js), with no external services. Text stays real, selectable text.
 
 - Works with block themes and classic themes, and keeps the look of core blocks and theme.json styles.
 - Leaves out the site header, navigation, sidebars, footer, comments and share buttons.
 - A4 or Letter, margins, title and featured image, and a header and footer with a logo, page numbers and placeholders.
-- An automatic button or the `[content_pdf_button]` shortcode, which can download the PDF or open it in a new tab.
+- An automatic button or the `[dinamiko_pdf_button]` shortcode, which can download the PDF or open it in a new tab.
 - Themes can supply their own print, header and footer templates, and plugins can extend the output through hooks.
 - Falls back to the browser's print dialog when the browser can't create the PDF.
 - Respects drafts, private and password-protected posts, and keeps PDF pages out of search engines.

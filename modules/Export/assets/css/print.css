@@ -1,23 +1,23 @@
 /*
- * Content PDF — print page styles.
+ * Dinamiko PDF — print page styles.
  * The browser lays out the article at the PDF content width; dompdf.js then reads that layout.
  */
 
 /* Fonts: @font-face rules and the font-family rules come from PrintEndpoint::font_css(). */
 
 html,
-body.cpdf-print {
+body.dinamiko-pdf-print {
 	margin: 0;
 	padding: 0;
 }
 
-/* White paper by default; the `cpdf_keep_theme_background` filter keeps the theme colour. */
-html:has(body.cpdf-print:not(.cpdf-theme-background)),
-body.cpdf-print:not(.cpdf-theme-background) {
+/* White paper by default; the `dinamiko_pdf_keep_theme_background` filter keeps the theme colour. */
+html:has(body.dinamiko-pdf-print:not(.dinamiko-pdf-theme-background)),
+body.dinamiko-pdf-print:not(.dinamiko-pdf-theme-background) {
 	background: #fff;
 }
 
-body.cpdf-print .wp-site-blocks {
+body.dinamiko-pdf-print .wp-site-blocks {
 	margin: 0;
 	padding: 0;
 }
@@ -26,7 +26,7 @@ body.cpdf-print .wp-site-blocks {
  * Fixed width = page width − margins, so line breaks match the PDF page.
  * Typography, colours and spacing are left to the theme.
  */
-.cpdf-article {
+.dinamiko-pdf-article {
 	/* Let constrained/wide blocks fill the page instead of the theme's content size. */
 	--wp--style--global--content-size: 100%;
 	--wp--style--global--wide-size: 100%;
@@ -36,19 +36,19 @@ body.cpdf-print .wp-site-blocks {
 	--responsive--alignfull-width: 100%;
 	/* The gutter is part of the page margin; it keeps list markers and overhangs from being clipped. */
 	box-sizing: content-box;
-	width: var(--cpdf-content-width, 680px);
+	width: var(--dinamiko-pdf-content-width, 680px);
 	max-width: none;
 	margin: 0;
-	padding: 0 var(--cpdf-gutter, 0px);
+	padding: 0 var(--dinamiko-pdf-gutter, 0px);
 }
 
 /* Classic theme wrappers (see templates/print.php): keep their styling, drop their page layout. */
-.cpdf-article .site,
-.cpdf-article .site-content,
-.cpdf-article .content-area,
-.cpdf-article .site-main,
-.cpdf-article .site-main > article,
-.cpdf-article .entry-header {
+.dinamiko-pdf-article .site,
+.dinamiko-pdf-article .site-content,
+.dinamiko-pdf-article .content-area,
+.dinamiko-pdf-article .site-main,
+.dinamiko-pdf-article .site-main > article,
+.dinamiko-pdf-article .entry-header {
 	width: auto;
 	max-width: none;
 	margin-left: 0;
@@ -58,13 +58,13 @@ body.cpdf-print .wp-site-blocks {
 	float: none;
 }
 
-.cpdf-article .site-content,
-.cpdf-article .site-main {
+.dinamiko-pdf-article .site-content,
+.dinamiko-pdf-article .site-main {
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
-.cpdf-article .entry-header {
+.dinamiko-pdf-article .entry-header {
 	margin-top: 0;
 	border: 0;
 }
@@ -73,16 +73,16 @@ body.cpdf-print .wp-site-blocks {
  * No motion: the export reads computed styles once, and in the hidden export iframe transitions
  * never advance (a progress bar would stay at 0).
  */
-.cpdf-article *,
-.cpdf-article *::before,
-.cpdf-article *::after {
+.dinamiko-pdf-article *,
+.dinamiko-pdf-article *::before,
+.dinamiko-pdf-article *::after {
 	transition: none !important;
 }
 
-.cpdf-article > .alignwide,
-.cpdf-article > .alignfull,
-.cpdf-article .entry-content > .alignwide,
-.cpdf-article .entry-content > .alignfull {
+.dinamiko-pdf-article > .alignwide,
+.dinamiko-pdf-article > .alignfull,
+.dinamiko-pdf-article .entry-content > .alignwide,
+.dinamiko-pdf-article .entry-content > .alignfull {
 	width: auto;
 	max-width: 100% !important;
 	margin-left: 0 !important;
@@ -90,22 +90,22 @@ body.cpdf-print .wp-site-blocks {
 }
 
 /* Classic themes cap content children at a vw-based width; the article already is the column. */
-.cpdf-article .entry-content > *:not(.alignleft):not(.alignright):not(.wp-block-separator) {
+.dinamiko-pdf-article .entry-content > *:not(.alignleft):not(.alignright):not(.wp-block-separator) {
 	max-width: 100% !important;
 }
 
-.cpdf-article .has-global-padding {
+.dinamiko-pdf-article .has-global-padding {
 	padding-left: 0;
 	padding-right: 0;
 }
 
-.cpdf-article > .wp-block-post-title,
-.cpdf-article > .cpdf-featured-image:first-child {
+.dinamiko-pdf-article > .wp-block-post-title,
+.dinamiko-pdf-article > .dinamiko-pdf-featured-image:first-child {
 	margin-top: 0;
 }
 
 /* Featured image (show_featured_image setting): full content width, between title and content. */
-.cpdf-article .cpdf-featured-image {
+.dinamiko-pdf-article .dinamiko-pdf-featured-image {
 	width: auto;
 	max-width: 100% !important;
 	margin-left: 0;
@@ -113,39 +113,39 @@ body.cpdf-print .wp-site-blocks {
 	margin-bottom: 1.5em;
 }
 
-.cpdf-article .cpdf-featured-image img {
+.dinamiko-pdf-article .dinamiko-pdf-featured-image img {
 	display: block;
 	width: 100%;
 	height: auto;
 }
 
-.cpdf-article img,
-.cpdf-article svg,
-.cpdf-article figure {
+.dinamiko-pdf-article img,
+.dinamiko-pdf-article svg,
+.dinamiko-pdf-article figure {
 	max-width: 100%;
 	height: auto;
 }
 
 /* dompdf.js draws list markers as glyphs; circle/square are not in Noto Sans. */
-.cpdf-article ul,
-.cpdf-article ul ul,
-.cpdf-article ul ul ul {
+.dinamiko-pdf-article ul,
+.dinamiko-pdf-article ul ul,
+.dinamiko-pdf-article ul ul ul {
 	list-style-type: disc;
 }
 
-.cpdf-article pre {
+.dinamiko-pdf-article pre {
 	white-space: pre-wrap;
 	word-break: break-word;
 }
 
 /* Set by print-export.js on elements whose hidden pseudo-element has text content. */
-.cpdf-no-before::before,
-.cpdf-no-after::after {
+.dinamiko-pdf-no-before::before,
+.dinamiko-pdf-no-after::after {
 	content: none !important;
 }
 
 /* Text version of iframes/videos/embeds (built by print-export.js). */
-.cpdf-embed-placeholder {
+.dinamiko-pdf-embed-placeholder {
 	display: block;
 	box-sizing: border-box;
 	padding: 12px 16px;
@@ -159,7 +159,7 @@ body.cpdf-print .wp-site-blocks {
 	word-break: break-all;
 }
 
-.cpdf-embed-placeholder img {
+.dinamiko-pdf-embed-placeholder img {
 	display: block;
 	width: 100%;
 	margin-bottom: 8px;
@@ -169,7 +169,7 @@ body.cpdf-print .wp-site-blocks {
  * Header/footer markup (templates/header.php, footer.php): read by the exporter, never displayed.
  * Not display:none, so computed font sizes and colours are still resolved.
  */
-.cpdf-regions {
+.dinamiko-pdf-regions {
 	position: absolute;
 	left: -10000px;
 	top: 0;
@@ -179,25 +179,25 @@ body.cpdf-print .wp-site-blocks {
 	visibility: hidden;
 }
 
-.cpdf-regions [data-cpdf-slot] {
+.dinamiko-pdf-regions [data-dinamiko-pdf-slot] {
 	font-weight: 400;
 	font-style: normal;
-	color: var(--cpdf-region-color, #666);
+	color: var(--dinamiko-pdf-region-color, #666);
 }
 
-.cpdf-regions [data-cpdf-region="header"] [data-cpdf-slot] {
-	font-size: var(--cpdf-header-font-size, 16px);
+.dinamiko-pdf-regions [data-dinamiko-pdf-region="header"] [data-dinamiko-pdf-slot] {
+	font-size: var(--dinamiko-pdf-header-font-size, 16px);
 }
 
-.cpdf-regions [data-cpdf-region="footer"] [data-cpdf-slot] {
-	font-size: var(--cpdf-footer-font-size, 10px);
+.dinamiko-pdf-regions [data-dinamiko-pdf-region="footer"] [data-dinamiko-pdf-slot] {
+	font-size: var(--dinamiko-pdf-footer-font-size, 10px);
 }
 
-.cpdf-regions .cpdf-region-logo {
+.dinamiko-pdf-regions .dinamiko-pdf-region-logo {
 	max-width: none;
 }
 
-.cpdf-status {
+.dinamiko-pdf-status {
 	position: fixed;
 	right: 12px;
 	bottom: 12px;
@@ -210,20 +210,20 @@ body.cpdf-print .wp-site-blocks {
 	z-index: 10;
 }
 
-.cpdf-status:empty {
+.dinamiko-pdf-status:empty {
 	display: none;
 }
 
-/* ?cpdf_mode=view: the finished PDF replaces the page (see showPdf() in resources/js/index.js). */
-body.cpdf-viewing {
+/* ?dinamiko_pdf_mode=view: the finished PDF replaces the page (see showPdf() in resources/js/index.js). */
+body.dinamiko-pdf-viewing {
 	overflow: hidden;
 }
 
-body.cpdf-viewing > :not(.cpdf-viewer):not(.cpdf-viewer-toolbar) {
+body.dinamiko-pdf-viewing > :not(.dinamiko-pdf-viewer):not(.dinamiko-pdf-viewer-toolbar) {
 	display: none !important;
 }
 
-.cpdf-viewer {
+.dinamiko-pdf-viewer {
 	position: fixed;
 	inset: 40px 0 0;
 	width: 100%;
@@ -232,7 +232,7 @@ body.cpdf-viewing > :not(.cpdf-viewer):not(.cpdf-viewer-toolbar) {
 	background: #525659;
 }
 
-.cpdf-viewer-toolbar {
+.dinamiko-pdf-viewer-toolbar {
 	position: fixed;
 	inset: 0 0 auto;
 	display: flex;
@@ -245,22 +245,22 @@ body.cpdf-viewing > :not(.cpdf-viewer):not(.cpdf-viewer-toolbar) {
 	font: 13px/1.4 system-ui, sans-serif;
 }
 
-.cpdf-viewer-toolbar a {
+.dinamiko-pdf-viewer-toolbar a {
 	color: #fff;
 	text-decoration: underline;
 }
 
 @media print {
-	.cpdf-status {
+	.dinamiko-pdf-status {
 		display: none !important;
 	}
 
-	.cpdf-article {
+	.dinamiko-pdf-article {
 		width: auto;
 		padding: 0;
 	}
 
-	.cpdf-page-break {
+	.dinamiko-pdf-page-break {
 		break-before: page;
 	}
 }

@@ -54,7 +54,7 @@
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>Choose the post types under Settings → Content PDF</li>
+<li>Choose the post types under Settings → Dinamiko PDF</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
@@ -88,9 +88,9 @@ the PDF keeps, clean and lean.</pre>
 <!-- /wp:heading -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>add_filter( 'cpdf_show_title', '__return_false' );
+<pre class="wp-block-code"><code>add_filter( 'dinamiko_pdf_show_title', '__return_false' );
 
-add_filter( 'cpdf_hidden_selectors', function ( array $selectors ): array {
+add_filter( 'dinamiko_pdf_hidden_selectors', function ( array $selectors ): array {
 	$selectors[] = '.share-buttons';
 	return $selectors;
 } );</code></pre>

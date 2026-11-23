@@ -1,4 +1,4 @@
-# Content PDF documentation
+# Dinamiko PDF documentation
 
 - [User guide](user-guide.md): installation, settings, header and footer, the shortcode and the block, page breaks, direct URLs and privacy.
 - [Developer guide](developer-guide.md): how the export works, custom print/header/footer templates, PHP and JavaScript hooks, and add-on modules.

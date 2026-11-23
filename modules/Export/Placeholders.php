@@ -2,12 +2,12 @@
 /**
  * Placeholders in header and footer texts.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Export;
+namespace Dinamiko\DinamikoPdf\Export;
 
 /**
  * Replaces the post placeholders ({title}, {site}, {date}, {url}).

@@ -23,7 +23,7 @@ function Notices() {
 	const { removeNotice } = useDispatch( noticesStore );
 	return (
 		<SnackbarList
-			className="cpdf-settings__notices"
+			className="dinamiko-pdf-settings__notices"
 			notices={ notices }
 			onRemove={ removeNotice }
 		/>
@@ -62,7 +62,7 @@ function Form( { settings } ) {
 	};
 
 	return (
-		<form className="cpdf-settings" onSubmit={ onSubmit }>
+		<form className="dinamiko-pdf-settings" onSubmit={ onSubmit }>
 			<DataForm
 				data={ settings }
 				fields={ fields }
@@ -79,14 +79,14 @@ function Form( { settings } ) {
 					disabled={ ! hasEdits || ! isValid || isSaving }
 					accessibleWhenDisabled
 				>
-					{ __( 'Save Changes', 'content-pdf' ) }
+					{ __( 'Save Changes', 'dinamiko-pdf' ) }
 				</Button>
 			</div>
-			<p className="cpdf-settings__hint">
+			<p className="dinamiko-pdf-settings__hint">
 				{ createInterpolateElement(
 					__(
-						'Use the <code>[content_pdf_button]</code> shortcode to place the button anywhere, on any post type.',
-						'content-pdf'
+						'Use the <code>[dinamiko_pdf_button]</code> shortcode to place the button anywhere, on any post type.',
+						'dinamiko-pdf'
 					),
 					{ code: <code /> }
 				) }

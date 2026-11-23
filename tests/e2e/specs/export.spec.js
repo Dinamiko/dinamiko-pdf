@@ -52,8 +52,8 @@ const PAGE_BREAK_CONTENT = `
 <p class="has-drop-cap">Drop cap paragraph on the first page.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:heading {"className":"cpdf-page-break"} -->
-<h2 class="wp-block-heading cpdf-page-break">Second page</h2>
+<!-- wp:heading {"className":"dinamiko-pdf-page-break"} -->
+<h2 class="wp-block-heading dinamiko-pdf-page-break">Second page</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -63,7 +63,7 @@ const PAGE_BREAK_CONTENT = `
 
 function printUrl( link ) {
 	const url = new URL( link );
-	url.searchParams.set( 'cpdf_print', '1' );
+	url.searchParams.set( 'dinamiko_pdf_print', '1' );
 	return url.href;
 }
 
@@ -96,7 +96,7 @@ test.describe( 'PDF export', () => {
 		page = await requestUtils.createPage( {
 			title: 'Shortcode Page',
 			content:
-				'<!-- wp:shortcode -->[content_pdf_button label="Get PDF"]<!-- /wp:shortcode -->',
+				'<!-- wp:shortcode -->[dinamiko_pdf_button label="Get PDF"]<!-- /wp:shortcode -->',
 			status: 'publish',
 		} );
 		breakPost = await requestUtils.createPost( {
@@ -119,31 +119,31 @@ test.describe( 'PDF export', () => {
 		).toBeVisible();
 		await expect(
 			browserPage.locator( '.wp-block-post-content > :last-child' )
-		).toHaveClass( /cpdf-button-wrap/ );
+		).toHaveClass( /dinamiko-pdf-button-wrap/ );
 	} );
 
 	test( 'the position setting puts the button before the content', async ( {
 		page: browserPage,
 		requestUtils,
 	} ) => {
-		const { cpdf_settings: original } = await requestUtils.rest( {
+		const { dinamiko_pdf_settings: original } = await requestUtils.rest( {
 			path: '/wp/v2/settings',
 		} );
 		await requestUtils.rest( {
 			path: '/wp/v2/settings',
 			method: 'POST',
-			data: { cpdf_settings: { ...original, button_position: 'before' } },
+			data: { dinamiko_pdf_settings: { ...original, button_position: 'before' } },
 		} );
 		try {
 			await browserPage.goto( post.link );
 			await expect(
 				browserPage.locator( '.wp-block-post-content > :first-child' )
-			).toHaveClass( /cpdf-button-wrap/ );
+			).toHaveClass( /dinamiko-pdf-button-wrap/ );
 		} finally {
 			await requestUtils.rest( {
 				path: '/wp/v2/settings',
 				method: 'POST',
-				data: { cpdf_settings: original },
+				data: { dinamiko_pdf_settings: original },
 			} );
 		}
 	} );
@@ -152,14 +152,14 @@ test.describe( 'PDF export', () => {
 		page: browserPage,
 		requestUtils,
 	} ) => {
-		const { cpdf_settings: original } = await requestUtils.rest( {
+		const { dinamiko_pdf_settings: original } = await requestUtils.rest( {
 			path: '/wp/v2/settings',
 		} );
 		await requestUtils.rest( {
 			path: '/wp/v2/settings',
 			method: 'POST',
 			data: {
-				cpdf_settings: { ...original, button_label: 'Save as PDF' },
+				dinamiko_pdf_settings: { ...original, button_label: 'Save as PDF' },
 			},
 		} );
 		try {
@@ -171,7 +171,7 @@ test.describe( 'PDF export', () => {
 			await requestUtils.rest( {
 				path: '/wp/v2/settings',
 				method: 'POST',
-				data: { cpdf_settings: original },
+				data: { dinamiko_pdf_settings: original },
 			} );
 		}
 	} );
@@ -184,7 +184,7 @@ test.describe( 'PDF export', () => {
 			browserPage.getByRole( 'button', { name: 'Get PDF' } )
 		).toBeVisible();
 		// Pages are not in the default post types, so there is no automatic button.
-		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 1 );
+		await expect( browserPage.locator( '.dinamiko-pdf-button' ) ).toHaveCount( 1 );
 	} );
 
 	test( 'renders the PDF Button block instead of the automatic button', async ( {
@@ -195,7 +195,7 @@ test.describe( 'PDF export', () => {
 			title: 'Block Button Post',
 			content:
 				'<!-- wp:paragraph --><p>Intro.</p><!-- /wp:paragraph -->' +
-				'<!-- wp:content-pdf/button {"label":"Save \\u0026amp; share","action":"view"} /-->',
+				'<!-- wp:dinamiko-pdf/button {"label":"Save \\u0026amp; share","action":"view"} /-->',
 			status: 'publish',
 		} );
 		await browserPage.goto( blockPost.link );
@@ -203,9 +203,9 @@ test.describe( 'PDF export', () => {
 			name: 'Save & share',
 		} );
 		await expect( button ).toBeVisible();
-		await expect( button ).toHaveAttribute( 'data-cpdf-action', 'view' );
+		await expect( button ).toHaveAttribute( 'data-dinamiko-pdf-action', 'view' );
 		// Posts get the automatic button, but not when the content has the block.
-		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 1 );
+		await expect( browserPage.locator( '.dinamiko-pdf-button' ) ).toHaveCount( 1 );
 
 		// The block is not printed in the PDF.
 		await browserPage.route(
@@ -213,10 +213,10 @@ test.describe( 'PDF export', () => {
 			( route ) => route.abort()
 		);
 		await browserPage.goto( printUrl( blockPost.link ) );
-		await expect( browserPage.locator( '.cpdf-article' ) ).toContainText(
+		await expect( browserPage.locator( '.dinamiko-pdf-article' ) ).toContainText(
 			'Intro.'
 		);
-		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 0 );
+		await expect( browserPage.locator( '.dinamiko-pdf-button' ) ).toHaveCount( 0 );
 	} );
 
 	test( 'the PDF Button block exports another post by ID', async ( {
@@ -225,7 +225,7 @@ test.describe( 'PDF export', () => {
 	} ) => {
 		const blockPage = await requestUtils.createPage( {
 			title: 'Block Page',
-			content: `<!-- wp:content-pdf/button {"postId":${ post.id }} /-->`,
+			content: `<!-- wp:dinamiko-pdf/button {"postId":${ post.id }} /-->`,
 			status: 'publish',
 		} );
 		await browserPage.goto( blockPage.link );
@@ -241,9 +241,9 @@ test.describe( 'PDF export', () => {
 		editor,
 	} ) => {
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'content-pdf/button' } );
+		await editor.insertBlock( { name: 'dinamiko-pdf/button' } );
 		const block = editor.canvas.locator(
-			'[data-type="content-pdf/button"]'
+			'[data-type="dinamiko-pdf/button"]'
 		);
 		await expect( block ).toBeVisible();
 		await expect(
@@ -265,7 +265,7 @@ test.describe( 'PDF export', () => {
 		);
 		await browserPage.goto( printUrl( post.link ) );
 
-		const article = browserPage.locator( '.cpdf-article' );
+		const article = browserPage.locator( '.dinamiko-pdf-article' );
 		await expect( article ).toHaveCount( 1 );
 		await expect( article.locator( '.wp-block-post-title' ) ).toHaveText(
 			'Blocks Export'
@@ -273,7 +273,7 @@ test.describe( 'PDF export', () => {
 		await expect( article ).toContainText( 'Section heading' );
 		await expect( article.locator( '.wp-block-columns' ) ).toHaveCount( 1 );
 		await expect( article.locator( 'table' ) ).toContainText( 'Cell B' );
-		await expect( browserPage.locator( '.cpdf-button' ) ).toBeHidden();
+		await expect( browserPage.locator( '.dinamiko-pdf-button' ) ).toBeHidden();
 		await expect(
 			browserPage.locator( 'header.wp-block-template-part' )
 		).toHaveCount( 0 );
@@ -281,7 +281,7 @@ test.describe( 'PDF export', () => {
 			browserPage.locator( 'footer.wp-block-template-part' )
 		).toHaveCount( 0 );
 
-		const config = await browserPage.evaluate( () => window.cpdfConfig );
+		const config = await browserPage.evaluate( () => window.dinamikoPdfConfig );
 		expect( config.filename ).toBe( 'Blocks-Export.pdf' );
 		expect( config.format ).toBe( 'a4' );
 	} );
@@ -308,17 +308,17 @@ test.describe( 'PDF export', () => {
 	test( 'view mode shows the PDF in the tab instead of downloading', async ( {
 		page: browserPage,
 	} ) => {
-		await browserPage.goto( printUrl( post.link ) + '&cpdf_mode=view' );
+		await browserPage.goto( printUrl( post.link ) + '&dinamiko_pdf_mode=view' );
 
-		const viewer = browserPage.locator( 'iframe.cpdf-viewer' );
+		const viewer = browserPage.locator( 'iframe.dinamiko-pdf-viewer' );
 		await expect( viewer ).toHaveAttribute( 'src', /^blob:/, {
 			timeout: 60000,
 		} );
-		const link = browserPage.locator( '.cpdf-viewer-toolbar a' );
+		const link = browserPage.locator( '.dinamiko-pdf-viewer-toolbar a' );
 		await expect( link ).toHaveAttribute( 'download', 'Blocks-Export.pdf' );
 		// The page hands the PDF to the viewer instead of downloading it. (Headless Chromium has no
 		// PDF viewer and saves the iframe's PDF as a download, so downloads are not asserted.)
-		await expect( browserPage.locator( '.cpdf-article' ) ).toBeHidden();
+		await expect( browserPage.locator( '.dinamiko-pdf-article' ) ).toBeHidden();
 
 		// The toolbar link downloads the same PDF with the real filename.
 		const downloadPromise = browserPage.waitForEvent( 'download' );
@@ -332,18 +332,18 @@ test.describe( 'PDF export', () => {
 	} ) => {
 		const viewPage = await requestUtils.createPage( {
 			title: 'View Page',
-			content: `<!-- wp:shortcode -->[content_pdf_button id="${ post.id }" action="view"]<!-- /wp:shortcode -->`,
+			content: `<!-- wp:shortcode -->[dinamiko_pdf_button id="${ post.id }" action="view"]<!-- /wp:shortcode -->`,
 			status: 'publish',
 		} );
 		await browserPage.goto( viewPage.link );
 
 		const popupPromise = browserPage.waitForEvent( 'popup' );
 		await browserPage
-			.locator( 'button.cpdf-button[data-cpdf-action="view"]' )
+			.locator( 'button.dinamiko-pdf-button[data-dinamiko-pdf-action="view"]' )
 			.click();
 		const popup = await popupPromise;
-		expect( popup.url() ).toContain( 'cpdf_mode=view' );
-		await expect( popup.locator( 'iframe.cpdf-viewer' ) ).toHaveAttribute(
+		expect( popup.url() ).toContain( 'dinamiko_pdf_mode=view' );
+		await expect( popup.locator( 'iframe.dinamiko-pdf-viewer' ) ).toHaveAttribute(
 			'src',
 			/^blob:/,
 			{ timeout: 60000 }
@@ -364,7 +364,7 @@ test.describe( 'PDF export', () => {
 		expect( pageCount( bytes ) ).toBe( 2 );
 
 		// The drop cap's ::first-letter is replaced with a real element for the exporter.
-		await expect( browserPage.locator( '.cpdf-drop-cap' ) ).toHaveText(
+		await expect( browserPage.locator( '.dinamiko-pdf-drop-cap' ) ).toHaveText(
 			'D'
 		);
 		await expect( browserPage.locator( '.has-drop-cap' ) ).toHaveCount( 0 );
@@ -374,18 +374,18 @@ test.describe( 'PDF export', () => {
 		page: browserPage,
 		requestUtils,
 	} ) => {
-		const { cpdf_settings: original } = await requestUtils.rest( {
+		const { dinamiko_pdf_settings: original } = await requestUtils.rest( {
 			path: '/wp/v2/settings',
 		} );
 		const setSettings = ( values ) =>
 			requestUtils.rest( {
 				path: '/wp/v2/settings',
 				method: 'POST',
-				data: { cpdf_settings: { ...original, ...values } },
+				data: { dinamiko_pdf_settings: { ...original, ...values } },
 			} );
 
 		// 40×20 red PNG.
-		const imagePath = path.join( os.tmpdir(), 'cpdf-featured.png' );
+		const imagePath = path.join( os.tmpdir(), 'dinamiko-pdf-featured.png' );
 		fs.writeFileSync(
 			imagePath,
 			Buffer.from(
@@ -406,7 +406,7 @@ test.describe( 'PDF export', () => {
 				'**/modules/Export/build/index.js*',
 				( route ) => route.abort()
 			);
-			const article = browserPage.locator( '.cpdf-article' );
+			const article = browserPage.locator( '.dinamiko-pdf-article' );
 
 			// Defaults: title on, featured image off.
 			await browserPage.goto( printUrl( featuredPost.link ) );
@@ -414,7 +414,7 @@ test.describe( 'PDF export', () => {
 				article.locator( '.wp-block-post-title' )
 			).toHaveText( 'Featured Export' );
 			await expect(
-				article.locator( '.cpdf-featured-image' )
+				article.locator( '.dinamiko-pdf-featured-image' )
 			).toHaveCount( 0 );
 
 			await setSettings( {
@@ -426,7 +426,7 @@ test.describe( 'PDF export', () => {
 				article.locator( '.wp-block-post-title' )
 			).toHaveCount( 0 );
 			await expect(
-				article.locator( '.cpdf-featured-image img' )
+				article.locator( '.dinamiko-pdf-featured-image img' )
 			).toBeVisible();
 			await browserPage.unroute( '**/modules/Export/build/index.js*' );
 
@@ -453,7 +453,7 @@ test.describe( 'PDF export', () => {
 			( route ) => route.abort()
 		);
 		await browserPage.goto( printUrl( post.link ) );
-		const article = browserPage.locator( '.cpdf-article' );
+		const article = browserPage.locator( '.dinamiko-pdf-article' );
 		await expect( article.locator( '.entry-title' ) ).toHaveText(
 			'Blocks Export'
 		);
@@ -472,11 +472,11 @@ test.describe( 'PDF export', () => {
 		page: browserPage,
 		requestUtils,
 	} ) => {
-		// Block child theme with content-pdf/print-page.php and print-post-cpdf-hierarchy-post.php.
-		await requestUtils.activateTheme( 'cpdf-test-child' );
+		// Block child theme with dinamiko-pdf/print-page.php and print-post-dinamiko-pdf-hierarchy-post.php.
+		await requestUtils.activateTheme( 'dinamiko-pdf-test-child' );
 		const slugPost = await requestUtils.createPost( {
 			title: 'Hierarchy Post',
-			slug: 'cpdf-hierarchy-post',
+			slug: 'dinamiko-pdf-hierarchy-post',
 			content: BLOCK_CONTENT,
 			status: 'publish',
 		} );
@@ -486,7 +486,7 @@ test.describe( 'PDF export', () => {
 			( route ) => route.abort()
 		);
 		const marker = browserPage.locator(
-			'.cpdf-article .cpdf-test-template'
+			'.dinamiko-pdf-article .dinamiko-pdf-test-template'
 		);
 
 		// print-page.php matches every page.
@@ -496,14 +496,14 @@ test.describe( 'PDF export', () => {
 		// print-post-{slug}.php matches only that post.
 		await browserPage.goto( printUrl( slugPost.link ) );
 		await expect( marker ).toHaveText(
-			'print-post-cpdf-hierarchy-post.php'
+			'print-post-dinamiko-pdf-hierarchy-post.php'
 		);
 
 		// Other posts fall back to the plugin template.
 		await browserPage.goto( printUrl( post.link ) );
 		await expect( marker ).toHaveCount( 0 );
 		await expect(
-			browserPage.locator( '.cpdf-article .wp-block-post-title' )
+			browserPage.locator( '.dinamiko-pdf-article .wp-block-post-title' )
 		).toHaveText( 'Blocks Export' );
 		await browserPage.unroute( '**/modules/Export/build/index.js*' );
 
@@ -513,20 +513,20 @@ test.describe( 'PDF export', () => {
 		await expectPdfDownload( await downloadPromise, 'Shortcode-Page.pdf' );
 	} );
 
-	test( 'fonts from cpdf_fonts apply to headings and body text', async ( {
+	test( 'fonts from dinamiko_pdf_fonts apply to headings and body text', async ( {
 		page: browserPage,
 		requestUtils,
 	} ) => {
-		// The child theme registers "cpdf-test-font" (the Noto Sans Bold file) through cpdf_fonts.
-		await requestUtils.activateTheme( 'cpdf-test-child' );
-		const { cpdf_settings: original } = await requestUtils.rest( {
+		// The child theme registers "dinamiko-pdf-test-font" (the Noto Sans Bold file) through dinamiko_pdf_fonts.
+		await requestUtils.activateTheme( 'dinamiko-pdf-test-child' );
+		const { dinamiko_pdf_settings: original } = await requestUtils.rest( {
 			path: '/wp/v2/settings',
 		} );
 		await requestUtils.rest( {
 			path: '/wp/v2/settings',
 			method: 'POST',
 			data: {
-				cpdf_settings: { ...original, font_heading: 'cpdf-test-font' },
+				dinamiko_pdf_settings: { ...original, font_heading: 'dinamiko-pdf-test-font' },
 			},
 		} );
 
@@ -538,18 +538,18 @@ test.describe( 'PDF export', () => {
 			await browserPage.goto( printUrl( post.link ) );
 
 			const config = await browserPage.evaluate(
-				() => window.cpdfConfig
+				() => window.dinamikoPdfConfig
 			);
 			const heading = config.fonts.filter(
-				( font ) => font.family === 'cpdf-heading'
+				( font ) => font.family === 'dinamiko-pdf-heading'
 			);
 			expect( heading ).toHaveLength( 1 );
 			expect( heading[ 0 ].url ).toContain( 'NotoSans-Bold.ttf' );
 			expect( heading[ 0 ].weight ).toBe( 400 );
 			expect(
-				config.fonts.filter( ( font ) => font.family === 'cpdf-body' )
+				config.fonts.filter( ( font ) => font.family === 'dinamiko-pdf-body' )
 			).toHaveLength( 2 );
-			expect( config.regions.fontFamily ).toBe( 'cpdf-body' );
+			expect( config.regions.fontFamily ).toBe( 'dinamiko-pdf-body' );
 
 			const fontFamily = ( locator ) =>
 				locator.evaluate(
@@ -557,16 +557,16 @@ test.describe( 'PDF export', () => {
 						el.ownerDocument.defaultView.getComputedStyle( el )
 							.fontFamily
 				);
-			const article = browserPage.locator( '.cpdf-article' );
+			const article = browserPage.locator( '.dinamiko-pdf-article' );
 			expect(
 				await fontFamily( article.locator( 'h2' ).first() )
-			).toMatch( /^"?cpdf-heading"?/ );
+			).toMatch( /^"?dinamiko-pdf-heading"?/ );
 			expect(
 				await fontFamily( article.locator( '.wp-block-post-title' ) )
-			).toMatch( /^"?cpdf-heading"?/ );
+			).toMatch( /^"?dinamiko-pdf-heading"?/ );
 			expect(
 				await fontFamily( article.locator( 'p' ).first() )
-			).toMatch( /^"?cpdf-body"?/ );
+			).toMatch( /^"?dinamiko-pdf-body"?/ );
 			await browserPage.unroute( '**/modules/Export/build/index.js*' );
 
 			const downloadPromise = browserPage.waitForEvent( 'download' );
@@ -579,7 +579,7 @@ test.describe( 'PDF export', () => {
 			await requestUtils.rest( {
 				path: '/wp/v2/settings',
 				method: 'POST',
-				data: { cpdf_settings: original },
+				data: { dinamiko_pdf_settings: original },
 			} );
 			await requestUtils.activateTheme( 'twentytwentyfive' );
 		}
@@ -591,7 +591,7 @@ test.describe( 'PDF export', () => {
 		requestUtils,
 	} ) => {
 		const ttf = new URL(
-			'/wp-content/plugins/content-pdf/modules/Export/assets/fonts/NotoSans-Bold.ttf',
+			'/wp-content/plugins/dinamiko-pdf/modules/Export/assets/fonts/NotoSans-Bold.ttf',
 			post.link
 		).href;
 		const family = await requestUtils.rest( {
@@ -605,7 +605,7 @@ test.describe( 'PDF export', () => {
 				} ),
 			},
 		} );
-		const { cpdf_settings: original } = await requestUtils.rest( {
+		const { dinamiko_pdf_settings: original } = await requestUtils.rest( {
 			path: '/wp/v2/settings',
 		} );
 
@@ -626,7 +626,7 @@ test.describe( 'PDF export', () => {
 			// The settings page offers the family.
 			await admin.visitAdminPage(
 				'options-general.php',
-				'page=content-pdf'
+				'page=dinamiko-pdf'
 			);
 			await browserPage
 				.getByRole( 'combobox', { name: /PDF font/ } )
@@ -645,13 +645,13 @@ test.describe( 'PDF export', () => {
 			);
 			await browserPage.goto( printUrl( post.link ) );
 			const config = await browserPage.evaluate(
-				() => window.cpdfConfig
+				() => window.dinamikoPdfConfig
 			);
 			expect(
-				config.fonts.filter( ( font ) => font.family === 'cpdf-body' )
+				config.fonts.filter( ( font ) => font.family === 'dinamiko-pdf-body' )
 			).toEqual( [
 				{
-					family: 'cpdf-body',
+					family: 'dinamiko-pdf-body',
 					url: ttf,
 					weight: 400,
 					style: 'normal',
@@ -669,7 +669,7 @@ test.describe( 'PDF export', () => {
 			await requestUtils.rest( {
 				path: '/wp/v2/settings',
 				method: 'POST',
-				data: { cpdf_settings: original },
+				data: { dinamiko_pdf_settings: original },
 			} );
 			await requestUtils.rest( {
 				path: `/wp/v2/font-families/${ family.id }`,
@@ -693,9 +693,9 @@ test.describe( 'PDF export', () => {
 
 		// Without the password: no button, and the print URL shows the password form, not the content.
 		await browserPage.goto( protectedPost.link );
-		await expect( browserPage.locator( '.cpdf-button' ) ).toHaveCount( 0 );
+		await expect( browserPage.locator( '.dinamiko-pdf-button' ) ).toHaveCount( 0 );
 		await browserPage.goto( printUrl( protectedPost.link ) );
-		await expect( browserPage.locator( '.cpdf-article' ) ).toHaveCount( 0 );
+		await expect( browserPage.locator( '.dinamiko-pdf-article' ) ).toHaveCount( 0 );
 		await expect(
 			browserPage.locator( 'input[name="post_password"]' )
 		).toBeVisible();

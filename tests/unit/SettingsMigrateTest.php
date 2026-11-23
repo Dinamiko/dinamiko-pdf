@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Tests\Unit;
+namespace Dinamiko\DinamikoPdf\Tests\Unit;
 
-use Dinamiko\ContentPdf\Settings\Settings;
+use Dinamiko\DinamikoPdf\Settings\Settings;
 use PHPUnit\Framework\TestCase;
 
 class SettingsMigrateTest extends TestCase {

@@ -1,13 +1,13 @@
 <?php
 /**
- * Settings → Content PDF admin page.
+ * Settings → Dinamiko PDF admin page.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Settings;
+namespace Dinamiko\DinamikoPdf\Settings;
 
 use Inpsyde\Modularity\Properties\Properties;
 
@@ -17,11 +17,11 @@ use Inpsyde\Modularity\Properties\Properties;
  */
 class SettingsPage {
 
-	private const PAGE      = 'content-pdf';
-	private const HOOK      = 'settings_page_content-pdf';
-	private const HANDLE    = 'cpdf-settings';
+	private const PAGE      = 'dinamiko-pdf';
+	private const HOOK      = 'settings_page_dinamiko-pdf';
+	private const HANDLE    = 'dinamiko-pdf-settings';
 	private const BUILD_DIR = 'modules/Settings/build/';
-	private const ROOT_ID   = 'cpdf-settings-root';
+	private const ROOT_ID   = 'dinamiko-pdf-settings-root';
 
 	/**
 	 * Constructor.
@@ -42,8 +42,8 @@ class SettingsPage {
 	 */
 	public function add_page(): void {
 		add_options_page(
-			__( 'Content PDF', 'content-pdf' ),
-			__( 'Content PDF', 'content-pdf' ),
+			__( 'Dinamiko PDF', 'dinamiko-pdf' ),
+			__( 'Dinamiko PDF', 'dinamiko-pdf' ),
 			'manage_options',
 			self::PAGE,
 			[ $this, 'render_page' ]
@@ -129,10 +129,10 @@ class SettingsPage {
 			$asset['version'],
 			[ 'in_footer' => true ]
 		);
-		wp_set_script_translations( self::HANDLE, 'content-pdf' );
+		wp_set_script_translations( self::HANDLE, 'dinamiko-pdf' );
 		wp_add_inline_script(
 			self::HANDLE,
-			'window.cpdfSettings = ' . wp_json_encode( $this->bootstrap() ) . ';',
+			'window.dinamikoPdfSettings = ' . wp_json_encode( $this->bootstrap() ) . ';',
 			'before'
 		);
 	}

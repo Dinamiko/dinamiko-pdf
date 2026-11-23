@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Tests\Unit;
+namespace Dinamiko\DinamikoPdf\Tests\Unit;
 
-use Dinamiko\ContentPdf\Settings\Geometry;
+use Dinamiko\DinamikoPdf\Settings\Geometry;
 use PHPUnit\Framework\TestCase;
 
 class GeometryTest extends TestCase {

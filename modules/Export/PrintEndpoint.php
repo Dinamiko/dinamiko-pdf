@@ -1,17 +1,17 @@
 <?php
 /**
- * The content-only print page at ?cpdf_print=1.
+ * The content-only print page at ?dinamiko_pdf_print=1.
  *
- * @package Dinamiko\ContentPdf
+ * @package Dinamiko\DinamikoPdf
  */
 
 declare( strict_types=1 );
 
-namespace Dinamiko\ContentPdf\Export;
+namespace Dinamiko\DinamikoPdf\Export;
 
-use Dinamiko\ContentPdf\Export\Engine\Engine;
-use Dinamiko\ContentPdf\Settings\Fonts;
-use Dinamiko\ContentPdf\Settings\Settings;
+use Dinamiko\DinamikoPdf\Export\Engine\Engine;
+use Dinamiko\DinamikoPdf\Settings\Fonts;
+use Dinamiko\DinamikoPdf\Settings\Settings;
 use Inpsyde\Modularity\Properties\Properties;
 use WP_Post;
 
@@ -21,13 +21,13 @@ use WP_Post;
  */
 class PrintEndpoint {
 
-	public const QUERY_VAR = 'cpdf_print';
+	public const QUERY_VAR = 'dinamiko_pdf_print';
 
 	/**
 	 * CSS families of the body and heading fonts on the print page.
 	 */
-	public const FONT_BODY    = 'cpdf-body';
-	public const FONT_HEADING = 'cpdf-heading';
+	public const FONT_BODY    = 'dinamiko-pdf-body';
+	public const FONT_HEADING = 'dinamiko-pdf-heading';
 
 	/**
 	 * True while the print page is being rendered.
@@ -142,7 +142,7 @@ class PrintEndpoint {
 		 * @param bool    $show Default from the `show_title` setting.
 		 * @param WP_Post $post Post being exported.
 		 */
-		$show_title = (bool) apply_filters( 'cpdf_show_title', (bool) $settings['show_title'], $post );
+		$show_title = (bool) apply_filters( 'dinamiko_pdf_show_title', (bool) $settings['show_title'], $post );
 
 		/**
 		 * Whether the print page shows the featured image above the content.
@@ -150,10 +150,10 @@ class PrintEndpoint {
 		 * @param bool    $show Default from the `show_featured_image` setting.
 		 * @param WP_Post $post Post being exported.
 		 */
-		$show_featured_image = (bool) apply_filters( 'cpdf_show_featured_image', (bool) $settings['show_featured_image'], $post );
+		$show_featured_image = (bool) apply_filters( 'dinamiko_pdf_show_featured_image', (bool) $settings['show_featured_image'], $post );
 		$featured_image      = $show_featured_image && has_post_thumbnail( $post ) ? get_the_post_thumbnail( $post, 'large' ) : '';
 
-		$body_classes = [ 'cpdf-print' ];
+		$body_classes = [ 'dinamiko-pdf-print' ];
 
 		/**
 		 * Keep the theme's page background instead of white paper.
@@ -161,8 +161,8 @@ class PrintEndpoint {
 		 * @param bool    $keep Default false.
 		 * @param WP_Post $post Post being exported.
 		 */
-		if ( apply_filters( 'cpdf_keep_theme_background', false, $post ) ) {
-			$body_classes[] = 'cpdf-theme-background';
+		if ( apply_filters( 'dinamiko_pdf_keep_theme_background', false, $post ) ) {
+			$body_classes[] = 'dinamiko-pdf-theme-background';
 		}
 
 		$template = locate_template( $this->template_candidates( $post ) );
@@ -174,7 +174,7 @@ class PrintEndpoint {
 		 * @param WP_Post $post     Post being exported.
 		 */
 		$template = (string) apply_filters(
-			'cpdf_print_template',
+			'dinamiko_pdf_print_template',
 			$template ? $template : __DIR__ . '/templates/print.php',
 			$post
 		);
@@ -185,7 +185,7 @@ class PrintEndpoint {
 
 	/**
 	 * Theme template names for the print page (or its header/footer), most specific first:
-	 * content-pdf/{name}-{post_type}-{slug}.php, {name}-{post_type}-{id}.php,
+	 * dinamiko-pdf/{name}-{post_type}-{slug}.php, {name}-{post_type}-{id}.php,
 	 * {name}-{post_type}.php, {name}.php.
 	 *
 	 * @param WP_Post $post Post being exported.
@@ -204,7 +204,7 @@ class PrintEndpoint {
 		 */
 		return array_values(
 			array_filter(
-				(array) apply_filters( 'cpdf_print_template_hierarchy', $candidates, $post, $name ),
+				(array) apply_filters( 'dinamiko_pdf_print_template_hierarchy', $candidates, $post, $name ),
 				'is_string'
 			)
 		);
@@ -226,10 +226,10 @@ class PrintEndpoint {
 
 		// Slot style defaults from the settings; templates and theme CSS can override them.
 		printf(
-			'<div class="cpdf-regions" aria-hidden="true" style="%s">',
+			'<div class="dinamiko-pdf-regions" aria-hidden="true" style="%s">',
 			esc_attr(
 				sprintf(
-					'--cpdf-header-font-size:%dpx;--cpdf-footer-font-size:%dpx;--cpdf-region-color:%s',
+					'--dinamiko-pdf-header-font-size:%dpx;--dinamiko-pdf-footer-font-size:%dpx;--dinamiko-pdf-region-color:%s',
 					(int) $settings['header_font_size'],
 					(int) $settings['footer_font_size'],
 					(string) $settings['hf_color']
@@ -253,7 +253,7 @@ class PrintEndpoint {
 			 * @param WP_Post $post     Post being exported.
 			 */
 			$template = (string) apply_filters(
-				'cpdf_region_template',
+				'dinamiko_pdf_region_template',
 				$template ? $template : __DIR__ . '/templates/' . $region . '.php',
 				$region,
 				$post
@@ -296,7 +296,7 @@ class PrintEndpoint {
 		 * @param WP_Post               $post   Post being exported.
 		 */
 		return (array) apply_filters(
-			'cpdf_placeholder_values',
+			'dinamiko_pdf_placeholder_values',
 			[
 				'title' => $decode( get_the_title( $post ) ),
 				'site'  => $decode( (string) get_bloginfo( 'name' ) ),
@@ -376,8 +376,8 @@ class PrintEndpoint {
 		$headings = ':is(h1,h2,h3,h4,h5,h6)';
 
 		return $css . sprintf(
-			'.cpdf-article,.cpdf-article *{font-family:"%1$s",sans-serif!important}'
-			. '.cpdf-article %3$s,.cpdf-article %3$s *{font-family:"%2$s","%1$s",sans-serif!important}',
+			'.dinamiko-pdf-article,.dinamiko-pdf-article *{font-family:"%1$s",sans-serif!important}'
+			. '.dinamiko-pdf-article %3$s,.dinamiko-pdf-article %3$s *{font-family:"%2$s","%1$s",sans-serif!important}',
 			self::FONT_BODY,
 			self::FONT_HEADING,
 			$headings
@@ -400,7 +400,7 @@ class PrintEndpoint {
 		// The file time busts browser caches when the CSS changes without a version bump.
 		$css_file = $this->properties->basePath() . 'modules/Export/assets/css/print.css';
 		wp_enqueue_style(
-			'cpdf-print',
+			'dinamiko-pdf-print',
 			$base_url . 'modules/Export/assets/css/print.css',
 			[],
 			$this->properties->version() . ( is_readable( $css_file ) ? '.' . filemtime( $css_file ) : '' )
@@ -412,9 +412,9 @@ class PrintEndpoint {
 		 * @param string[] $selectors CSS selectors.
 		 */
 		$hidden = apply_filters(
-			'cpdf_hidden_selectors',
+			'dinamiko_pdf_hidden_selectors',
 			[
-				'.cpdf-button',
+				'.dinamiko-pdf-button',
 				'.sharedaddy',
 				'.sd-sharing-enabled',
 				'.jp-relatedposts',
@@ -431,14 +431,14 @@ class PrintEndpoint {
 		);
 		$hidden = array_filter( array_map( 'wp_strip_all_tags', (array) $hidden ) );
 		if ( $hidden ) {
-			wp_add_inline_style( 'cpdf-print', implode( ',', $hidden ) . '{display:none!important}' );
+			wp_add_inline_style( 'dinamiko-pdf-print', implode( ',', $hidden ) . '{display:none!important}' );
 		}
 
 		$fonts = $this->print_fonts( $settings );
-		wp_add_inline_style( 'cpdf-print', $this->font_css( $fonts ) );
+		wp_add_inline_style( 'dinamiko-pdf-print', $this->font_css( $fonts ) );
 
 		wp_add_inline_style(
-			'cpdf-print',
+			'dinamiko-pdf-print',
 			sprintf(
 				'@page{size:%1$s;margin:%2$spt}',
 				'letter' === $geometry['format'] ? 'letter' : 'A4',
@@ -451,7 +451,7 @@ class PrintEndpoint {
 		$filename = sanitize_file_name( $title );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view.
-		$mode = isset( $_GET['cpdf_mode'] ) ? sanitize_key( wp_unslash( $_GET['cpdf_mode'] ) ) : '';
+		$mode = isset( $_GET['dinamiko_pdf_mode'] ) ? sanitize_key( wp_unslash( $_GET['dinamiko_pdf_mode'] ) ) : '';
 
 		$config = [
 			'format'         => $geometry['format'],
@@ -488,12 +488,12 @@ class PrintEndpoint {
 				)
 			),
 			'i18n'           => [
-				'preparing' => __( 'Preparing PDF…', 'content-pdf' ),
+				'preparing' => __( 'Preparing PDF…', 'dinamiko-pdf' ),
 				/* translators: 1: current page, 2: total pages */
-				'rendering' => __( 'Rendering page %1$d of %2$d…', 'content-pdf' ),
-				'done'      => __( 'PDF downloaded.', 'content-pdf' ),
-				'failed'    => __( 'PDF export failed — opening the print dialog instead.', 'content-pdf' ),
-				'download'  => __( 'Download PDF', 'content-pdf' ),
+				'rendering' => __( 'Rendering page %1$d of %2$d…', 'dinamiko-pdf' ),
+				'done'      => __( 'PDF downloaded.', 'dinamiko-pdf' ),
+				'failed'    => __( 'PDF export failed — opening the print dialog instead.', 'dinamiko-pdf' ),
+				'download'  => __( 'Download PDF', 'dinamiko-pdf' ),
 			],
 		];
 
@@ -503,14 +503,14 @@ class PrintEndpoint {
 		 * @param array   $config Config.
 		 * @param WP_Post $post   Post being exported.
 		 */
-		$config = (array) apply_filters( 'cpdf_export_config', $config, $post );
+		$config = (array) apply_filters( 'dinamiko_pdf_export_config', $config, $post );
 
 		/**
 		 * Filters the PDF engine.
 		 *
 		 * @param Engine $engine Engine instance.
 		 */
-		$engine = apply_filters( 'cpdf_engine', $this->engine );
+		$engine = apply_filters( 'dinamiko_pdf_engine', $this->engine );
 		if ( ! $engine instanceof Engine ) {
 			$engine = $this->engine;
 		}
@@ -518,12 +518,12 @@ class PrintEndpoint {
 
 		/**
 		 * Fires after the print page assets are enqueued. Compatibility modules add CSS/JS here,
-		 * e.g. a script that registers `window.cpdfHooks.beforeExport` functions.
+		 * e.g. a script that registers `window.dinamikoPdfHooks.beforeExport` functions.
 		 *
 		 * @param WP_Post $post   Post being exported.
 		 * @param array   $config Export config.
 		 */
-		do_action( 'cpdf_print_enqueue', $post, $config );
+		do_action( 'dinamiko_pdf_print_enqueue', $post, $config );
 	}
 
 	/**
@@ -549,7 +549,7 @@ class PrintEndpoint {
 		 *
 		 * @param string[] $handles Handles.
 		 */
-		foreach ( (array) apply_filters( 'cpdf_dequeue_scripts', array_unique( $handles ) ) as $handle ) {
+		foreach ( (array) apply_filters( 'dinamiko_pdf_dequeue_scripts', array_unique( $handles ) ) as $handle ) {
 			wp_dequeue_script( $handle );
 		}
 	}
