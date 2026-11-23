@@ -688,7 +688,7 @@ test.describe( 'PDF export', () => {
 			title: 'Protected Export',
 			content: `<!-- wp:paragraph --><p>${ secret }</p><!-- /wp:paragraph -->`,
 			status: 'publish',
-			password: 'cpdf',
+			password: 'dinamiko-pdf',
 		} );
 
 		// Without the password: no button, and the print URL shows the password form, not the content.
@@ -705,7 +705,7 @@ test.describe( 'PDF export', () => {
 		await browserPage.goto( protectedPost.link );
 		await browserPage
 			.locator( 'input[name="post_password"]' )
-			.fill( 'cpdf' );
+			.fill( 'dinamiko-pdf' );
 		await browserPage
 			.locator( 'input[name="post_password"]' )
 			.press( 'Enter' );

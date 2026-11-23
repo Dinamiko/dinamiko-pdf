@@ -10,7 +10,7 @@ Run everything here before a release. The automated suites need the local WordPr
 | JS build | `npm run build` | The committed `modules/*/build/` must not change afterwards (`git status`). |
 | Unit tests | `npm run test:php` | `Geometry`, `Placeholders`, settings schema and migration, `TemplateHierarchy`. |
 | End-to-end tests | `npm run test:e2e` | Button, shortcode and PDF Button block, print page in block and classic themes, download and view modes, page breaks, title/featured image settings, template hierarchy, password-protected posts, settings REST validation. |
-| Plugin Check | see [Release](release.md#2-plugin-check) | wordpress.org requirements, on the release zip. |
+| Plugin Check | `npm run dist`, then `mkdir -p dist/check && unzip -qo dist/dinamiko-pdf.zip -d dist/check && npm run wp-env run cli -- wp plugin check /var/www/html/wp-content/plugins/dinamiko-pdf/dist/check/dinamiko-pdf` | wordpress.org requirements, on the release zip (not the working copy, which has dev files). Expected: "Checks complete. No errors found." |
 
 Run `npm run build` before the e2e tests if the JS changed, because the tests load `build/`. To run a single test: `npm run test:e2e -- tests/e2e/specs/export.spec.js -g "classic theme"`.
 

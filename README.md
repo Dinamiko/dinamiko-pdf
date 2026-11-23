@@ -18,7 +18,6 @@ A WordPress plugin that lets visitors download any post, page or custom post typ
 - [Developer guide](docs/developer-guide.md): templates, hooks, add-ons
 - [Known limitations](docs/limitations.md)
 - [Testing](docs/testing.md)
-- [Releasing to wordpress.org](docs/release.md)
 
 ## Quick start (development)
 
